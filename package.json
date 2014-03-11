@@ -1,0 +1,14 @@
+{
+"name": "cloudsim_k",
+"version": "0.0.1",
+"description": "CloudSim kiosk",
+"dependencies": {
+"socket.io": "~0.9.6",
+"mime": "~1.2.7",
+"express": "*",
+"mongoose": "*",
+"mocha": "*",
+"mocha-jenkins-reporter": "*"
+}
+}
+
