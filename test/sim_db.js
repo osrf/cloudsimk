@@ -63,7 +63,7 @@ describe('sim_db', function(){
       // while history went from 0 to 1
       describe('one sim', function(){
 	 
-       it('should have a single sim', function(done) {
+        it('should have a single sim', function(done) {
             console.log('one sim');
             var my_db = new db.sim_db(db_user);
             var sim_id;
@@ -78,26 +78,52 @@ describe('sim_db', function(){
                 console.log("new sim id: " + sim_id);  
                 my_db.get_running_simulations(function(err, results){
                     var count = results.length;
-		        console.log("Found " + count + " results");
-		        assert.equal(count, 1);
+		            console.log("Found " + count + " results");
+		            assert.equal(count, 1);
+                    
+                    // terminate the sim
+	                my_db.change_state(sim_id, "terminated", function(err, changed_sim){
+                    console.log("terminated sim: " + changed_sim);
+                    // no more running sims
+                    my_db.get_running_simulations(function(err, results){
+                        console.log("remaining sims: " + results)
+                        assert.equal(results.length, 0);
+                        // history has 1 sim
+                        my_db.get_history(function(err, results){
+                            console.log("err: " + err);
+                            //console.log(type(results));
+                            console.log("history count: " + results.length);
+                            console.log("HISTORY: " + results);
+                            assert.equal(results.length, 1);
+                            done();
+                        });     
+                    });
                 });
- 
-           // terminate the sim
-	       my_db.change_state(sim_id, "terminated", function(err, changed_sim){
-                   console.log("changed sim: " + changed_sim);
-                   // no more running sims
-                   my_db.get_running_simulations(function(err, results){
-                       console.log("remaining sims: " + results)
-                       assert.equal(results.length, 0);
-                       // history has 1 sim
-                       my_db.get_history(function(err, results){
-                           assert.equal(results.length, 1);
-                           done();
-                       });     
-                   });
-               });
+             });
            });
         });
-    });
+
+        // create a sim, change the simulation world        
+        describe('change the word', function(){
+            it('should be possible to change the world', function(done) {
+                var my_db = new db.sim_db(db_user);
+                
+                my_db.create_sim("initial_world", "region", function(err, sim){
+                    if(err){
+                        console.log("error: " + err);
+                        assert(0==1);
+                    }
+                    
+                    my_db.change_world(sim.sim_id, "new_world", function(err, sim){
+                        assert.equal(sim.world, "new_world");
+                        done();
+                    });
+                });
+            });
+        });
+
+});    
+
+
 });
 
