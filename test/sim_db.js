@@ -122,6 +122,27 @@ describe('sim_db', function(){
             });
         });
 
+        // add a sim, terminate and remove the evidence...
+        // and then check for an empty history 
+        describe('delete history', function(){
+            it('history can be deleted', function(done){
+                var my_db = new db.sim_db(db_user);
+                my_db.create_sim("will not exist", "past", function(err, sim){
+                         console.log("soon rip :" + sim.sim_id); 
+                         my_db.change_state(sim.sim_id, "terminated", function(err, old_sim){
+                         my_db.remove_from_history(sim.sim_id, function(err, dead_sim) {
+                             my_db.get_history(function(err, results){
+                                 console.log("history: " + results);
+                                 console.log("count: " + results.length);
+                                 assert.equal(results.length, 0);
+                                 done();
+                             });
+                         });
+                    });
+                });
+            });
+	});
+    
 });    
 
 
