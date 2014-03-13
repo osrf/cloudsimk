@@ -8,7 +8,8 @@
 "express": "*",
 "mongoose": "*",
 "mocha": "*",
-"mocha-jenkins-reporter": "*"
+"mocha-jenkins-reporter": "*",
+"jslint": "*"
 }
 }
 
