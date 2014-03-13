@@ -93,7 +93,7 @@ function del(req, res)
     var my_db = get_db(req);
     var id = req.params.id;
     
-    my_db.change_state(id, "terminated", function(err, changed_sim){     
+    my_db.terminate_sim(id, function(err, changed_sim){     
         res.json(changed_sim);
     });
 }

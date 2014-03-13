@@ -1,3 +1,6 @@
+"use strict;"
+
+
 var db = require('../lib/sim_db');
 var db_name = "db_" + process.argv[2];
 
@@ -5,8 +8,7 @@ var db_name = "db_" + process.argv[2];
 // internal function that
 // returns a database connection
 // for the logged on user
-function get_db(req)
-{
+function get_db(req){
     var user = "test_user";
     console.log("GETDB: " + req);
     var my_db = new db.sim_db(user);

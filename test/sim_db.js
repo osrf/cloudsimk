@@ -82,7 +82,7 @@ describe('sim_db', function(){
 		            assert.equal(count, 1);
                     
                     // terminate the sim
-	                my_db.change_state(sim_id, "terminated", function(err, changed_sim){
+	                my_db.terminate_sim(sim_id, function (err, changed_sim) {
                     console.log("terminated sim: " + changed_sim);
                     // no more running sims
                     my_db.get_running_simulations(function(err, results){
@@ -129,7 +129,7 @@ describe('sim_db', function(){
                 var my_db = new db.sim_db(db_user);
                 my_db.create_sim("will not exist", "past", function(err, sim){
                          console.log("soon rip :" + sim.sim_id); 
-                         my_db.change_state(sim.sim_id, "terminated", function(err, old_sim){
+                         my_db.terminate_sim(sim.sim_id, function (err, old_sim) {
                          my_db.remove_from_history(sim.sim_id, function(err, dead_sim) {
                              my_db.get_history(function(err, results){
                                  console.log("history: " + results);
@@ -141,10 +141,7 @@ describe('sim_db', function(){
                     });
                 });
             });
-	});
-    
-});    
-
-
+	    });
+    });
 });
 
