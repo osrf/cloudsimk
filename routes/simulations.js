@@ -21,6 +21,8 @@ curl -u testUser:testPass http://localhost:3000/api/history
 
 */
 
+'use strict';
+
 var path = require('path');
 var mime = require('mime');
 var fs = require('fs');
@@ -32,18 +34,16 @@ console.log("Database name:  " + db_name);
 db.connect(db_name);
 
 // clear the database if instructed
-if (process.argv[3] == "--clear_db")
-{
-    db.clear_db(function(){});
+if (process.argv[3] === "--clear_db") {
+    db.clear_db(function () {});
 }
 
 // internal function that
 // returns a database connection
 // for the logged on user
-function get_db(req)
-{
-    var user = "test_user";
-    var my_db = new db.sim_db(user);
+function get_db(req) {
+    var user = "test_user",
+        my_db = new db.sim_db(user);
     return my_db;
 }
 
@@ -52,7 +52,7 @@ function get_db(req)
 function read(req, res)
 {
     var my_db = get_db(req); 
-    my_db.get_running_simulations(function(err, sims){
+    my_db.get_running_simulations(function (err, sims) {
         console.log("results: " + list.length);
         res.json(sims);
     });
@@ -64,7 +64,7 @@ function read(req, res)
 function create(req, res)
 {
    var my_db = get_db(req);
-   my_db.create_sim(req.body["world"], req.body["region"], function(err, sim){
+   my_db.create_sim(req.body["world"], req.body["region"], function (err, sim) {
        res.json(sim);
    });
 }
@@ -79,8 +79,7 @@ function update(req, res)
     var world = data["world"];    
     var my_db = get_db(req);    
 
-    my_db.change_world(id, world, function(err, sim) 
-    {
+    my_db.change_world(id, world, function (err, sim) {
         res.json(sim);
     });
 }   
@@ -93,7 +92,7 @@ function del(req, res)
     var my_db = get_db(req);
     var id = req.params.id;
     
-    my_db.terminate_sim(id, function(err, changed_sim){     
+    my_db.terminate_sim(id, function (err, changed_sim) {     
         res.json(changed_sim);
     });
 }
