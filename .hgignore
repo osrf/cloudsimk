@@ -1,0 +1,12 @@
+syntax: glob
+node_modules
+report.xml
+.bower-cache
+.DS_Store
+.nodemonignore
+.sass-cache
+.bower-*
+.idea
+public/lib
+test/coverage
+mean.iml
