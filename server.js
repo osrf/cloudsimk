@@ -56,6 +56,7 @@ var walk = function(path) {
         var newPath = path + '/' + file;
         var stat = fs.statSync(newPath);
         if (stat.isFile()) {
+            console.log('## loading: ' + newPath);
             if (/(.*)\.(js$|coffee$)/.test(file)) {
                 require(newPath)(app, passport);
             }
