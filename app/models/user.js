@@ -21,7 +21,12 @@ var UserSchema = new Schema({
         unique: true
     },
     
-    sim_id: String,
+    // the index for the next simulation
+    // for this user
+    next_sim_id: {
+	type: Number,
+	unique: true
+    },}
 
     hashed_password: String,
     provider: String,
