@@ -21,7 +21,10 @@ var UserSchema = new Schema({
         unique: true
     },
     
-    next_sim_id: Number,
+    next_sim_id: {
+        type: Number,
+        default: 0
+    },
 
     hashed_password: String,
     provider: String,

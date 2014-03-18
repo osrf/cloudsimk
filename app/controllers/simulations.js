@@ -27,6 +27,8 @@ exports.create = function(req, res) {
     var Simulation = new Simulation(req.body);
     Simulation.user = req.user;
 
+    console.log('#$@$@# create sim for user: ' + req.user);
+
     Simulation.save(function(err) {
         if (err) {
             return res.send('users/signup', {
