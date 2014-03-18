@@ -24,7 +24,7 @@ var SimulationSchema = new Schema({
     
     // human readable simulation id (starts at 0)
     sim_id: {
-        type: String, // number
+        type: Number, // number
         default: 0
     },
 
