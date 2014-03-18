@@ -23,7 +23,7 @@ var mongoose = require('mongoose'),
 exports.Simulation = function(req, res, next, id) {
     /* Load a simulation model based on the given id */
     Simulation.load(id, function(err, simulation) {
-        /* WHAT DOES THIS LINE DO? */
+        /* in case of error, hand it over to the next middleware */
         if (err) return next(err);
 
         /* If a simulation instance was not found, then return an error */
@@ -31,8 +31,11 @@ exports.Simulation = function(req, res, next, id) {
             return next(new Error('Failed to load simulation ' + id));
         }
 
-        /* WHAT DO THESE TWO LINES DO? */
+        /* add the new simulation to the request object
+         * for future reference
+        */
         req.simulation = simulation;
+        /* hand over control to the next middleware */
         next();
     });
 };
@@ -76,6 +79,10 @@ exports.update = function(req, res) {
     /* Get the simulation from the request */
     var simulation = req.simulation;
 
+    /* use the lodash library to populate each
+     * simulation attribute with the values in the
+     * request body 
+     */
     simulation = _.extend(Simulation, req.body);
 
     /* Save the updated simulation to the database */
