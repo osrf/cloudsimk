@@ -1,4 +1,8 @@
 'use strict';
+/**
+ * @module simulation_controller
+ * Server side simulation controller.
+ */
 
 /**
  * Module dependencies.
@@ -10,107 +14,150 @@ var mongoose = require('mongoose'),
 
 /**
  * Find Simulation by id
+ * @param[in] req Nodejs request object.
+ * @param[out] res Nodejs response object.
+ * @param[in] next The next Nodejs function to be executed.
+ * @param[in] id ID of the simulation instance to retrieve. 
+ * @return Simulation instance retrieval function.
  */
 exports.Simulation = function(req, res, next, id) {
-    Simulation.load(id, function(err, Simulation) {
+    /* Load a simulation model based on the given id */
+    Simulation.load(id, function(err, simulation) {
+        /* WHAT DOES THIS LINE DO? */
         if (err) return next(err);
-        if (!Simulation) return next(new Error('Failed to load Simulation ' + id));
-        req.Simulation = Simulation;
+
+        /* If a simulation instance was not found, then return an error */
+        if (!simulation) {
+            return next(new Error('Failed to load simulation ' + id));
+        }
+
+        /* WHAT DO THESE TWO LINES DO? */
+        req.simulation = simulation;
         next();
     });
 };
 
 /**
- * Create an Simulation
+ * Create a simulation
+ * @param[in] req Nodejs request object.
+ * @param[out] res Nodejs response object.
+ * @return Simulation create function.
  */
 exports.create = function(req, res) {
-    var Simulation = new Simulation(req.body);
-    Simulation.user = req.user;
 
-    Simulation.save(function(err) {
+    /* Create a new simulation instance based on the content of the
+     * request */
+    var simulation = new Simulation(req.body);
+
+    /* Set the simulation user */
+    simulation.user = req.user;
+
+    /* Save the simulation instance to the database */
+    simulation.save(function(err) {
         if (err) {
             return res.send('users/signup', {
                 errors: err.errors,
-                Simulation: Simulation
+                Simulation: simulation
             });
         } else {
-            res.jsonp(Simulation);
+            res.jsonp(simulation);
         }
     });
 };
 
 /**
- * Update a Simulation
+ * Update a simulation
+ * @param[in] req Nodejs request object.
+ * @param[out] res Nodejs response object
+ * @return Simulation update function.
  */
 exports.update = function(req, res) {
-    var Simulation = req.Simulation;
 
-    Simulation = _.extend(Simulation, req.body);
+    /* Get the simulation from the request */
+    var simulation = req.simulation;
 
-    Simulation.save(function(err) {
+    simulation = _.extend(Simulation, req.body);
+
+    /* Save the updated simulation to the database */
+    simulation.save(function(err) {
         if (err) {
             return res.send('users/signup', {
                 errors: err.errors,
-                Simulation: Simulation
+                Simulation: simulation
             });
         } else {
-            res.jsonp(Simulation);
+            res.jsonp(simulation);
         }
     });
 };
 
 /**
- * Delete an Simulation
+ * Delete a simulation
+ * @param[in] req Nodejs request object.
+ * @param[out] res Nodejs response object.
+ * @return Destroy function
  */
 exports.destroy = function(req, res) {
-    var Simulation = req.Simulation;
 
-    Simulation.remove(function(err) {
+    /* Get the simulation model */
+    var simulation = req.simulation;
+
+    /* Remove the simulation model from the database */
+    /* TODO: We need to check to make sure the simulation instance has been
+     * terminated */
+    simulation.remove(function(err) {
         if (err) {
             return res.send('users/signup', {
                 errors: err.errors,
-                Simulation: Simulation
+                Simulation: simulation
             });
         } else {
-            res.jsonp(Simulation);
+            res.jsonp(simulation);
         }
     });
 };
 
 /**
- * Show an Simulation
+ * Show an simulation.
+ * @param[in] req Nodejs request object.
+ * @param[out] res Nodejs response object.
  */
 exports.show = function(req, res) {
-    res.jsonp(req.Simulation);
+    res.jsonp(req.simulation);
 };
 
 /**
- * List of Simulations
+ * List of simulations for a user.
+ * @param[in] req Nodejs request object.
+ * @param[out] res Nodejs response object.
+ * @return Function to get all simulation instances for a user.
  */
 exports.all = function(req, res) {
-    Simulation.find().sort('-created').populate('user', 'name username').exec(function(err, Simulations) {
+    /* Get all simulation models, in creation order, for a user */
+    Simulation.find().sort('-created').populate('user', 'name username')
+      .exec(function(err, simulations) {
         if (err) {
             res.render('error', {
                 status: 500
             });
         } else {
-            res.jsonp(Simulations);
+            res.jsonp(simulations);
         }
     });
 };
 
 /**
- * List of Simulations
+ * List of simulations
  */
 exports.history = function(req, res) {
-    Simulation.find().sort('-created').populate('user', 'name username').exec(function(err, Simulations) {
+    Simulation.find().sort('-created').populate('user', 'name username')
+      .exec(function(err, simulations) {
         if (err) {
             res.render('error', {
                 status: 500
             });
         } else {
-            res.jsonp(Simulations);
+            res.jsonp(simulations);
         }
     });
 };
-

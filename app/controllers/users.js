@@ -1,4 +1,9 @@
 'use strict';
+/**
+ * @module users_controller
+ * Server side users controller
+ */
+
 
 /**
  * Module dependencies.
@@ -7,7 +12,10 @@ var mongoose = require('mongoose'),
     User = mongoose.model('User');
 
 /**
- * Auth callback
+ * Authentication callback
+ * @param[in] req Nodejs request object.
+ * @param[out] res Nodejs response object.
+ * @return Authentication callback.
  */
 exports.authCallback = function(req, res) {
     res.redirect('/');
@@ -15,6 +23,8 @@ exports.authCallback = function(req, res) {
 
 /**
  * Show login form
+ * @param[in] req Nodejs request object.
+ * @param[out] res Nodejs response object.
  */
 exports.signin = function(req, res) {
     res.render('users/signin', {
@@ -25,6 +35,8 @@ exports.signin = function(req, res) {
 
 /**
  * Show sign up form
+ * @param[in] req Nodejs request object.
+ * @param[out] res Nodejs response object.
  */
 exports.signup = function(req, res) {
     res.render('users/signup', {
@@ -35,6 +47,8 @@ exports.signup = function(req, res) {
 
 /**
  * Logout
+ * @param[in] req Nodejs request object.
+ * @param[out] res Nodejs response object.
  */
 exports.signout = function(req, res) {
     req.logout();
@@ -43,6 +57,8 @@ exports.signout = function(req, res) {
 
 /**
  * Session
+ * @param[in] req Nodejs request object.
+ * @param[out] res Nodejs response object.
  */
 exports.session = function(req, res) {
     res.redirect('/');
@@ -50,12 +66,19 @@ exports.session = function(req, res) {
 
 /**
  * Create user
+ * @param[in] req Nodejs request object.
+ * @param[out] res Nodejs response object.
+ * @param[in] next The next Nodejs function to be executed.
+ * @return Function to create a user.
  */
 exports.create = function(req, res, next) {
+    /* Create a new user based on the value in the request object */
     var user = new User(req.body);
     var message = null;
 
     user.provider = 'local';
+
+    /* Save the user to the database */
     user.save(function(err) {
         if (err) {
             switch (err.code) {
@@ -81,6 +104,8 @@ exports.create = function(req, res, next) {
 
 /**
  * Send User
+ * @param[in] req Nodejs request object.
+ * @param[out] res Nodejs response object.
  */
 exports.me = function(req, res) {
     res.jsonp(req.user || null);
@@ -88,10 +113,13 @@ exports.me = function(req, res) {
 
 /**
  * Find user by id
- */
+ * @param[in] req Nodejs request object.
+ * @param[out] res Nodejs response object.
+ * @param[in] next The next Nodejs function to be executed.
+ * @param[in] id The id of the user to retrieve.
+*/
 exports.user = function(req, res, next, id) {
-    User
-        .findOne({
+    User.findOne({
             _id: id
         })
         .exec(function(err, user) {

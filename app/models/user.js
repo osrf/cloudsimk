@@ -11,25 +11,45 @@ var mongoose = require('mongoose'),
  * User Schema
  */
 var UserSchema = new Schema({
+    /* Name of the user */
     name: {
         type: String,
         required: true
     },
+    /* User's email address. */
     email: String,
+
+    /* User's username. */
     username: {
         type: String,
         unique: true
     },
-    
+   
+    /* The ID of the next simulation instance the user will run */
     next_sim_id: Number,
 
+    /* The user's password */
     hashed_password: String,
+
+    /* The user's password provider */
     provider: String,
+
+    /* TODO: describe this */
     salt: String,
+
+    /* Facebook authentication */
     facebook: {},
+
+    /* Twitter authentication */
     twitter: {},
+
+    /* Github authentication */
     github: {},
+
+    /* Google authentication */
     google: {},
+
+    /* Linkedin authentication */
     linkedin: {}
 });
 
