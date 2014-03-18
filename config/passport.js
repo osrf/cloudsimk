@@ -1,12 +1,12 @@
 'use strict';
 
 var mongoose = require('mongoose'),
-    LocalStrategy = require('passport-local').Strategy,
-    TwitterStrategy = require('passport-twitter').Strategy,
-    FacebookStrategy = require('passport-facebook').Strategy,
-    GitHubStrategy = require('passport-github').Strategy,
     GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
-    LinkedinStrategy = require('passport-linkedin').Strategy,
+    YahooStrategy = require('passport-yahoo-oauth').Strategy,
+    BitbucketStrategy = require('passport-bitbucket').Strategy,
+    GitHubStrategy = require('passport-github').Strategy,
+    FacebookStrategy = require('passport-facebook').Strategy,
+    TwitterStrategy = require('passport-twitter').Strategy,
     User = mongoose.model('User'),
     config = require('./config');
 
@@ -27,32 +27,68 @@ module.exports = function(passport) {
         });
     });
 
-    // Use local strategy
-    passport.use(new LocalStrategy({
-            usernameField: 'email',
-            passwordField: 'password'
+    // Use yahoo strategy
+    passport.use(new YahooStrategy({
+            consumerKey: config.yahoo.clientID,
+            consumerSecret: config.yahoo.clientSecret,
+            callbackURL: config.yahoo.callbackURL
         },
-        function(email, password, done) {
+        function(token, tokenSecret, profile, done) {
             User.findOne({
-                email: email
+                'yahoo.id': profile.id
             }, function(err, user) {
                 if (err) {
                     return done(err);
                 }
                 if (!user) {
-                    return done(null, false, {
-                        message: 'Unknown user'
+                    user = new User({
+                        name: profile.displayName,
+                        username: profile.username,
+                        provider: 'yahoo',
+                        yahoo: profile._json
                     });
-                }
-                if (!user.authenticate(password)) {
-                    return done(null, false, {
-                        message: 'Invalid password'
+                    user.save(function(err) {
+                        if (err) console.log(err);
+                        return done(err, user);
                     });
+                } else {
+                    return done(err, user);
                 }
-                return done(null, user);
             });
         }
     ));
+
+    // Use bitbucket strategy
+    passport.use(new TwitterStrategy({
+            consumerKey: config.bitbucket.clientID,
+            consumerSecret: config.bitbucket.clientSecret,
+            callbackURL: config.bitbucket.callbackURL
+        },
+        function(token, tokenSecret, profile, done) {
+            User.findOne({
+                'bitbucket.id': profile.id
+            }, function(err, user) {
+                if (err) {
+                    return done(err);
+                }
+                if (!user) {
+                    user = new User({
+                        name: profile.displayName,
+                        username: profile.username,
+                        provider: 'bitbucket',
+                        bitbucket: profile._json
+                    });
+                    user.save(function(err) {
+                        if (err) console.log(err);
+                        return done(err, user);
+                    });
+                } else {
+                    return done(err, user);
+                }
+            });
+        }
+    ));
+
 
     // Use twitter strategy
     passport.use(new TwitterStrategy({
@@ -117,6 +153,7 @@ module.exports = function(passport) {
         }
     ));
 
+
     // Use github strategy
     passport.use(new GitHubStrategy({
             clientID: config.github.clientID,
@@ -163,35 +200,6 @@ module.exports = function(passport) {
                         username: profile.emails[0].value,
                         provider: 'google',
                         google: profile._json
-                    });
-                    user.save(function(err) {
-                        if (err) console.log(err);
-                        return done(err, user);
-                    });
-                } else {
-                    return done(err, user);
-                }
-            });
-        }
-    ));
-
-    // use linkedin strategy
-    passport.use(new LinkedinStrategy({
-            consumerKey: config.linkedin.clientID,
-            consumerSecret: config.linkedin.clientSecret,
-            callbackURL: config.linkedin.callbackURL,
-            profileFields: ['id', 'first-name', 'last-name', 'email-address']
-        },
-        function(accessToken, refreshToken, profile, done) {
-            User.findOne({
-                'linkedin.id': profile.id
-            }, function(err, user) {
-                if (!user) {
-                    user = new User({
-                        name: profile.displayName,
-                        email: profile.emails[0].value,
-                        username: profile.emails[0].value,
-                        provider: 'linkedin'
                     });
                     user.save(function(err) {
                         if (err) console.log(err);
