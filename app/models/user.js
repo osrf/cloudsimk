@@ -20,6 +20,9 @@ var UserSchema = new Schema({
         type: String,
         unique: true
     },
+    
+    sim_id: String,
+
     hashed_password: String,
     provider: String,
     salt: String,
