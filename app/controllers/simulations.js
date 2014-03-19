@@ -24,19 +24,19 @@ exports.Simulation = function(req, res, next, id) {
  * Create an Simulation
  */
 exports.create = function(req, res) {
-    var Simulation = new Simulation(req.body);
-    Simulation.user = req.user;
 
     console.log('#$@$@# create sim for user: ' + req.user);
 
-    Simulation.save(function(err) {
+    var simulation = new Simulation(req.body);
+    simulation.user = req.user;
+    simulation.save(function(err) {
         if (err) {
             return res.send('users/signup', {
                 errors: err.errors,
-                Simulation: Simulation
+                Simulation: simulation
             });
         } else {
-            res.jsonp(Simulation);
+            res.jsonp(simulation);
         }
     });
 };
