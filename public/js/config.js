@@ -1,6 +1,6 @@
 'use strict';
 
-//Setting up route
+// Setting up route
 angular.module('mean').config(['$stateProvider', '$urlRouterProvider',
   function($stateProvider, $urlRouterProvider) {
     // For unmatched routes:
@@ -8,9 +8,9 @@ angular.module('mean').config(['$stateProvider', '$urlRouterProvider',
 
     // states for my app
     $stateProvider
-      .state('all articles', {
-        url: '/articles',
-        templateUrl: 'views/articles/list.html'
+      .state('all simulations', {
+        url: '/simulations',
+        templateUrl: 'views/simulations/list.html'
     })
       .state('create article', {
         url: '/articles/create',
@@ -31,7 +31,7 @@ angular.module('mean').config(['$stateProvider', '$urlRouterProvider',
 }
 ]);
 
-//Setting HTML5 Location Mode
+// Setting HTML5 Location Mode
 angular.module('mean').config(['$locationProvider',
   function($locationProvider) {
     $locationProvider.hashPrefix('!');

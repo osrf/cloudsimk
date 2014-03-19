@@ -22,55 +22,59 @@ module.exports = function(app, passport) {
         failureFlash: true
     }), users.session);
 
-    // Setting the facebook oauth routes
-    app.get('/auth/facebook', passport.authenticate('facebook', {
-        scope: ['email', 'user_about_me'],
-        failureRedirect: '/signin'
-    }), users.signin);
-
-    app.get('/auth/facebook/callback', passport.authenticate('facebook', {
-        failureRedirect: '/signin'
-    }), users.authCallback);
-
-    // Setting the github oauth routes
-    app.get('/auth/github', passport.authenticate('github', {
-        failureRedirect: '/signin'
-    }), users.signin);
-
-    app.get('/auth/github/callback', passport.authenticate('github', {
-        failureRedirect: '/signin'
-    }), users.authCallback);
-
-    // Setting the twitter oauth routes
-    app.get('/auth/twitter', passport.authenticate('twitter', {
-        failureRedirect: '/signin'
-    }), users.signin);
-
-    app.get('/auth/twitter/callback', passport.authenticate('twitter', {
-        failureRedirect: '/signin'
-    }), users.authCallback);
-
-    // Setting the google oauth routes
+    /////////////////////////////////////////////
+    // GOOGLE OpenID
+    // Setting the google openid routes
+    // On success, call app/controllers/users.js:signin
     app.get('/auth/google', passport.authenticate('google', {
         failureRedirect: '/signin',
-        scope: [
-            'https://www.googleapis.com/auth/userinfo.profile',
-            'https://www.googleapis.com/auth/userinfo.email'
-        ]
     }), users.signin);
 
+    // Callback that is received after openid authentication has completed
+    // On success, call app/controllers/users.js:authCallback
     app.get('/auth/google/callback', passport.authenticate('google', {
         failureRedirect: '/signin'
     }), users.authCallback);
 
-    // Setting the linkedin oauth routes
-    app.get('/auth/linkedin', passport.authenticate('linkedin', {
+    /////////////////////////////////////////////
+    // YAHOO OpenID
+    // Setting the yahoo openid routes
+    // On success, call app/controllers/users.js:signin
+    app.get('/auth/yahoo', passport.authenticate('yahoo', {
         failureRedirect: '/signin',
-        scope: [ 'r_emailaddress' ]
     }), users.signin);
 
-    app.get('/auth/linkedin/callback', passport.authenticate('linkedin', {
-        failureRedirect: '/siginin'
+    // Callback that is received after openid authentication has completed
+    // On success, call app/controllers/users.js:authCallback
+    app.get('/auth/yahoo/callback', passport.authenticate('yahoo', {
+        failureRedirect: '/signin'
     }), users.authCallback);
 
+    /////////////////////////////////////////////
+    // AOL OpenID
+    // Setting the aol openid routes
+    // On success, call app/controllers/users.js:signin
+    app.get('/auth/aol', passport.authenticate('aol', {
+        failureRedirect: '/signin',
+    }), users.signin);
+
+    // Callback that is received after openid authentication has completed
+    // On success, call app/controllers/users.js:authCallback
+    app.get('/auth/aol/callback', passport.authenticate('aol', {
+        failureRedirect: '/signin'
+    }), users.authCallback);
+
+    /////////////////////////////////////////////
+    // OpenID OpenID
+    // Setting the openid openid routes
+    // On success, call app/controllers/users.js:signin
+    app.get('/auth/openid', passport.authenticate('openid', {
+        failureRedirect: '/signin',
+    }), users.signin);
+
+    // Callback that is received after openid authentication has completed
+    // On success, call app/controllers/users.js:authCallback
+    app.get('/auth/openid/callback', passport.authenticate('openid', {
+        failureRedirect: '/signin'
+    }), users.authCallback);
 };

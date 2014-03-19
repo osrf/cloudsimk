@@ -11,28 +11,18 @@ module.exports = {
         callbackURL: 'http://localhost:3000/auth/google/callback'
     },
     yahoo: {
-        clientID: 'API_KEY',
+        clientID: 'APP_ID',
         clientSecret: 'SECRET_KEY',
         callbackURL: 'http://localhost:3000/auth/yahoo/callback'
     },
-    bitbucket: {
+    openid: {
         clientID: 'APP_ID',
-        clientSecret: 'APP_SECRET',
-        callbackURL: 'http://localhost:3000/auth/bitbucket/callback'
+        clientSecret: 'SECRET_KEY',
+        callbackURL: 'http://localhost:3000/auth/openid/callback'
     },
-    github: {
+    aol: {
         clientID: 'APP_ID',
-        clientSecret: 'APP_SECRET',
-        callbackURL: 'http://localhost:3000/auth/github/callback'
-    },
-    facebook: {
-        clientID: 'APP_ID',
-        clientSecret: 'APP_SECRET',
-        callbackURL: 'http://localhost:3000/auth/facebook/callback'
-    },
-    twitter: {
-        clientID: 'CONSUMER_KEY',
-        clientSecret: 'CONSUMER_SECRET',
-        callbackURL: 'http://localhost:3000/auth/twitter/callback'
+        clientSecret: 'SECRET_KEY',
+        callbackURL: 'http://localhost:3000/auth/aol/callback'
     }
 };

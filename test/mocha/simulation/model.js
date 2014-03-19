@@ -27,9 +27,7 @@ describe('<Unit Test>', function() {
                 simulation = new Simulation({
                     world: 'brave new world',
                     region: 'region',
-                    user: user,
-                    sim_id: 0,
-                    state: 'Launching'
+                    user: user
                 });
 
                 done();
