@@ -3,6 +3,11 @@
     margin-left:0
 }
 
+.navbar .brand, .navbar .nav > li > a:hover {
+  background: transparent;
+}
+
+
 .content {
     margin-top:70px;
     width:100%
