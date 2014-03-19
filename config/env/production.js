@@ -8,21 +8,21 @@ module.exports = {
     google: {
         clientID: 'APP_ID',
         clientSecret: 'APP_SECRET',
-        callbackURL: 'http://localhost:3000/auth/google/callback'
+        callbackURL: 'http://cloudsim.io/auth/google/callback'
     },
     yahoo: {
         clientID: 'APP_ID',
         clientSecret: 'SECRET_KEY',
-        callbackURL: 'http://localhost:3000/auth/yahoo/callback'
+        callbackURL: 'http://cloudsim.io/auth/yahoo/callback'
     },
     openid: {
         clientID: 'APP_ID',
         clientSecret: 'SECRET_KEY',
-        callbackURL: 'http://localhost:3000/auth/openid/callback'
+        callbackURL: 'http://cloudsim.io/auth/openid/callback'
     },
     aol: {
         clientID: 'APP_ID',
         clientSecret: 'SECRET_KEY',
-        callbackURL: 'http://localhost:3000/auth/aol/callback'
+        callbackURL: 'http://cloudsim.io/auth/aol/callback'
     }
 };
