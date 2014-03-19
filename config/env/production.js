@@ -6,23 +6,19 @@ module.exports = {
         name: 'CloudSim - Cloud-hosted robot simulation'
     },
     google: {
-        clientID: 'APP_ID',
-        clientSecret: 'APP_SECRET',
-        callbackURL: 'http://cloudsim.io/auth/google/callback'
+        returnURL: 'http://cloudsim.io/auth/google/callback',
+        realmURL: 'http://cloudsim.io/'
     },
     yahoo: {
-        clientID: 'APP_ID',
-        clientSecret: 'SECRET_KEY',
-        callbackURL: 'http://cloudsim.io/auth/yahoo/callback'
+        returnURL: 'http://cloudsim.io/auth/yahoo/callback',
+        realmURL: 'http://cloudsim.io/'
     },
     openid: {
-        clientID: 'APP_ID',
-        clientSecret: 'SECRET_KEY',
-        callbackURL: 'http://cloudsim.io/auth/openid/callback'
+        returnURL: 'http://cloudsim.io/auth/openid/callback',
+        realmURL: 'http://cloudsim.io/'
     },
     aol: {
-        clientID: 'APP_ID',
-        clientSecret: 'SECRET_KEY',
-        callbackURL: 'http://cloudsim.io/auth/aol/callback'
+        returnURL: 'http://cloudsim.io/auth/aol/callback',
+        realmURL: 'http://cloudsim.io/'
     }
 };

@@ -55,8 +55,8 @@ module.exports = function(passport) {
 
     // Use google strategy
     passport.use(new GoogleStrategy({
-        returnURL: 'http://localhost:3000/auth/google/callback',
-        realm: 'http://localhost:3000/'
+        returnURL: config.google.returnURL,
+        realm: config.google.realmURL
         },
         function(identifier, profile, done) {
             User.findOne({open_id: identifier}, function(err, user) {
@@ -83,8 +83,8 @@ module.exports = function(passport) {
 
     // Use yahoo strategy
     passport.use(new YahooStrategy({
-        returnURL: 'http://localhost:3000/auth/yahoo/callback',
-        realm: 'http://localhost:3000/'
+        returnURL: config.google.returnURL,
+        realm: config.google.realmURL
         },
         function(identifier, profile, done) {
             User.findOne({open_id: identifier}, function(err, user) {
@@ -111,8 +111,8 @@ module.exports = function(passport) {
 
     // Use openid strategy
     passport.use(new OpenIDStrategy({
-        returnURL: 'http://localhost:3000/auth/openid/callback',
-        realm: 'http://localhost:3000/'
+        returnURL: config.google.returnURL,
+        realm: config.google.realmURL
         },
         function(identifier, profile, done) {
             User.findOne({open_id: identifier}, function(err, user) {
@@ -139,8 +139,8 @@ module.exports = function(passport) {
 
     // Use aol strategy
     passport.use(new AOLStrategy({
-        returnURL: 'http://localhost:3000/auth/aol/callback',
-        realm: 'http://localhost:3000/'
+        returnURL: config.google.returnURL,
+        realm: config.google.realmURL
         },
         function(identifier, profile, done) {
             User.findOne({open_id: identifier}, function(err, user) {
