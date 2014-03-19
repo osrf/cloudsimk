@@ -74,7 +74,6 @@ module.exports = function(passport) {
                         return done(err, user);
                     });
                 } else {
-                    console.log(user);
                     return done(err, user);
                 }
             });
@@ -102,7 +101,6 @@ module.exports = function(passport) {
                         return done(err, user);
                     });
                 } else {
-                    console.log(user);
                     return done(err, user);
                 }
             });
@@ -130,7 +128,6 @@ module.exports = function(passport) {
                         return done(err, user);
                     });
                 } else {
-                    console.log(user);
                     return done(err, user);
                 }
             });
@@ -158,7 +155,6 @@ module.exports = function(passport) {
                         return done(err, user);
                     });
                 } else {
-                    console.log(user);
                     return done(err, user);
                 }
             });

@@ -40,6 +40,6 @@ module.exports = function(app) {
     app.put('/simulations/:simulationId',
             authorization.requiresLogin, hasAuthorization, Simulations.update);
 
-    /// Finish with setting up the articleId param
+    /// Finish with setting up the simulationId param
     app.param('simulationId', Simulations.Simulation);
 };
