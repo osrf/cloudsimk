@@ -1,0 +1,14 @@
+<section data-ng-controller="SimulationsController" data-ng-init="findOne()">
+    <span>{{simulation.date_launched | date:'medium'}}</span> /
+    <span>{{simulation.user.name}}</span>
+    <h2>{{simulation.sim_id}}</h2>
+    <div data-ng-show="global.user._id == simulation.user._id">
+        <a class="btn" href="/#!/simulations/{{simulation._id}}/edit">
+        	<i class="glyphicon glyphicon-edit"></i>
+        </a>
+        <a class="btn" data-ng-click="remove();">
+            <i class="glyphicon glyphicon-trash"></i>
+        </a>
+    </div>
+    <div>{{simulation.sim_id}}</div>
+</section>

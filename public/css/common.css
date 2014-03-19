@@ -3,10 +3,33 @@
     margin-left:0
 }
 
-.navbar .brand, .navbar .nav > li > a:hover {
+
+.navbar .brand, .navbar .nav > li > a:hover, .navbar .brand, .navbar .nav > li > a {
   background: transparent;
 }
 
+.navbar-right {
+  padding-right: 20px;
+}
+
+.dropdown-menu > li > a:hover {
+  background: transparent;
+}
+
+.dropdown-menu > li > a:hover > img {
+  background: #448ac9;
+}
+
+li.username {
+  padding:15px;
+}
+
+li.username > span {
+  padding-right:10px;
+}
+li.username > span.glyphicon {
+  padding-right:20px;
+}
 
 .content {
     margin-top:70px;

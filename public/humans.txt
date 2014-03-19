@@ -3,11 +3,14 @@
 
 # TEAM
 
-    <name> -- <role> -- <twitter>
+    Hugo Boyer 
+    Ian Chen
+    Steffi Paepcke
+    Nate Koenig
 
 # THANKS
 
-    <name>
+    To all contributors and supporters of CloudSim
 
 # TECHNOLOGY COLOPHON
 

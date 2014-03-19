@@ -4,31 +4,22 @@ module.exports = {
     db: 'mongodb://localhost/mean-test',
     port: 3001,
     app: {
-        name: 'MEAN - A Modern Stack - Test'
-    },
-    facebook: {
-        clientID: 'APP_ID',
-        clientSecret: 'APP_SECRET',
-        callbackURL: 'http://localhost:3000/auth/facebook/callback'
-    },
-    twitter: {
-        clientID: 'CONSUMER_KEY',
-        clientSecret: 'CONSUMER_SECRET',
-        callbackURL: 'http://localhost:3000/auth/twitter/callback'
-    },
-    github: {
-        clientID: 'APP_ID',
-        clientSecret: 'APP_SECRET',
-        callbackURL: 'http://localhost:3000/auth/github/callback'
+        name: 'CloudSim - Cloud-hosted robot simulation - Test'
     },
     google: {
-        clientID: 'APP_ID',
-        clientSecret: 'APP_SECRET',
-        callbackURL: 'http://localhost:3000/auth/google/callback'
-    },
-    linkedin: {
-        clientID: 'API_KEY',
-        clientSecret: 'SECRET_KEY',
-        callbackURL: 'http://localhost:3000/auth/linkedin/callback'
-    }
+            returnURL: 'http://localhost:3000/auth/google/callback',
+            realmURL: 'http://localhost:3000/'
+        },
+    yahoo: {
+            returnURL: 'http://localhost:3000/auth/yahoo/callback',
+            realmURL: 'http://localhost:3000/'
+        },
+    openid: {
+            returnURL: 'http://localhost:3000/auth/openid/callback',
+            realmURL: 'http://localhost:3000/'
+        },
+    aol: {
+            returnURL: 'http://localhost:3000/auth/aol/callback',
+            realmURL: 'http://localhost:3000/'
+        }
 };

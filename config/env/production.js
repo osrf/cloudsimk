@@ -3,31 +3,22 @@
 module.exports = {
     db: 'mongodb://localhost/mean',
     app: {
-        name: 'MEAN - A Modern Stack - Production'
-    },
-    facebook: {
-        clientID: 'APP_ID',
-        clientSecret: 'APP_SECRET',
-        callbackURL: 'http://localhost:3000/auth/facebook/callback'
-    },
-    twitter: {
-        clientID: 'CONSUMER_KEY',
-        clientSecret: 'CONSUMER_SECRET',
-        callbackURL: 'http://localhost:3000/auth/twitter/callback'
-    },
-    github: {
-        clientID: 'APP_ID',
-        clientSecret: 'APP_SECRET',
-        callbackURL: 'http://localhost:3000/auth/github/callback'
+        name: 'CloudSim - Cloud-hosted robot simulation'
     },
     google: {
-        clientID: 'APP_ID',
-        clientSecret: 'APP_SECRET',
-        callbackURL: 'http://localhost:3000/auth/google/callback'
+        returnURL: 'http://cloudsim.io/auth/google/callback',
+        realmURL: 'http://cloudsim.io/'
     },
-    linkedin: {
-        clientID: 'API_KEY',
-        clientSecret: 'SECRET_KEY',
-        callbackURL: 'http://localhost:3000/auth/linkedin/callback'
+    yahoo: {
+        returnURL: 'http://cloudsim.io/auth/yahoo/callback',
+        realmURL: 'http://cloudsim.io/'
+    },
+    openid: {
+        returnURL: 'http://cloudsim.io/auth/openid/callback',
+        realmURL: 'http://cloudsim.io/'
+    },
+    aol: {
+        returnURL: 'http://cloudsim.io/auth/aol/callback',
+        realmURL: 'http://cloudsim.io/'
     }
 };

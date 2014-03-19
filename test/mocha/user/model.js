@@ -19,7 +19,8 @@ describe('<Unit Test>', function() {
                 email: 'user_test@test.com',
                 username: 'user',
                 password: 'password',
-                provider: 'local'
+                provider: 'local',
+                open_id: 'openid'
             });
             user2 = new User(user);
 

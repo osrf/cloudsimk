@@ -1,0 +1,11 @@
+<section data-ng-controller="SimulationsController" data-ng-init="find()">
+	<ul class="simulations unstyled">
+		<li data-ng-repeat="simulation in simulations">
+			<span>{{simulation.date_launched | date:'medium'}}</span> /
+			<span>{{simulation.user.name}}</span>
+			<h2><a data-ng-href="#!/simulations/{{simulation.sim_id}}">{{simulation.sim_id}}</a></h2>
+			<div>{{simulation.sim_id}}</div>
+		</li>
+	</ul>
+	<h1 data-ng-hide="!simulations || simulations.length">No simulations yet. <br> Why don't you <a href="/#!/simulations/create">Create One</a>?</h1>
+</section>

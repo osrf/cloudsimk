@@ -1,61 +1,59 @@
 'use strict';
 
-/**
- * Module dependencies.
- */
+/// Module dependencies.
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema,
     crypto = require('crypto');
 
-/**
- * User Schema
- */
+/// User Schema
 var UserSchema = new Schema({
-    /* Name of the user */
+    /// OpenID string
+    open_id: {
+        type: String,
+        required: true
+    },
+
+    /// Name of the user
     name: {
         type: String,
         required: true
     },
-    /* User's email address. */
+
+    /// User's email address
     email: String,
 
-    /* User's username. */
+    /// User's username.
     username: {
         type: String,
         unique: true
     },
    
-    /* The ID of the next simulation instance the user will run */
+    /// The ID of the next simulation instance the user will run
     next_sim_id: Number,
 
-    /* The user's password */
+    /// The user's password
     hashed_password: String,
 
-    /* The user's password provider */
+    /// The user's password provider
     provider: String,
 
-    /* TODO: describe this */
+    /// TODO: describe this
     salt: String,
 
-    /* Facebook authentication */
-    facebook: {},
-
-    /* Twitter authentication */
-    twitter: {},
-
-    /* Github authentication */
-    github: {},
-
-    /* Google authentication */
+    /// Google authentication
     google: {},
 
-    /* Linkedin authentication */
-    linkedin: {}
+    /// Yahoo authentication
+    yahoo: {},
+
+    /// AOL authentication
+    aol: {},
+
+    /// AOL authentication
+    openid: {}
 });
 
-/**
- * Virtuals
- */
+/// Virtuals
 UserSchema.virtual('password').set(function(password) {
     this._password = password;
     this.salt = this.makeSalt();
@@ -64,9 +62,7 @@ UserSchema.virtual('password').set(function(password) {
     return this._password;
 });
 
-/**
- * Validations
- */
+/// Validations
 var validatePresenceOf = function(value) {
     return value && value.length;
 };
@@ -97,9 +93,7 @@ UserSchema.path('hashed_password').validate(function(hashed_password) {
 }, 'Password cannot be blank');
 
 
-/**
- * Pre-save hook
- */
+/// Pre-save hook
 UserSchema.pre('save', function(next) {
     if (!this.isNew) return next();
 
@@ -109,38 +103,30 @@ UserSchema.pre('save', function(next) {
         next();
 });
 
-/**
- * Methods
- */
+/// Methods
 UserSchema.methods = {
-    /**
-     * Authenticate - check if the passwords are the same
-     *
-     * @param {String} plainText
-     * @return {Boolean}
-     * @api public
-     */
+    ///  Authenticate - check if the passwords are the same
+    /// 
+    ///  @param {String} plainText
+    ///  @return {Boolean}
+    ///  @api public
     authenticate: function(plainText) {
         return this.encryptPassword(plainText) === this.hashed_password;
     },
 
-    /**
-     * Make salt
-     *
-     * @return {String}
-     * @api public
-     */
+    ///  Make salt
+    /// 
+    ///  @return {String}
+    ///  @api public
     makeSalt: function() {
         return crypto.randomBytes(16).toString('base64');
     },
 
-    /**
-     * Encrypt password
-     *
-     * @param {String} password
-     * @return {String}
-     * @api public
-     */
+    ///  Encrypt password
+    /// 
+    ///  @param {String} password
+    ///  @return {String}
+    ///  @api public
     encryptPassword: function(password) {
         if (!password || !this.salt) return '';
         var salt = new Buffer(this.salt, 'base64');
