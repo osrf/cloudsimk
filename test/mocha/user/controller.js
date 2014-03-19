@@ -1,16 +1,11 @@
 'use strict';
 
-/**
- * Module dependencies.
- */
-var should = require('should'),
-    mongoose = require('mongoose'),
+/// Module dependencies.
+var mongoose = require('mongoose'),
     User = mongoose.model('User'),
-    app = require('/home/hugo/code/cloudsimk/server');
+    app = require('../../../server');
 
-var util = require('util');
-
-console.log("app type: " + typeof app);
+console.log('app type: ' + typeof app);
 
 var supertest = require('supertest');
 
@@ -18,14 +13,14 @@ var cookie;
 var user;
 var agent;
 
-function log_res(res) {
-    var cookie = res.headers['set-cookie'];
-    console.log('cookie: ' + cookie);
-    console.log('body: %j',  res.body);
-    console.log('redirects: ' + res.redirects.length);
-    console.log('text: ' + res.text);
-    // console.log('everything: ' + util.inspect(res)); 
-}
+// function log_res(res) {
+//     var cookie = res.headers['set-cookie'];
+//     console.log('cookie: ' + cookie);
+//     console.log('body: %j',  res.body);
+//     console.log('redirects: ' + res.redirects.length);
+//     console.log('text: ' + res.text);
+//     // console.log('everything: ' + util.inspect(res)); 
+// }
 
 describe('<Unit Test>', function() {
     describe('Model User:', function() {
@@ -49,8 +44,10 @@ describe('<Unit Test>', function() {
                     .send({ email: 'random@test.com', password:'secret' })
                     .end(function(err,res){
                         // log_res(res);
-                        res.should.have.status(302) /*  302 'Moved Temporarily'  200 'OK' */
-                        res.text.should.equal('Moved Temporarily. Redirecting to /signin');
+                        // 302 Moved Temporarily  200 OK
+                        res.should.have.status(302);
+                        res.text.should.equal(
+                            'Moved Temporarily. Redirecting to /signin');
                         done();
                     });
             });
@@ -63,7 +60,8 @@ describe('<Unit Test>', function() {
                 .set('Acccept', 'application/json')
                 .send({ email: 'user_test@test.com', password:'pass' })
                 .end(function(err,res){
-                    res.should.have.status(302) /*  302 'Moved Temporarily'  200 'OK' */
+                    // 302 Moved Temporarily  200 OK
+                    res.should.have.status(302);
                     cookie = res.headers['set-cookie'];
                     // log_res(res); 
                     res.text.should.equal('Moved Temporarily. Redirecting to /');
@@ -77,14 +75,15 @@ describe('<Unit Test>', function() {
                 agent
                 .get('/')
                 .end(function(err,res){
-                    res.should.have.status(200) /*  302 'Moved Temporarily'  200 'OK' */
+                    // 302 Moved Temporarily  200 OK
+                    res.should.have.status(200);
                     console.log('res.user: ' + res.user);
                     cookie = res.headers['set-cookie'];
                     // log_res(res); 
                     done();
                 });
             });
-        }); 
+        });
 
         after(function(done) {
             user.remove();
