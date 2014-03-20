@@ -15,6 +15,19 @@
   border-bottom: 1px solid #abd7ff;
 }
 
+.navbar-default .navbar-toggle .icon-bar {
+  background: #abd7ff;
+}
+
+.navbar-default .navbar-toggle:hover,
+.navbar-default .navbar-toggle:focus {
+  background: #448ac9;
+}
+
+.navbar-default .navbar-toggle {
+  border-color:#abd7ff;
+}
+
 .navbar-right, .navbar-nav.navbar-right:last-child {
   padding-right: 20px;
   padding-top: 5px;
