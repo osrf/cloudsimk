@@ -1,45 +1,48 @@
 <div class="" data-ng-controller="HeaderController">
-    <ul class="navbar-nav nav">
-        <li><a class="navbar-brand" style="vertical-align:bottom" href="/">
-            <img src="img/icons/cloudsim.png" alt="cloudsimlogo"/>CloudSim</a>
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle"
+                data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/"><img src="img/icons/cloudsim.svg" alt="cloudsim_logo" height="20"/></a>
+    </div>
+    <div class="navbar-collapse collapse">
+      <ul class="nav navbar-nav navbar-right"
+          data-ng-hide="global.authenticated">
+        <li>
+          <a href="#" class="dropdown-toggle"
+             data-toggle="dropdown">Login | Signup <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li>
+              <a href="/auth/google"><img class="inline-block"
+                 alt="Google" src="/img/icons/google.svg"/>Google</a>
+            </li>
+            <li>
+              <a href="/auth/yahoo"><img class="inline-block"
+                 alt="Yahoo" src="/img/icons/yahoo.svg">Yahoo</a>
+            </li>
+            <li>
+              <a href="/auth/aol"><img class="inline-block"
+                 alt="AOL" src="/img/icons/aol.svg">AOL</a>
+            </li>
+            <li>
+              <a href="/auth/openid"><img class="inline-block"
+                 alt="OpenId" src="/img/icons/openid.svg">OpenId</a>
+            </li>
+          </ul>
         </li>
-
-        <!-- Repeat over each menu item defined in HeaderController -->
-        <li data-ng-repeat="item in menu" data-ng-show="global.user"
-            ui-route="/{{item.link}}" ng-class="{active: $uiRoute}">
-            <a href="#!/{{item.link}}">{{item.title}}</a>
-        </li>
-    </ul>
-    <ul class="navbar-nav nav navbar-right" data-ng-hide="global.authenticated">
-      <li class="dropdown">
-        <a href="#" class="dropdown-toggle"
-           data-toggle="dropdown">Login | Signup <b class="caret"></b></a>
-        <ul class="dropdown-menu">
+      </ul>
+      <ul class="nav navbar-nav navbar-right"
+          data-ng-show="global.authenticated">
           <li>
-            <a href="/auth/google"><img class="inline-block"
-               alt="Google" src="/img/icons/google.svg"/>Google</a>
+            <span>Hi, {{global.user.name}}</span>
+            <span class="glyphicon glyphicon-user"></span> 
+            <span>|</span>
+            <span><a href="/signout">Signout</a></span>
           </li>
-          <li>
-            <a href="/auth/yahoo"><img class="inline-block"
-               alt="Yahoo" src="/img/icons/yahoo.svg">Yahoo</a>
-          </li>
-          <li>
-            <a href="/auth/aol"><img class="inline-block"
-               alt="AOL" src="/img/icons/aol.svg">AOL</a>
-          </li>
-          <li>
-            <a href="/auth/openid"><img class="inline-block"
-               alt="OpenId" src="/img/icons/openid.svg">OpenId</a>
-          </li>
-        </ul>
-      </li>
-    </ul>
-    <ul class="navbar-nav nav navbar-right" data-ng-show="global.authenticated">
-        <li class="username">
-          <span>Hi, {{global.user.name}}</span>
-          <span class="glyphicon glyphicon-user"></span> 
-          <span>|</span>
-          <span><a href="/signout">Signout</a></span>
-        </li>
-    </ul>
+      </ul>
+    </div>
 </div>
