@@ -3,13 +3,9 @@
 /// Module dependencies.
 var mongoose = require('mongoose'),
     User = mongoose.model('User'),
-<<<<<<< local
     Simulation = mongoose.model('Simulation'),
-    app = require('../../../server');
-=======
     app = require('../../../server'),
     util = require('../util');
->>>>>>> other
 
 console.log('app type: ' + typeof app);
 
@@ -72,7 +68,7 @@ describe('<Unit Test>', function() {
                 .set('Acccept', 'application/json')
                 .send({ world: 'empty.world', region:'africa' })
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     var text = JSON.parse(res.text);
@@ -90,7 +86,7 @@ describe('<Unit Test>', function() {
                 agent
                 .get('/simulations/running')
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     var text = JSON.parse(res.text);
@@ -111,7 +107,7 @@ describe('<Unit Test>', function() {
                 agent
                 .get('/simulations/0')
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     var text = JSON.parse(res.text);
@@ -133,7 +129,7 @@ describe('<Unit Test>', function() {
                 .set('Acccept', 'application/json')
                 .send({ world: 'blank.world', region:'asia' })
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     var text = JSON.parse(res.text);
@@ -152,7 +148,7 @@ describe('<Unit Test>', function() {
                 agent
                 .get('/simulations/running')
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     var text = JSON.parse(res.text);
@@ -179,7 +175,7 @@ describe('<Unit Test>', function() {
                 agent
                 .get('/simulations/1')
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     var text = JSON.parse(res.text);
@@ -200,7 +196,7 @@ describe('<Unit Test>', function() {
                 .put('/simulations/1')
                 .send({ world: 'blank_update.world', region:'europe' })
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     var text = JSON.parse(res.text);
@@ -220,7 +216,7 @@ describe('<Unit Test>', function() {
                 agent
                 .get('/simulations/1')
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     var text = JSON.parse(res.text);
@@ -242,7 +238,7 @@ describe('<Unit Test>', function() {
                 .del('/simulations/running/0')
                 .set('Acccept', 'application/json')
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     done();
@@ -255,7 +251,7 @@ describe('<Unit Test>', function() {
                 agent
                 .get('/simulations/0')
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     var text = JSON.parse(res.text);
@@ -276,7 +272,7 @@ describe('<Unit Test>', function() {
                 agent
                 .get('/simulations/running')
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     var text = JSON.parse(res.text);
@@ -297,7 +293,7 @@ describe('<Unit Test>', function() {
                 agent
                 .get('/simulations/history')
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     var text = JSON.parse(res.text);
@@ -319,7 +315,7 @@ describe('<Unit Test>', function() {
                 .put('/simulations/0')
                 .send({ world: 'empty_update.world', region:'europe' })
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     var text = JSON.parse(res.text);
@@ -340,7 +336,7 @@ describe('<Unit Test>', function() {
                 agent
                 .get('/simulations/0')
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     var text = JSON.parse(res.text);
@@ -362,7 +358,7 @@ describe('<Unit Test>', function() {
                 .del('/simulations/history/0')
                 .set('Acccept', 'application/json')
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     done();
@@ -375,7 +371,7 @@ describe('<Unit Test>', function() {
                 agent
                 .get('/simulations/history')
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     var text = JSON.parse(res.text);
@@ -404,9 +400,7 @@ describe('<Unit Test>', function() {
                 agentUnauthorized
                 .post('/simulations')
                 .end(function(err,res){
-                    if (err)
-                        console.log('err ' + err);
-                    log_res(res);
+                    util.log_res(res);
                     res.should.have.status(401);
                     done();
                 });
@@ -419,7 +413,7 @@ describe('<Unit Test>', function() {
                 agentUnauthorized
                 .get('/simulations/1')
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     res.should.have.status(401);
                     done();
                 });
@@ -433,7 +427,7 @@ describe('<Unit Test>', function() {
                 .del('/simulations/running/1')
                 .set('Acccept', 'application/json')
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     res.should.have.status(401);
                     done();
                 });
@@ -446,7 +440,7 @@ describe('<Unit Test>', function() {
                 agentUnauthorized
                 .get('/simulations/history')
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     res.should.have.status(401);
                     done();
                 });
