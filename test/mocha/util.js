@@ -1,3 +1,5 @@
+'use strict';
+
 var util = require('util');
 
 exports.log_res = function(res, verbose) {
@@ -9,4 +11,4 @@ exports.log_res = function(res, verbose) {
     console.log('redirects: ' + res.redirects.length);
     console.log('text: ' + res.text);
     console.log('everything: ' + util.inspect(res));
-}
+};
