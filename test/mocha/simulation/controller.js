@@ -23,7 +23,7 @@ function log_res(res, verbose) {
     console.log('body: %j',  res.body);
     console.log('redirects: ' + res.redirects.length);
     console.log('text: ' + res.text);
-//    console.log('everything: ' + util.inspect(res));
+    console.log('everything: ' + util.inspect(res));
 }
 
 describe('<Unit Test>', function() {
@@ -113,6 +113,26 @@ describe('<Unit Test>', function() {
             });
         });
 
+        describe('Check Get Simulation by ID', function() {
+            it('should be able to get the first running simulation', function(done) {
+                agent
+                .get('/simulations/0')
+                .end(function(err,res){
+                    log_res(res);
+                    res.should.have.status(200);
+                    res.redirect.should.equal(false);
+                    var text = JSON.parse(res.text);
+                    text.user.name.should.equal('User Tester');
+                    text.user.username.should.equal('user');
+                    text.sim_id.should.be.exactly(0);
+                    text.state.should.equal('Launching');
+                    text.region.should.equal('africa');
+                    text.world.should.equal('empty.world');
+                    done();
+                });
+            });
+        });
+
         describe('Check Create Second Simulation', function() {
             it('should be able to create another simulation', function(done) {
                 agent
@@ -161,28 +181,264 @@ describe('<Unit Test>', function() {
             });
         });
 
-        describe('Check Delete Simulation', function() {
-            it('should be able to delete a simulation', function(done) {
+        describe('Check Get Second Simulation by ID', function() {
+            it('should be able to get the second running simulation', function(done) {
                 agent
-                .del('/simulations/running/0')
-                .set('Acccept', 'application/json')
+                .get('/simulations/1')
                 .end(function(err,res){
-                    if (err)
-                      console.log('err' + err );
                     log_res(res);
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     var text = JSON.parse(res.text);
+                    text.user.name.should.equal('User Tester');
+                    text.user.username.should.equal('user');
+                    text.sim_id.should.be.exactly(1);
+                    text.state.should.equal('Launching');
+                    text.region.should.equal('asia');
+                    text.world.should.equal('blank.world');
                     done();
                 });
             });
         });
 
-        describe('Check Unauthorized Running Simulation', function() {
+        describe('Check Update Running Simulation by ID', function() {
+            it('should be able to update a running simulation', function(done) {
+                agent
+                .put('/simulations/1')
+                .send({ world: 'blank_update.world', region:'europe' })
+                .end(function(err,res){
+                    log_res(res);
+                    res.should.have.status(200);
+                    res.redirect.should.equal(false);
+                    var text = JSON.parse(res.text);
+                    text.user.name.should.equal('User Tester');
+                    text.user.username.should.equal('user');
+                    text.sim_id.should.be.exactly(1);
+                    text.state.should.equal('Launching');
+                    text.region.should.equal('europe');
+                    text.world.should.equal('blank_update.world');
+                    done();
+                });
+            });
+        });
+
+        describe('Check Get Updated Running Simulation by ID', function() {
+            it('should be able to see the updated simulation', function(done) {
+                agent
+                .get('/simulations/1')
+                .end(function(err,res){
+                    log_res(res);
+                    res.should.have.status(200);
+                    res.redirect.should.equal(false);
+                    var text = JSON.parse(res.text);
+                    text.user.name.should.equal('User Tester');
+                    text.user.username.should.equal('user');
+                    text.sim_id.should.be.exactly(1);
+                    text.state.should.equal('Launching');
+                    text.region.should.equal('europe');
+                    text.world.should.equal('blank_update.world');
+                    done();
+                });
+            });
+        });
+
+
+        describe('Check Terminate Simulation', function() {
+            it('should be able to terminate a running simulation', function(done) {
+                agent
+                .del('/simulations/running/0')
+                .set('Acccept', 'application/json')
+                .end(function(err,res){
+                    log_res(res);
+                    res.should.have.status(200);
+                    res.redirect.should.equal(false);
+                    done();
+                });
+            });
+        });
+
+        describe('Check Get Simulation By ID Valid State', function() {
+            it('should be able to get the first simulation by id and verify its new state', function(done) {
+                agent
+                .get('/simulations/0')
+                .end(function(err,res){
+                    log_res(res);
+                    res.should.have.status(200);
+                    res.redirect.should.equal(false);
+                    var text = JSON.parse(res.text);
+                    text.user.name.should.equal('User Tester');
+                    text.user.username.should.equal('user');
+                    text.sim_id.should.be.exactly(0);
+                    // state should now be terminated
+                    text.state.should.equal('Terminated');
+                    text.region.should.equal('africa');
+                    text.world.should.equal('empty.world');
+                    done();
+                });
+            });
+        });
+
+        describe('Check One Simulation Left', function() {
+            it('should be one running simulation with sim id 1', function(done) {
+                agent
+                .get('/simulations/running')
+                .end(function(err,res){
+                    log_res(res);
+                    res.should.have.status(200);
+                    res.redirect.should.equal(false);
+                    var text = JSON.parse(res.text);
+                    text.length.should.be.exactly(1);
+                    text[0].user.name.should.equal('User Tester');
+                    text[0].user.username.should.equal('user');
+                    text[0].sim_id.should.be.exactly(1);
+                    text[0].state.should.equal('Launching');
+                    text[0].region.should.equal('europe');
+                    text[0].world.should.equal('blank_update.world');
+                    done();
+                });
+            });
+        });
+
+        describe('Check One Simulation In History', function() {
+            it('should be one simulation in history', function(done) {
+                agent
+                .get('/simulations/history')
+                .end(function(err,res){
+                    log_res(res);
+                    res.should.have.status(200);
+                    res.redirect.should.equal(false);
+                    var text = JSON.parse(res.text);
+                    text.length.should.be.exactly(1);
+                    text[0].user.name.should.equal('User Tester');
+                    text[0].user.username.should.equal('user');
+                    text[0].sim_id.should.be.exactly(0);
+                    text[0].state.should.equal('Terminated');
+                    text[0].region.should.equal('africa');
+                    text[0].world.should.equal('empty.world');
+                    done();
+                });
+            });
+        });
+
+        describe('Check Update Terminated Simulation by ID', function() {
+            it('should not be able to update a terminated simulation', function(done) {
+                agent
+                .put('/simulations/0')
+                .send({ world: 'empty_update.world', region:'europe' })
+                .end(function(err,res){
+                    log_res(res);
+                    res.should.have.status(200);
+                    res.redirect.should.equal(false);
+                    var text = JSON.parse(res.text);
+                    text.user.name.should.equal('User Tester');
+                    text.user.username.should.equal('user');
+                    text.sim_id.should.be.exactly(0);
+                    text.state.should.equal('Terminated');
+                    // region and world should remain unchanged.
+                    text.region.should.equal('africa');
+                    text.world.should.equal('empty.world');
+                    done();
+                });
+            });
+        });
+
+        describe('Check Get Updated Simulation History by ID', function() {
+            it('should be able to see the terminated simulation remain unchanged', function(done) {
+                agent
+                .get('/simulations/0')
+                .end(function(err,res){
+                    log_res(res);
+                    res.should.have.status(200);
+                    res.redirect.should.equal(false);
+                    var text = JSON.parse(res.text);
+                    text.user.name.should.equal('User Tester');
+                    text.user.username.should.equal('user');
+                    text.sim_id.should.be.exactly(0);
+                    text.state.should.equal('Terminated');
+                    // region and world should remain unchanged.
+                    text.region.should.equal('africa');
+                    text.world.should.equal('empty.world');
+                    done();
+                });
+            });
+        });
+
+        describe('Check Delete Simulation In History', function() {
+            it('should be able to delete a simulation in history', function(done) {
+                agent
+                .del('/simulations/history/0')
+                .set('Acccept', 'application/json')
+                .end(function(err,res){
+                    log_res(res);
+                    res.should.have.status(200);
+                    res.redirect.should.equal(false);
+                    done();
+                });
+            });
+        });
+
+        describe('Check Empty Simulation In History', function() {
+            it('should be no more simulations in history', function(done) {
+                agent
+                .get('/simulations/history')
+                .end(function(err,res){
+                    log_res(res);
+                    res.should.have.status(200);
+                    res.redirect.should.equal(false);
+                    var text = JSON.parse(res.text);
+                    text.length.should.be.exactly(0);
+                    done();
+                });
+            });
+        });
+
+        describe('Check Unauthorized Get Running Simulations', function() {
             it('should not be able to see running simulations', function(done) {
                 var agentUnauthorized = supertest.agent(app);
                 agentUnauthorized
                 .get('/simulations/running')
+                .end(function(err,res){
+                    log_res(res);
+                    res.should.have.status(401);
+                    done();
+                });
+            });
+        });
+
+        describe('Check Unauthorized Create Simulation', function() {
+            it('should not be able to create simulations', function(done) {
+                var agentUnauthorized = supertest.agent(app);
+                agentUnauthorized
+                .post('/simulations')
+                .end(function(err,res){
+                    if (err)
+                        console.log('err ' + err);
+                    log_res(res);
+                    res.should.have.status(401);
+                    done();
+                });
+            });
+        });
+
+        describe('Check Unauthorized Get Simulation By ID', function() {
+            it('should not be able to get simulations by id', function(done) {
+                var agentUnauthorized = supertest.agent(app);
+                agentUnauthorized
+                .get('/simulations/1')
+                .end(function(err,res){
+                    log_res(res);
+                    res.should.have.status(401);
+                    done();
+                });
+            });
+        });
+
+        describe('Check Unauthorized Terminate Simulation By ID', function() {
+            it('should not be able to terminate running simulation by id', function(done) {
+                var agentUnauthorized = supertest.agent(app);
+                agentUnauthorized
+                .del('/simulations/running/1')
+                .set('Acccept', 'application/json')
                 .end(function(err,res){
                     log_res(res);
                     res.should.have.status(401);

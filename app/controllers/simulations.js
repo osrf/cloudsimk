@@ -18,6 +18,13 @@ var mongoose = require('mongoose'),
 /// @param[in] id ID of the simulation instance to retrieve.
 /// @return Simulation instance retrieval function.
 exports.simulation = function(req, res, next, id) {
+    // in routes/simulation.js, looks like app.param is always called
+    // before other middlewares, so we need to manually check
+    // authentication here. The code below is the same as
+    // authorization.requiresLogin.
+    if (!req.isAuthenticated()) {
+        return res.send(401, 'User is not authorized');
+    }
 
     // Load a simulation model based on the given id
     Simulation.loadBySimId(req.user.id, id, function(err, simulation) {
@@ -88,11 +95,17 @@ exports.update = function(req, res) {
     /* Get the simulation from the request */
     var simulation = req.simulation;
 
+    if (simulation.state === 'Terminated') {
+        // don't rewrite history, just return.
+        res.jsonp(simulation);
+        return;
+    }
+
     /* use the lodash library to populate each
      * simulation attribute with the values in the
      * request body
      */
-    simulation = _.extend(Simulation, req.body);
+    simulation = _.extend(simulation, req.body);
 
     /* Save the updated simulation to the database */
     simulation.save(function(err) {
@@ -189,7 +202,7 @@ exports.all = function(req, res) {
 /// @return Function to get all simulation instances for a user.
 exports.running = function(req, res) {
     // Get all running simulation models, in creation order, for a user
-    Simulation.find({state: {$ne: 'terminated'}}).sort('-created').populate('user', 'name username')
+    Simulation.find({state: {$ne: 'Terminated'}}).sort('-created').populate('user', 'name username')
       .exec(function(err, simulations) {
         if (err) {
             res.render('error', {
@@ -206,7 +219,7 @@ exports.running = function(req, res) {
 /// @param[in] req Nodejs request object.
 /// @param[out] res Nodejs response object.
 exports.history = function(req, res) {
-    Simulation.find({state: 'terminated'}).sort('-created').populate('user', 'name username')
+    Simulation.find({state: 'Terminated'}).sort('-created').populate('user', 'name username')
       .exec(function(err, simulations) {
         if (err) {
             res.render('error', {
