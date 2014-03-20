@@ -27,7 +27,7 @@ var SimulationSchema = new Schema({
         type: Date,
         default: null
     },
-    
+
     /* Simulation id (starts at 0). The user is not allowed to modify
      * this value */
     sim_id: {
@@ -60,7 +60,7 @@ var SimulationSchema = new Schema({
     }
 
    /* TODO: Addserver cost per hr (nb) */
-   
+
 });
 
 /**
@@ -87,19 +87,25 @@ SimulationSchema.path('region').validate(function(s) {
 }, 'Region cannot be blank');
 
 SimulationSchema.path('state').validate(function(s) {
-    return s === 'Launching';
-}, 'State of the simulation instance must be Launching');
+    return ['Launching', 'Terminated'].indexOf(s) > -1 ;
+}, 'State of the simulation instance must be Launching or Terminated');
 
 SimulationSchema.path('user').validate(function(s) {
     return s !== null;
 }, 'User must be set.');
 
-/**
- * Statics
- */
+/////////////////////////////////////////////////
+// Statics
 SimulationSchema.statics.load = function(id, cb) {
     this.findOne({
         _id: id
+    }).populate('user', 'name username').exec(cb);
+};
+
+SimulationSchema.statics.loadBySimId = function(userId, simId, cb) {
+    this.findOne({
+        user: userId,
+        sim_id: simId
     }).populate('user', 'name username').exec(cb);
 };
 
