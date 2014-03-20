@@ -8,6 +8,7 @@ var mongoose = require('mongoose'),
 console.log('app type: ' + typeof app);
 
 var supertest = require('supertest');
+var util = require('util');
 
 var cookie;
 var user;
@@ -15,13 +16,12 @@ var agent;
 
 function log_res(res, verbose) {
     if (!verbose)
-      return;
+        return;
     var cookie = res.headers['set-cookie'];
     console.log('cookie: ' + cookie);
     console.log('body: %j',  res.body);
     console.log('redirects: ' + res.redirects.length);
     console.log('text: ' + res.text);
-    var util = require('util');
     console.log('everything: ' + util.inspect(res));
 }
 
@@ -51,7 +51,7 @@ describe('<Unit Test>', function() {
                         // 302 Moved Temporarily  200 OK
                         res.should.have.status(302);
                         res.redirect.should.equal(true);
-                        res.headers['location'].should.equal('/signin');
+                        res.headers.location.should.equal('/signin');
                         done();
                     });
             });
@@ -83,8 +83,8 @@ describe('<Unit Test>', function() {
                     res.should.have.status(302);
                     cookie = res.headers['set-cookie'];
                     log_res(res);
-                    res.redirect.should.be.true;
-                    res.headers['location'].should.equal('/');
+                    res.redirect.should.equal(true);
+                    res.headers.location.should.equal('/');
                     done();
                 });
             });
