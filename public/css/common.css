@@ -1,16 +1,39 @@
 .navbar .nav>li>a.brand {
-    padding-left:20px;
-    margin-left:0
+  padding-left:20px;
+  margin-left:0
+  background: #e8f4ff;
 }
 
-
-.navbar .brand, .navbar .nav > li > a:hover, .navbar .brand, .navbar .nav > li > a {
-  background: transparent;
+.navbar .brand, .navbar .nav > li > a:hover,
+.navbar .brand, .navbar .nav > li > a
+{
+  background: #e8f4ff;
 }
 
-.navbar-right {
+.navbar {
+  background: #e8f4ff;
+  border-bottom: 1px solid #abd7ff;
+}
+
+.navbar-default .navbar-toggle .icon-bar {
+  background: #abd7ff;
+}
+
+.navbar-default .navbar-toggle:hover,
+.navbar-default .navbar-toggle:focus {
+  background: #448ac9;
+}
+
+.navbar-default .navbar-toggle {
+  border-color:#abd7ff;
+}
+
+.navbar-right, .navbar-nav.navbar-right:last-child {
   padding-right: 20px;
-}
+  padding-top: 5px;
+  margin-right: 0px;
+  line-height: 50px;
+} 
 
 .dropdown-menu > li > a:hover {
   background: transparent;
@@ -18,17 +41,6 @@
 
 .dropdown-menu > li > a:hover > img {
   background: #448ac9;
-}
-
-li.username {
-  padding:15px;
-}
-
-li.username > span {
-  padding-right:10px;
-}
-li.username > span.glyphicon {
-  padding-right:20px;
 }
 
 .content {
