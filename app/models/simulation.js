@@ -70,9 +70,9 @@ SimulationSchema.path('date_launch').validate(function(s) {
     return s !== null;
 }, 'Launch date must be set');
 
-SimulationSchema.path('date_term').validate(function(s) {
-    return s === null;
-}, 'Termination date must not be set');
+// SimulationSchema.path('date_term').validate(function(s) {
+//    return s === null;
+// }, 'Termination date must not be set');
 
 SimulationSchema.path('sim_id').validate(function(s) {
     return s >= 0;

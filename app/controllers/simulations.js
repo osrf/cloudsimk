@@ -156,6 +156,8 @@ exports.terminate = function(req, res) {
     var simulation = req.simulation;
 
     simulation.state = 'Terminated';
+    simulation.date_term = Date.now();
+
     simulation.save(function(err) {
         if (err) {
             return res.send('users/signup', {
@@ -219,7 +221,7 @@ exports.running = function(req, res) {
 /// @param[in] req Nodejs request object.
 /// @param[out] res Nodejs response object.
 exports.history = function(req, res) {
-    Simulation.find({state: 'Terminated'}).sort('-created').populate('user', 'name username')
+    Simulation.find({state: 'Terminated'}).sort('-date_term').populate('user', 'name username')
       .exec(function(err, simulations) {
         if (err) {
             res.render('error', {
