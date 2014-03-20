@@ -19,7 +19,6 @@ angular.module('mean.simulations').controller('SimulationsController', ['$scope'
             region: $scope.region
         });
         simulation.$save(function(response) {
-            console.log(response);
             $location.path('simulations/' + response._id);
         });
     };
