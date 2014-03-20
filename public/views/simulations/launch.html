@@ -5,8 +5,7 @@
       <!-- Form to launch a simulation. This form uses the launch() function
            in SimulationsController -->
       <form class="form-inline form-horizontal" role="form"
-        ng-submit="launch()" ng-controller="SimulationsController"
-        style="margin: 0 auto; width: 90%">
+        ng-submit="launch()" ng-controller="SimulationsController">
 
         <!-- Create a control group for the world -->
         <div class="form-group">
@@ -27,7 +26,7 @@
 
            
          <!-- Create a control group for the region -->
-         <div class="form-group" style="padding-left:20px">
+         <div class="form-group">
            <label for="region" class="col-sm-2 control-label">Region</label>
            <div class="col-sm-10">
              <select class="form-control" style="width: 190px"
@@ -45,9 +44,7 @@
          </div>
       
          <!-- Create a control group for the launch button -->
-         <div class="form-group" style="padding-left:50px">
            <button type="submit" class="btn btn-primary">Launch Gazebo</button>
-         </div>
       </form>
     </div>
     </div>
