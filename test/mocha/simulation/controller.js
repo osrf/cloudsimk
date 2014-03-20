@@ -8,6 +8,7 @@ var mongoose = require('mongoose'),
 console.log('app type: ' + typeof app);
 
 var supertest = require('supertest');
+var util = require('util');
 
 var user;
 var agent;
@@ -20,7 +21,6 @@ function log_res(res, verbose) {
     console.log('body: %j',  res.body);
     console.log('redirects: ' + res.redirects.length);
     console.log('text: ' + res.text);
-    var util = require('util');
     console.log('everything: ' + util.inspect(res));
 }
 
