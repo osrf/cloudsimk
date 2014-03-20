@@ -3,26 +3,15 @@
 /// Module dependencies.
 var mongoose = require('mongoose'),
     User = mongoose.model('User'),
-    app = require('../../../server');
+    app = require('../../../server'),
+    util = require('../util');
 
 console.log('app type: ' + typeof app);
 
 var supertest = require('supertest');
-var util = require('util');
 
 var user;
 var agent;
-
-function log_res(res, verbose) {
-    if (!verbose)
-        return;
-    var cookie = res.headers['set-cookie'];
-    console.log('cookie: ' + cookie);
-    console.log('body: %j',  res.body);
-    console.log('redirects: ' + res.redirects.length);
-    console.log('text: ' + res.text);
-    console.log('everything: ' + util.inspect(res));
-}
 
 describe('<Unit Test>', function() {
     describe('Simulation Controller:', function() {
@@ -54,7 +43,7 @@ describe('<Unit Test>', function() {
                 agent
                 .get('/simulations/running')
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     JSON.parse(res.text).length.should.be.exactly(0);
@@ -69,7 +58,7 @@ describe('<Unit Test>', function() {
                 agentUnauthorized
                 .get('/simulations/running')
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     res.should.have.status(401);
                     done();
                 });
