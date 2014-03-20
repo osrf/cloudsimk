@@ -3,27 +3,17 @@
 /// Module dependencies.
 var mongoose = require('mongoose'),
     User = mongoose.model('User'),
-    app = require('../../../server');
+    app = require('../../../server'),
+    util = require('../util');
 
 console.log('app type: ' + typeof app);
 
 var supertest = require('supertest');
-var util = require('util');
 
 var cookie;
 var user;
 var agent;
 
-function log_res(res, verbose) {
-    if (!verbose)
-        return;
-    var cookie = res.headers['set-cookie'];
-    console.log('cookie: ' + cookie);
-    console.log('body: %j',  res.body);
-    console.log('redirects: ' + res.redirects.length);
-    console.log('text: ' + res.text);
-    console.log('everything: ' + util.inspect(res));
-}
 
 describe('<Unit Test>', function() {
     describe('Model User:', function() {
@@ -47,7 +37,7 @@ describe('<Unit Test>', function() {
                     .set('Acccept', 'application/json')
                     .send({ email: 'random@test.com', password:'secret' })
                     .end(function(err,res){
-                        log_res(res);
+                        util.log_res(res);
                         // 302 Moved Temporarily  200 OK
                         res.should.have.status(302);
                         res.redirect.should.equal(true);
@@ -62,7 +52,7 @@ describe('<Unit Test>', function() {
                 agent
                 .get('/users/me')
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     // 302 Moved Temporarily  200 OK
                     res.should.have.status(200);
                     // cookie = res.headers['set-cookie'];
@@ -82,7 +72,7 @@ describe('<Unit Test>', function() {
                     // 302 Moved Temporarily  200 OK
                     res.should.have.status(302);
                     cookie = res.headers['set-cookie'];
-                    log_res(res);
+                    util.log_res(res);
                     res.redirect.should.equal(true);
                     res.headers.location.should.equal('/');
                     done();
@@ -95,7 +85,7 @@ describe('<Unit Test>', function() {
                 agent
                 .get('/users/me')
                 .end(function(err,res){
-                    log_res(res);
+                    util.log_res(res);
                     // 302 Moved Temporarily  200 OK
                     res.should.have.status(200);
                     // cookie = res.headers['set-cookie'];
