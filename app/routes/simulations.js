@@ -16,29 +16,33 @@ module.exports = function(app) {
 
     /// GET /simulations/history
     /// Return the simulation history for the user
-    app.get('/simulations/history', Simulations.history);
+    app.get('/simulations/history',
+        authorization.requiresLogin, Simulations.history);
 
-    /// DEL /simulations/history:simulationId 
+    /// DEL /simulations/history:simulationId
     /// Delete one simulation history instance
     app.del('/simulations/history/:simulationId',
-            authorization.requiresLogin, hasAuthorization, Simulations.destroy);
+        authorization.requiresLogin, hasAuthorization, Simulations.destroy);
 
-    /// GET /simulations/running 
+    /// GET /simulations/running
     /// Return all the running simulations
-    app.get('/simulations/running', Simulations.all);
+    app.get('/simulations/running',
+        authorization.requiresLogin, Simulations.all);
 
-    /// POST /simulations 
+    /// POST /simulations
     /// Create a new simulation
-    app.post('/simulations', authorization.requiresLogin, Simulations.create);
+    app.post('/simulations',
+        authorization.requiresLogin, Simulations.create);
 
     /// GET /simulations/:simulationId
-    /// Return properties for one simulation 
-    app.get('/simulations/:simulationId', Simulations.show);
+    /// Return properties for one simulation
+    app.get('/simulations/:simulationId',
+        authorization.requiresLogin, Simulations.show);
 
     /// PUT /simulations/:simulationId
     /// Modify one simulation
     app.put('/simulations/:simulationId',
-            authorization.requiresLogin, hasAuthorization, Simulations.update);
+        authorization.requiresLogin, hasAuthorization, Simulations.update);
 
     /// Finish with setting up the simulationId param
     app.param('simulationId', Simulations.Simulation);
