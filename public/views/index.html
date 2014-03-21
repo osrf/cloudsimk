@@ -1,3 +1,11 @@
 <section data-ng-controller="IndexController">
-<!-- PUT IN THE KIOSK CONTENT HERE -->
+
+  <!-- Show the simulations view when authenticated -->
+  <ng-include src="'views/index_authenticated.html'"
+  data-ng-show="global.authenticated"></ng-include>
+
+  <!-- Show the landing page view when not authenticated -->
+  <ng-include src="'views/index_landing.html'"
+  data-ng-hide="global.authenticated"></ng-include>
+
 </section>
