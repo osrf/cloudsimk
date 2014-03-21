@@ -16,16 +16,16 @@
                 <div>
                     <ul class="pagination pull-right">
                         <li ng-class="{disabled: currentPage == 0}">
-                            <a href ng-click="prevPage()">« Prev</a>
+                            <a href ng-click="setPage(currentPage-1)">« Prev</a>
                         </li>
                         <li ng-repeat="n in range(pagedItems.length,
                         currentPage, currentPage + gap)" ng-class="{active: n ==
-                        currentPage}" ng-click="setPage()">
+                        currentPage}" ng-click="setPage(n)">
                             <a href ng-bind="n+1">1</a>
                         </li>
                         <li ng-class="{disabled: (currentPage) ==
                         pagedItems.length - 1}">
-                            <a href ng-click="nextPage()">Next »</a>
+                            <a href ng-click="setPage(currentPage+1)">Next »</a>
                         </li>
                     </ul>
                 </div>

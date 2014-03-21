@@ -46,7 +46,6 @@ angular.module('mean.simulations').controller('SimulationsController', ['$scope'
             $scope.simulations[i].selected = $scope.simulationsChecked;
     };
 
-
     $scope.gap = 5;
     $scope.groupedItems = [];
     $scope.itemsPerPage = 5;
@@ -66,7 +65,7 @@ angular.module('mean.simulations').controller('SimulationsController', ['$scope'
 
     $scope.range = function (size,start, end) {
         var ret = [];
-        console.log(size,start, end);
+        // console.log(size,start, end);
 
         if (size < end) {
             end = size;
@@ -76,24 +75,13 @@ angular.module('mean.simulations').controller('SimulationsController', ['$scope'
         for (var i = start; i < end; i++) {
             ret.push(i);
         }
-        console.log(ret);
+        // console.log(ret);
         return ret;
     };
 
-    $scope.prevPage = function () {
-        if ($scope.currentPage > 0) {
-            $scope.currentPage--;
-        }
-    };
-
-    $scope.nextPage = function () {
-        if ($scope.currentPage < $scope.pagedItems.length - 1) {
-            $scope.currentPage++;
-       }
-    };
-
-    $scope.setPage = function () {
-        $scope.currentPage = this.n;
+    $scope.setPage = function(n) {
+        if (n >= 0 && n < $scope.pagedItems.length)
+            $scope.currentPage = n;
     };
 
 }]);
