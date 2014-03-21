@@ -92,7 +92,7 @@ exports.create = function(req, res) {
 /// @return Simulation update function.
 exports.update = function(req, res) {
 
-    /* Get the simulation from the request */
+    // Get the simulation from the request
     var simulation = req.simulation;
 
     if (simulation.state === 'Terminated') {
@@ -101,10 +101,23 @@ exports.update = function(req, res) {
         return;
     }
 
-    /* use the lodash library to populate each
-     * simulation attribute with the values in the
-     * request body
-     */
+    // Check to make sure the region is not modified.
+    if (req.body.region && simulation.region !== req.body.region) {
+
+        // Create an error message. The id is currently arbitrary.
+        var error = {error: {
+            msg: 'Cannot change the region of a running simulation',
+            id: 0
+        }};
+
+        // Can't change the world.
+        res.jsonp(error);
+        return;
+    }
+
+    // use the lodash library to populate each
+    // simulation attribute with the values in the
+    // request body
     simulation = _.extend(simulation, req.body);
 
     /* Save the updated simulation to the database */

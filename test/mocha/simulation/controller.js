@@ -191,10 +191,29 @@ describe('<Unit Test>', function() {
         });
 
         describe('Check Update Running Simulation by ID', function() {
-            it('should be able to update a running simulation', function(done) {
+            it('should not be able to change the region of a running simulation', function(done) {
                 agent
                 .put('/simulations/1')
                 .send({ world: 'blank_update.world', region:'europe' })
+                .end(function(err, res){
+                    util.log_res(res);
+                    res.should.have.status(200);
+                    res.redirect.should.equal(false);
+                    var text = JSON.parse(res.text);
+                    console.log(text);
+                    text.error.msg.should.equal(
+                        'Cannot change the region of a running simulation');
+                    done();
+                });
+            });
+        });
+
+
+        describe('Check Update Running Simulation by ID with region', function() {
+            it('should be able to update a running simulation with correct region', function(done) {
+                agent
+                .put('/simulations/1')
+                .send({ world: 'blank_update.world', region:'asia' })
                 .end(function(err,res){
                     util.log_res(res);
                     res.should.have.status(200);
@@ -204,7 +223,28 @@ describe('<Unit Test>', function() {
                     text.user.username.should.equal('user');
                     text.sim_id.should.be.exactly(1);
                     text.state.should.equal('Launching');
-                    text.region.should.equal('europe');
+                    text.region.should.equal('asia');
+                    text.world.should.equal('blank_update.world');
+                    done();
+                });
+            });
+        });
+
+        describe('Check Update Running Simulation by ID without region', function() {
+            it('should be able to update a running simulation with no region specified', function(done) {
+                agent
+                .put('/simulations/1')
+                .send({ world: 'blank_update.world'})
+                .end(function(err,res){
+                    util.log_res(res);
+                    res.should.have.status(200);
+                    res.redirect.should.equal(false);
+                    var text = JSON.parse(res.text);
+                    text.user.name.should.equal('User Tester');
+                    text.user.username.should.equal('user');
+                    text.sim_id.should.be.exactly(1);
+                    text.state.should.equal('Launching');
+                    text.region.should.equal('asia');
                     text.world.should.equal('blank_update.world');
                     done();
                 });
@@ -224,7 +264,7 @@ describe('<Unit Test>', function() {
                     text.user.username.should.equal('user');
                     text.sim_id.should.be.exactly(1);
                     text.state.should.equal('Launching');
-                    text.region.should.equal('europe');
+                    text.region.should.equal('asia');
                     text.world.should.equal('blank_update.world');
                     done();
                 });
@@ -281,7 +321,7 @@ describe('<Unit Test>', function() {
                     text[0].user.username.should.equal('user');
                     text[0].sim_id.should.be.exactly(1);
                     text[0].state.should.equal('Launching');
-                    text[0].region.should.equal('europe');
+                    text[0].region.should.equal('asia');
                     text[0].world.should.equal('blank_update.world');
                     done();
                 });
