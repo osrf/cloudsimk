@@ -1,13 +1,16 @@
 <section data-ng-controller="SimulationsController" data-ng-init="find()">
     <table class="table">
         <tr>
+            <th><input type="checkbox" ng-model="simulationsChecked"
+                ng-change="selectAllSimulations()"></th>
             <th>ID</th>
             <th>Status</th>
             <th>Region</th>
             <th>Uptime</th>
             <th>Cost</th>
-        </tr>
+          </tr>
         <tr ng-repeat="simulation in simulations">
+            <td><input type="checkbox" ng-model="simulation.selected"></td>
             <td>{{simulation.sim_id}}<br>{{simulation.world}}</br></td>
             <td>{{simulation.state}}</td>
             <td>{{simulation.region}}</td>
