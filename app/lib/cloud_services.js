@@ -10,12 +10,13 @@ var util = require('util');
 
 /////////////////////////////////////////////////////////////
 // Launch a simulator machine, given:
-// a username (for info on the AWS console)
-// a public ssh key name (must exist on AWS for that region)
-// a simulation id (for info on the AWS console) 
-// a hardware type
-// an AMI (image id registered in that region)
-// a call back function
+// @param[in] username Username (for info on the AWS console)
+// @param[in] keyName Public ssh key name (must exist on AWS for that region)
+// @param[in] simId Simulation id (for info on the AWS console) 
+// @param[in] region The region in which to launch the machine.
+// @param[in] hardware A hardware type
+// @param[in] image An AMI (image id registered in that region)
+// @param[in] a call back function
 exports.launchSimulator = function (username, keyName, simId, region, hardware, image, cb) {
 
     // set AWS region
@@ -28,15 +29,16 @@ exports.launchSimulator = function (username, keyName, simId, region, hardware, 
         MinCount:1,
         MaxCount: 1
     };
+
     var ec2 = new AWS.EC2();
     ec2.runInstances(awsParams, function (err, data) {
-
         if(err) {
             cb(err);
         }
         else {
             if(data.Instances[0]) {
-                // console.log("data.instances[0]:  " + util.inspect(data.Instances[0]));
+                // console.log("data.instances[0]:  " +
+                // util.inspect(data.Instances[0]));
 
                 var machineInfo = { id: data.Instances[0].InstanceId,
                                     region: region
@@ -61,21 +63,22 @@ exports.launchSimulator = function (username, keyName, simId, region, hardware, 
 };
 
 
-
 /////////////////////////////////////////////////////////
-//
 // Get the ip address and status of a simulator machine
-// machineInfo must contain:
+// @params[in] machineInfo machineInfo must contain:
 //      id: the AWS instance id
-//      region: the AWS region where the machine exists      
+//      region: the AWS region where the machine exists
+// @param[in] cb Callback function to use when this function is complete.
 exports.simulatorStatus = function (machineInfo, cb) {
     var params = {
         DryRun: false,
         Filters: [],
         InstanceIds: [machineInfo.id]
     };
+
     AWS.config.region = machineInfo.region;
     var ec2 = new AWS.EC2();
+
     ec2.describeInstances(params, function(err, data) {
         if (err) {
             cb(err);
@@ -93,7 +96,6 @@ exports.simulatorStatus = function (machineInfo, cb) {
 
 
 ////////////////////////////////////////////////////
-//
 // Terminates a simulator machine.
 // machineInfo must constain:
 //       id: the AWS instance id
@@ -107,7 +109,8 @@ exports.terminateSimulator = function (machineInfo, cb) {
     var ec2 = new AWS.EC2();
     ec2.terminateInstances(params, function(err, data) {
         if (err) {
-            // console.log('terminate err: ' + err, err.stack); // an error occurred
+            // console.log('terminate err: ' + err, err.stack);
+            // an error occurred
             cb(err);
         } else  {
             // console.log('terminate data: ' + util.inspect(data));
@@ -119,47 +122,31 @@ exports.terminateSimulator = function (machineInfo, cb) {
 
 
 //////////////////////////////////////////////////////
-//
 // Uploads a public ssh key to a specific AWS region
 // The key name on AWS is 'cs-' + the specified username 
 exports.setupPublicKey = function (username, region, cb) {
     var params = {
-        KeyName: 'cs-' + username, // required
-        PublicKeyMaterial: 'BASE64_ENCODED_STRING', // required
+        // required
+        KeyName: 'cs-' + username,
+        // required
+        PublicKeyMaterial: 'BASE64_ENCODED_STRING',
         DryRun: false
     };
+
     AWS.config.region = region;
     var ec2 = new AWS.EC2();
+
     ec2.importKeyPair(params, function(err, data) {
         if (err) {
-            console.log(err, err.stack); // an error occurred
+            // an error occurred
+            console.log(err, err.stack);
             cb(err);
         }
         else {
-            console.log(util.inspect(data));           // successful response
+            // successful response
+            console.log(util.inspect(data));
             var info = data;
             cb(null, info);
         }
     });
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
