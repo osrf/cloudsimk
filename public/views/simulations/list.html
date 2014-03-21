@@ -1,6 +1,7 @@
 <section data-ng-controller="SimulationsController" data-ng-init="find()">
-    <table class="table">
-        <tr>
+    <table class="table table-striped table-condensed table-hover">
+        <thead>
+          <tr>
             <th><input type="checkbox" ng-model="simulationsChecked"
                 ng-change="selectAllSimulations()"></th>
             <th>ID</th>
@@ -9,7 +10,29 @@
             <th>Uptime</th>
             <th>Cost</th>
           </tr>
-        <tr ng-repeat="simulation in simulations">
+        </thead>
+        <tfoot>
+            <td colspan="6">
+                <div>
+                    <ul class="pagination pull-right">
+                        <li ng-class="{disabled: currentPage == 0}">
+                            <a href ng-click="prevPage()">« Prev</a>
+                        </li>
+                        <li ng-repeat="n in range(pagedItems.length,
+                        currentPage, currentPage + gap)" ng-class="{active: n ==
+                        currentPage}" ng-click="setPage()">
+                            <a href ng-bind="n+1">1</a>
+                        </li>
+                        <li ng-class="{disabled: (currentPage) ==
+                        pagedItems.length - 1}">
+                            <a href ng-click="nextPage()">Next »</a>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+        </tfoot>
+        <tbody>
+        <tr ng-repeat="simulation in pagedItems[currentPage]">
             <td><input type="checkbox" ng-model="simulation.selected"></td>
             <td>{{simulation.sim_id}}<br>{{simulation.world}}</br></td>
             <td>{{simulation.state}}</td>
@@ -17,6 +40,7 @@
             <td>0</td>
             <td>0</td>
         </tr>
+        </tbody>
 	  </table>
   <!-- Create a control group for the launch button -->
   <button ng-click="find()" class="btn btn-primary" >Get Simulations</button>
