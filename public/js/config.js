@@ -21,7 +21,12 @@ angular.module('mean').config(['$stateProvider', '$urlRouterProvider',
         url: '/simulations/:simulationId',
         templateUrl: 'views/simulations/view.html'
     })*/
-      .state('home', {
+    // Route to the admin view
+    .state('admin', {
+        url: '/admin',
+        templateUrl: 'views/users/admin.html'
+    })
+    .state('home', {
         url: '/',
         templateUrl: 'views/index.html'
     });
