@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('mean.simulations').controller('SimulationsController', ['$scope', '$stateParams', '$location', 'Global', 'Simulations', function ($scope, $stateParams, $location, Global, Simulations) {
+angular.module('mean.simulations').controller('SimulationsController', ['$scope', '$stateParams', '$location', 'Global', 'Simulations', 'SimulationsRunning', function ($scope, $stateParams, $location, Global, Simulations, SimulationsRunning) {
     $scope.global = Global;
 
     /// All the worlds available to the user.
@@ -24,7 +24,7 @@ angular.module('mean.simulations').controller('SimulationsController', ['$scope'
     };
 
     $scope.find = function() {
-        Simulations.query(function(simulations) {
+        SimulationsRunning.query(function(simulations) {
             $scope.simulations = simulations;
         });
     };

@@ -1,11 +1,21 @@
 <section data-ng-controller="SimulationsController" data-ng-init="find()">
-	<ul class="simulations unstyled">
-		<li data-ng-repeat="simulation in simulations">
-			<span>{{simulation.date_launched | date:'medium'}}</span> /
-			<span>{{simulation.user.name}}</span>
-			<h2><a data-ng-href="#!/simulations/{{simulation.sim_id}}">{{simulation.sim_id}}</a></h2>
-			<div>{{simulation.sim_id}}</div>
-		</li>
-	</ul>
-	<h1 data-ng-hide="!simulations || simulations.length">No simulations yet. <br> Why don't you <a href="/#!/simulations/create">Create One</a>?</h1>
+    <table class="table">
+        <tr>
+            <th>ID</th>
+            <th>Status</th>
+            <th>Region</th>
+            <th>Uptime</th>
+            <th>Cost</th>
+        </tr>
+        <tr ng-repeat="simulation in simulations">
+            <td>{{simulation.sim_id}}<br>{{simulation.world}}</br></td>
+            <td>{{simulation.state}}</td>
+            <td>{{simulation.region}}</td>
+            <td>0</td>
+            <td>0</td>
+        </tr>
+	  </table>
+  <!-- Create a control group for the launch button -->
+  <button ng-click="find()" class="btn btn-primary" >Get Simulations</button>
+
 </section>
