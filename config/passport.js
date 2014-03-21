@@ -82,10 +82,17 @@ module.exports = function(passport) {
 
     // Use yahoo strategy
     passport.use(new YahooStrategy({
-        returnURL: config.google.returnURL,
-        realm: config.google.realmURL
+        returnURL: config.yahoo.returnURL,
+        realm: config.yahoo.realmURL
         },
         function(identifier, profile, done) {
+            // We are restricting users to only OSRF people using
+            // their google accounts
+            return done({
+                message: "CloudSim is closed to external users.",
+                stack: "CloudSim is closed to external users."
+            });
+
             User.findOne({open_id: identifier}, function(err, user) {
                 if (!user) {
                     user = new User({
@@ -109,10 +116,16 @@ module.exports = function(passport) {
 
     // Use openid strategy
     passport.use(new OpenIDStrategy({
-        returnURL: config.google.returnURL,
-        realm: config.google.realmURL
+        returnURL: config.openid.returnURL,
+        realm: config.openid.realmURL
         },
         function(identifier, profile, done) {
+            // We are restricting users to only OSRF people using
+            // their google accounts
+            return done(null, false, {
+                message: "CloudSim is closed to external users.",
+            });
+
             User.findOne({open_id: identifier}, function(err, user) {
                 if (!user) {
                     user = new User({
@@ -136,10 +149,16 @@ module.exports = function(passport) {
 
     // Use aol strategy
     passport.use(new AOLStrategy({
-        returnURL: config.google.returnURL,
-        realm: config.google.realmURL
+        returnURL: config.aol.returnURL,
+        realm: config.aol.realmURL
         },
         function(identifier, profile, done) {
+            // We are restricting users to only OSRF people using
+            // their google accounts
+            return done(null, false, {
+                message: "CloudSim is closed to external users.",
+            });
+
             User.findOne({open_id: identifier}, function(err, user) {
                 if (!user) {
                     user = new User({
