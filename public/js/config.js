@@ -1,7 +1,7 @@
 'use strict';
 
 // Setting up route
-angular.module('mean').config(['$stateProvider', '$urlRouterProvider',
+angular.module('cloudsim').config(['$stateProvider', '$urlRouterProvider',
   function($stateProvider, $urlRouterProvider) {
     // For unmatched routes:
     $urlRouterProvider.otherwise('/');
@@ -34,7 +34,7 @@ angular.module('mean').config(['$stateProvider', '$urlRouterProvider',
 ]);
 
 // Setting HTML5 Location Mode
-angular.module('mean').config(['$locationProvider',
+angular.module('cloudsim').config(['$locationProvider',
   function($locationProvider) {
     $locationProvider.hashPrefix('!');
 }

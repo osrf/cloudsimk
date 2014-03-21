@@ -1,10 +1,10 @@
 'use strict';
 
 (function() {
-    describe('MEAN controllers', function() {
+    describe('CloudSim controllers', function() {
         describe('IndexController', function() {
             // Load the controllers module
-            beforeEach(module('mean'));
+            beforeEach(module('cloudsim'));
 
             var scope, IndexController;
 

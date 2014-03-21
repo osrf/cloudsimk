@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('mean', ['ngCookies', 'ngResource', 'ui.bootstrap', 'ui.router', 'ngAnimate', 'mean.system', 'mean.simulations', 'mean.users']);
+angular.module('cloudsim', ['ngCookies', 'ngResource', 'ui.bootstrap', 'ui.router', 'ngAnimate', 'cloudsim.system', 'cloudsim.simulations', 'cloudsim.users']);
 
-angular.module('mean.system', []);
-angular.module('mean.simulations', []);
-angular.module('mean.users', []);
+angular.module('cloudsim.system', []);
+angular.module('cloudsim.simulations', []);
+angular.module('cloudsim.users', []);
