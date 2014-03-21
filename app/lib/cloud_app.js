@@ -1,4 +1,7 @@
-var cloud_services = require('cloud_services');
+'use strict';
+
+var util = require('util');
+var cloud_services = require('./cloud_services');
 
 
 // this is a cmd line app to exercise the cloud_services module,
@@ -22,20 +25,17 @@ var cloud_services = require('cloud_services');
 
 var sim_id = 'sim_0';
 var username = 'test@test.com';
-var keyName = 'cs-test@test.com';
 var image = 'ami-b8d2b088';
 var hardware = 'g2.2xlarge';
-
-
 var cmd = process.argv[2];
 
 console.log('cmd: ' + cmd);
 
-if (cmd == 'launch') {
-    region = process.argv[3];
+if (cmd === 'launch') {
+    var region = process.argv[3];
     console.log('region: ' + region);
-    keyName = process.argv[4];
-    console.log('keyName: ' + keyName;
+    var keyName = process.argv[4];
+    console.log('keyName: ' + keyName);
 
     cloud_services.launchSimulator(username, keyName, sim_id, region, hardware, image, function (err, machineInfo) {
         if(err) {
@@ -46,20 +46,20 @@ if (cmd == 'launch') {
     });
 }
 
-if (cmd == 'stat') {
+if (cmd === 'stat') {
     var instance = process.argv[3];
     var region = process.argv[4];
 
     console.log('instance: ' + instance);
     console.log('region:' + region);
 
-    simulatorStatus({id: instance, region: region}, function(err, data) {
+    cloud_services.simulatorStatus({id: instance, region: region}, function(err, data) {
         if (err) console.log(err);
         else console.log(data);
     });
 }
 
-if (cmd == 'term') {
+if (cmd === 'term') {
     var instance = process.argv[3];
     var region = process.argv[4];
 
@@ -72,17 +72,17 @@ if (cmd == 'term') {
     });
 }
 
-if (cmd == 'key') {
-    username = process.argv[3];
+if (cmd === 'key') {
+    var username = process.argv[3];
     console.log('username: ' + username);
-    path = process.argv[4];
+    var path = process.argv[4];
     console.log('path: ' + path);
-    region = process.argv[5];
+    var region = process.argv[5];
     console.log('region: ' + region);
 
     cloud_services.setupPublicKey(username, region, function (err, info) {
-       if (err) console.log('err: ' + err);
-       else console.log('info: ' + info);
+        if (err) console.log('err: ' + err);
+        else console.log('info: ' + info);
     });
 }
 
