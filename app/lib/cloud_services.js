@@ -4,6 +4,8 @@
 var AWS = require('aws-sdk');
 var util = require('util');
 
+var dryRun = process.env.NODE_ENV != 'production';
+
 
 // Async functions to launch machines on a cloud provider
 // AWS is the only supported one for now
@@ -22,6 +24,7 @@ exports.launchSimulator = function (username, keyName, simId, region, hardware, 
     AWS.config.region = region;
 
     var awsParams = {
+        DryRun: dryRun,
         KeyName: keyName,
         ImageId: image,
         InstanceType: hardware,
@@ -70,7 +73,7 @@ exports.launchSimulator = function (username, keyName, simId, region, hardware, 
 //      region: the AWS region where the machine exists      
 exports.simulatorStatus = function (machineInfo, cb) {
     var params = {
-        DryRun: false,
+        DryRun: dryRun,
         Filters: [],
         InstanceIds: [machineInfo.id]
     };
@@ -101,7 +104,7 @@ exports.simulatorStatus = function (machineInfo, cb) {
 exports.terminateSimulator = function (machineInfo, cb) {
     var params = {
         InstanceIds: [ machineInfo.id],
-        DryRun: false
+        DryRun: dryRun
     };
     AWS.config.region = machineInfo.region;
     var ec2 = new AWS.EC2();
@@ -126,7 +129,7 @@ exports.setupPublicKey = function (username, region, cb) {
     var params = {
         KeyName: 'cs-' + username, // required
         PublicKeyMaterial: 'BASE64_ENCODED_STRING', // required
-        DryRun: false
+        DryRun: dryRun
     };
     AWS.config.region = region;
     var ec2 = new AWS.EC2();
