@@ -27,9 +27,12 @@ var UserSchema = new Schema({
         type: String,
         unique: true
     },
-   
+
     /// The ID of the next simulation instance the user will run
-    next_sim_id: Number,
+    next_sim_id: {
+        type: Number,
+        default: 0
+    },
 
     /// The user's password
     hashed_password: String,
@@ -106,7 +109,7 @@ UserSchema.pre('save', function(next) {
 /// Methods
 UserSchema.methods = {
     ///  Authenticate - check if the passwords are the same
-    /// 
+    ///
     ///  @param {String} plainText
     ///  @return {Boolean}
     ///  @api public
@@ -115,7 +118,7 @@ UserSchema.methods = {
     },
 
     ///  Make salt
-    /// 
+    ///
     ///  @return {String}
     ///  @api public
     makeSalt: function() {
@@ -123,7 +126,7 @@ UserSchema.methods = {
     },
 
     ///  Encrypt password
-    /// 
+    ///
     ///  @param {String} password
     ///  @return {String}
     ///  @api public
@@ -132,6 +135,14 @@ UserSchema.methods = {
         var salt = new Buffer(this.salt, 'base64');
         return crypto.pbkdf2Sync(password, salt, 10000, 64).toString('base64');
     }
+};
+
+/////////////////////////////////////////////////
+// Statics
+UserSchema.statics.load = function(id, cb) {
+    this.findOne({
+        _id: id
+    }).exec(cb);
 };
 
 mongoose.model('User', UserSchema);
