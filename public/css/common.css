@@ -57,6 +57,8 @@
   margin-right: 0px;
   line-height: 50px;
 }
+
+
 /*First part of login dropdown*/
 .navbar .nav > li > .dropdown-menu::before {
   position: absolute;
@@ -97,6 +99,51 @@
   color: #448ac9;
  }
 
+ /*MODAL FOR LOGGING IN/SIGNING UP*/
+
+.modal-header{
+  color;#333;
+}
+ .modal-body {
+  color:#333;
+  line-height: 130%;
+  font-size: 18px;
+  font-family:  "Helvetica Neue",Helvetica,Arial,sans-serif; 
+ }
+/*Adds padding to top of OpenID list*/
+ .dropdown-menu-modal{
+  padding-top: 20px;
+ }
+
+/*Settings for Login options text*/
+.dropdown-menu-modal > li > a {
+  color:#333;
+  text-decoration: none;
+  list-style: none;
+/*I'm trying to left-align the li items in relation
+to one another, but then center-align the entire
+block of li's...This is a bad hack, I think. Will
+it mess up the responsiveness? How do I get the width
+just right so it's in the middle of the modal?*/
+  display: block;
+  text-align: left;
+  width:140px;
+  margin:0px auto;
+} 
+
+/* Hover state for icons in signup modal*/
+ .dropdown-menu-modal > li > a:hover > img {
+  background: #448ac9;
+  border-color: #ffffff;
+}
+
+/* Hover state for OpenID option text in signup modal*/
+.dropdown-menu-modal > li > a:hover {
+  color: #448ac9;
+ }
+
+/*MODAL COMMENTS END HERE*/
+
 
 h1, h2, h3, h4, h5, h6 {
   font-family: Montserrat;
@@ -108,6 +155,10 @@ p {
 }
 
 .col-sm-6 {
+  padding-bottom: 50px;
+}
+
+.col-sm-offset-6 {
   padding-bottom: 50px;
 }
 
@@ -135,6 +186,7 @@ p {
   padding-bottom: 8px;
   font-family: Montserrat;
 }
+
 
 footer {
     position:fixed;
