@@ -1,10 +1,10 @@
-<section data-ng-controller="SimulationsController" data-ng-init="find()">
+<div class="container">
   <table class="table table-striped table-condensed table-hover">
     <thead>
       <tr>
-        <th><input type="checkbox" ng-model="simulationsChecked"
-           ng-change="selectAllSimulations()"></th>
-        <th>ID</th>
+        <th><input type="checkbox"></th>
+        <th>Id</th>
+        <th>World</th>
         <th>Status</th>
         <th>Region</th>
         <th>Uptime</th>
@@ -12,30 +12,20 @@
       </tr>
     </thead>
     <tfoot>
-      <td colspan="6">
-        <div>
-          <ul class="pagination pull-right">
-            <li ng-class="{disabled: currentPage == 0}">
-               <a href ng-click="setPage(currentPage-1)">« Prev</a>
-            </li>
-            <li ng-repeat="n in range(pagedItems.length,
-                currentPage, currentPage + gap)"
-                ng-class="{active: n == currentPage}"
-                ng-click="setPage(n)">
-              <a href ng-bind="n+1">1</a>
-            </li>
-              <li ng-class="{disabled: (currentPage) ==
-                  pagedItems.length - 1}">
-                <a href ng-click="setPage(currentPage+1)">Next »</a>
-             </li>
-           </ul>
+      <td colspan="7">
+        <div class='text-right'>
+          <pagination direction-links="true"
+          total-items="simulations.length" items-per-page="simPerPage"
+          page="currentPage" ng-model="currentPage"></pagination>
          </div>
       </td>
     </tfoot>
+
     <tbody>
-      <tr ng-repeat="simulation in pagedItems[currentPage]">
-        <td><input type="checkbox" ng-model="simulation.selected"></td>
-        <td>{{simulation.sim_id}}<br>{{simulation.world}}</br></td>
+      <tr ng-repeat="simulation in simulations.slice((currentPage-1)*simPerPage, (currentPage-1)*simPerPage+simPerPage)">
+        <td><input type="checkbox"></td>
+        <td>{{simulation.sim_id}}</td>
+        <td>{{simulation.world}}</td>
         <td>{{simulation.state}}</td>
         <td>{{simulation.region}}</td>
         <td>0</td>
@@ -43,6 +33,4 @@
       </tr>
     </tbody>
   </table>
-  <!-- A button for testing the display of simulations -->
-  <button ng-click="find()" class="btn btn-primary" >Get Simulations</button>
-</section>
+</div>
