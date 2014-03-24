@@ -70,6 +70,9 @@ exports.launchSimulator = function (username, keyName, simId, region, hardware, 
 //      region: the AWS region where the machine exists
 // @param[in] cb Callback function to use when this function is complete.
 exports.simulatorStatus = function (machineInfo, cb) {
+    // the parameters for describeInstances call
+    // we only want information about a single 
+    // machine (machineInfo.id
     var params = {
         DryRun: false,
         Filters: [],
@@ -101,6 +104,9 @@ exports.simulatorStatus = function (machineInfo, cb) {
 //       id: the AWS instance id
 //       region: the region where the machine exists
 exports.terminateSimulator = function (machineInfo, cb) {
+    // parameters for terminateInstances
+    // we specifiy which machine to 
+    // terminate in the InstanceIds array
     var params = {
         InstanceIds: [ machineInfo.id],
         DryRun: false
