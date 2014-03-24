@@ -9,6 +9,7 @@ var mongoose = require('mongoose'),
     User = mongoose.model('User'),
     _ = require('lodash');
 
+var cloud_service = require('../lib/cloud_services.js');
 
 /////////////////////////////////////////////////
 /// Find Simulation by id
