@@ -36,7 +36,7 @@ exports.launchSimulator = function (username, keyName, simId, region, hardware, 
             cb(err);
         }
         else {
-            if(data.Instances[0]) {
+            if(data.Instances.length > 0 && data.Instances[0]) {
                 // console.log("data.instances[0]:  " +
                 // util.inspect(data.Instances[0]));
 
@@ -57,6 +57,10 @@ exports.launchSimulator = function (username, keyName, simId, region, hardware, 
                         cb(null, machineInfo);
                     }
                 });
+            }
+            else
+            {
+                cb("No instance returned!"); 
             }
         }
     });
