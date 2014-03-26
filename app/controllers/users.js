@@ -20,6 +20,24 @@ exports.authCallback = function(req, res) {
 /// Show login form
 /// @param[in] req Nodejs request object.
 /// @param[out] res Nodejs response object.
+exports.all = function(req, res) {
+    // Get all simulation models, in creation order, for a user
+    User.find().sort('-created') //.populate('user', 'name username')
+      .exec(function(err, users) {
+        if (err) {
+            res.render('error', {
+                status: 500
+            });
+        } else {
+            res.jsonp(users);
+        }
+    });
+};
+
+/////////////////////////////////////////////////
+/// Show login form
+/// @param[in] req Nodejs request object.
+/// @param[out] res Nodejs response object.
 exports.signin = function(req, res) {
     res.render('users/signin', {
         title: 'Signin',
@@ -59,36 +77,81 @@ exports.session = function(req, res) {
 /// Create user
 /// @param[in] req Nodejs request object.
 /// @param[out] res Nodejs response object.
-/// @param[in] next The next Nodejs function to be executed.
 /// @return Function to create a user.
-exports.create = function(req, res, next) {
-    // Create a new user based on the value in the request object
-    var user = new User(req.body);
+exports.remove = function(req, res) {
+    console.log('Remove');
+    console.log(req.profile);
+    var user = req.profile;
+
+    user.remove(function(err) {
+        if (err) {
+            res.jsonp({ error: {
+                message: 'Unable to delete user',
+            }});
+        }
+        else {
+            res.jsonp(user);
+        }
+    });
+};
+
+/////////////////////////////////////////////////
+/// Create user
+/// @param[in] req Nodejs request object.
+/// @param[out] res Nodejs response object.
+/// @return Function to create a user.
+exports.create = function(req, res) {
     var message = null;
 
-    user.provider = 'local';
+    // Make sure the requesting user is authenticated.
+    // todo: Add in check for admin privelages.
+    if (!req.user || !req.user.open_id)
+    {
+        var err = {error: {
+            message: 'Only administrators can add users',
+            user: 'n/a'
+        }};
+        return res.jsonp(err);
+    }
 
-    // Save the user to the database
-    user.save(function(err) {
-        if (err) {
-            switch (err.code) {
-                case 11000:
-                case 11001:
-                    message = 'Username already exists';
-                    break;
-                default:
-                    message = 'Please fill all the required fields';
-            }
+    // Make sure the requesting user is in the database.
+    // TODO: We need to implement user privaleges.
+    User.findOne({open_id: req.user.open_id}, function(err) {
+        if (!err) {
+            // Create a new user based on the value in the request object
+            var user = new User(req.body);
+            user.provider = 'local';
 
-            return res.render('users/signup', {
-                message: message,
-                user: user
+            // Save the user to the database
+            user.save(function(err) {
+                if (err) {
+                    switch (err.code) {
+                        case 11000:
+                        case 11001:
+                            message = 'Username already exists';
+                            break;
+                        default:
+                            message = 'Please fill all the required fields';
+                    }
+    
+                    return res.jsonp({error: {
+                        message: message,
+                        user: user
+                    }
+                    });
+                }
+                else {
+                    // Send back the user (expected by angularjs on success).
+                    return res.jsonp(user);
+                }
             });
         }
-        req.logIn(user, function(err) {
-            if (err) return next(err);
-            return res;
-        });
+        else {
+            return res.jsonp({error: {
+                message: 'Only administrators can add users',
+                user: 'n/a'
+            }});
+        }
     });
 };
 

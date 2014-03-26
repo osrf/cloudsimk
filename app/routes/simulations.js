@@ -24,7 +24,7 @@ module.exports = function(app) {
     app.del('/simulations/history/:simulationId',
         authorization.requiresLogin, hasAuthorization, Simulations.destroy);
 
-     /// GET /simulations
+    /// GET /simulations
     /// Return all the simulations, running and terminated
     app.get('/simulations',
         authorization.requiresLogin, Simulations.all);
