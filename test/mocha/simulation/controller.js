@@ -66,7 +66,7 @@ describe('<Unit Test>', function() {
                 agent
                 .post('/simulations')
                 .set('Acccept', 'application/json')
-                .send({ world: 'empty.world', region:'africa' })
+                .send({ world: 'empty.world', region:'US East' })
                 .end(function(err,res){
                     util.log_res(res);
                     res.should.have.status(200);
@@ -74,7 +74,7 @@ describe('<Unit Test>', function() {
                     var text = JSON.parse(res.text);
                     text.sim_id.should.be.exactly(0);
                     text.state.should.equal('Launching');
-                    text.region.should.equal('africa');
+                    text.region.should.equal('US East')
                     text.world.should.equal('empty.world');
                     done();
                 });
@@ -95,7 +95,7 @@ describe('<Unit Test>', function() {
                     text[0].user.username.should.equal('user');
                     text[0].sim_id.should.be.exactly(0);
                     text[0].state.should.equal('Launching');
-                    text[0].region.should.equal('africa');
+                    text[0].region.should.equal('US East');
                     text[0].world.should.equal('empty.world');
                     done();
                 });
@@ -115,7 +115,7 @@ describe('<Unit Test>', function() {
                     text.user.username.should.equal('user');
                     text.sim_id.should.be.exactly(0);
                     text.state.should.equal('Launching');
-                    text.region.should.equal('africa');
+                    text.region.should.equal('US East');
                     text.world.should.equal('empty.world');
                     done();
                 });
@@ -127,7 +127,7 @@ describe('<Unit Test>', function() {
                 agent
                 .post('/simulations')
                 .set('Acccept', 'application/json')
-                .send({ world: 'blank.world', region:'asia' })
+                .send({ world: 'blank.world', region:'Ireland' })
                 .end(function(err,res){
                     util.log_res(res);
                     res.should.have.status(200);
@@ -136,7 +136,7 @@ describe('<Unit Test>', function() {
                     // the sim_id should increment by 1
                     text.sim_id.should.be.exactly(1);
                     text.state.should.equal('Launching');
-                    text.region.should.equal('asia');
+                    text.region.should.equal('Ireland');
                     text.world.should.equal('blank.world');
                     done();
                 });
@@ -157,13 +157,13 @@ describe('<Unit Test>', function() {
                     text[0].user.username.should.equal('user');
                     text[0].sim_id.should.be.exactly(0);
                     text[0].state.should.equal('Launching');
-                    text[0].region.should.equal('africa');
+                    text[0].region.should.equal('US East');
                     text[0].world.should.equal('empty.world');
                     text[1].user.name.should.equal('User Tester');
                     text[1].user.username.should.equal('user');
                     text[1].sim_id.should.be.exactly(1);
                     text[1].state.should.equal('Launching');
-                    text[1].region.should.equal('asia');
+                    text[1].region.should.equal('Ireland');
                     text[1].world.should.equal('blank.world');
                     done();
                 });
@@ -183,7 +183,7 @@ describe('<Unit Test>', function() {
                     text.user.username.should.equal('user');
                     text.sim_id.should.be.exactly(1);
                     text.state.should.equal('Launching');
-                    text.region.should.equal('asia');
+                    text.region.should.equal('Ireland');
                     text.world.should.equal('blank.world');
                     done();
                 });
@@ -213,17 +213,18 @@ describe('<Unit Test>', function() {
             it('should be able to update a running simulation with correct region', function(done) {
                 agent
                 .put('/simulations/1')
-                .send({ world: 'blank_update.world', region:'asia' })
+                .send({ world: 'blank_update.world', region:'US East' })
                 .end(function(err,res){
                     util.log_res(res);
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     var text = JSON.parse(res.text);
+                    console.log('\n\n********\n********\n*****' + require('util').inspect(text));
                     text.user.name.should.equal('User Tester');
                     text.user.username.should.equal('user');
                     text.sim_id.should.be.exactly(1);
                     text.state.should.equal('Launching');
-                    text.region.should.equal('asia');
+                    text.region.should.equal('US East');
                     text.world.should.equal('blank_update.world');
                     done();
                 });
@@ -244,7 +245,7 @@ describe('<Unit Test>', function() {
                     text.user.username.should.equal('user');
                     text.sim_id.should.be.exactly(1);
                     text.state.should.equal('Launching');
-                    text.region.should.equal('asia');
+                    text.region.should.equal('US East');
                     text.world.should.equal('blank_update.world');
                     done();
                 });
@@ -300,7 +301,7 @@ describe('<Unit Test>', function() {
                     text.sim_id.should.be.exactly(0);
                     // state should now be terminated
                     text.state.should.equal('Terminated');
-                    text.region.should.equal('africa');
+                    text.region.should.equal('US East');
                     text.world.should.equal('empty.world');
                     done();
                 });
@@ -342,7 +343,7 @@ describe('<Unit Test>', function() {
                     text[0].user.username.should.equal('user');
                     text[0].sim_id.should.be.exactly(0);
                     text[0].state.should.equal('Terminated');
-                    text[0].region.should.equal('africa');
+                    text[0].region.should.equal('US East');
                     text[0].world.should.equal('empty.world');
                     done();
                 });
@@ -364,7 +365,7 @@ describe('<Unit Test>', function() {
                     text.sim_id.should.be.exactly(0);
                     text.state.should.equal('Terminated');
                     // region and world should remain unchanged.
-                    text.region.should.equal('africa');
+                    text.region.should.equal('US East');
                     text.world.should.equal('empty.world');
                     done();
                 });
@@ -385,7 +386,7 @@ describe('<Unit Test>', function() {
                     text.sim_id.should.be.exactly(0);
                     text.state.should.equal('Terminated');
                     // region and world should remain unchanged.
-                    text.region.should.equal('africa');
+                    text.region.should.equal('Ireland');
                     text.world.should.equal('empty.world');
                     done();
                 });

@@ -9,7 +9,18 @@ var mongoose = require('mongoose'),
     User = mongoose.model('User'),
     _ = require('lodash');
 
-var cloud_service = require('../lib/cloud_services.js');
+
+var cloud_service;
+console.log('process.env.CLOUDSIM_CLOUD: ' + process.env.CLOUDSIM_CLOUD);
+ 
+if(process.env.CLOUDSIM_CLOUD === 'FAKE') {
+    console.log('using the fake cloud');
+    cloud_service = require('../lib/fake_cloud_services.js');
+} else {
+    console.log('using the real cloud_services!');
+    cloud_service = require('../lib/cloud_services.js');
+}
+
 var util = require('util');
 
 
@@ -73,7 +84,7 @@ exports.create = function(req, res) {
 
     // Create a new simulation instance based on the content of the
     // request
-    console.log('body: ' + util.inspect(req.body));
+    console.log('create simulation request body: ' + util.inspect(req.body));
     var simulation = new Simulation(req.body);
 
     // Set the simulation user
@@ -97,7 +108,7 @@ exports.create = function(req, res) {
             if(err) {
                 res.jsonp(500, { error: err });
             } else {
-                console.log('machine: ' + util.machineInfo);
+                console.log('launchSimulator returned: ' + util.inspect(machineInfo));
                 simulation.machine_id = machineInfo.id;
                 simulation.server_price = serverDetails.price;
                 simulation.machine_ip = 'N/A';
