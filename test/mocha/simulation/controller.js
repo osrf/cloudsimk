@@ -275,7 +275,8 @@ describe('<Unit Test>', function() {
         describe('Check Terminate Simulation', function() {
             it('should be able to terminate a running simulation', function(done) {
                 agent
-                .del('/simulations/0')
+                .put('/simulations/0')
+                .send({ state: 'Terminated'})
                 .set('Acccept', 'application/json')
                 .end(function(err,res){
                     util.log_res(res);
@@ -464,7 +465,8 @@ describe('<Unit Test>', function() {
             it('should not be able to terminate running simulation by id', function(done) {
                 var agentUnauthorized = supertest.agent(app);
                 agentUnauthorized
-                .del('/simulations/1')
+                .put('/simulations/1')
+                .send({ state: 'Terminated'})
                 .set('Acccept', 'application/json')
                 .end(function(err,res){
                     util.log_res(res);

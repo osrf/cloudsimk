@@ -101,6 +101,13 @@ exports.update = function(req, res) {
         return;
     }
 
+    // Check if the update operation is to terminate a simulation
+    if (req.body.state !== simulation.state &&
+        req.body.state === 'Terminated') {
+        exports.terminate(req, res);
+        return;
+    }
+
     // Check to make sure the region is not modified.
     if (req.body.region && simulation.region !== req.body.region) {
 
@@ -134,8 +141,7 @@ exports.update = function(req, res) {
 };
 
 /////////////////////////////////////////////////
-/// Delete a simulation. Remove from database if it's already terminated.
-/// Otherwise set its state to Terminated.
+/// Delete a simulation.
 /// @param[in] req Nodejs request object.
 /// @param[out] res Nodejs response object.
 /// @return Destroy function
@@ -144,39 +150,44 @@ exports.destroy = function(req, res) {
     // Get the simulation model
     var simulation = req.simulation;
 
-    // If the simulation is already terminated
-    // then remove it from the database
-    if (simulation.state === 'Terminated') {
-        // Remove the simulation model from the database
-        // TODO: We need to check to make sure the simulation instance has been
-        // terminated
-        simulation.remove(function(err) {
-            if (err) {
-                return res.send('users/signup', {
-                    errors: err.errors,
-                    Simulation: simulation
-                });
-            } else {
-                res.jsonp(simulation);
-            }
-        });
-    }
-    else {
-        // Set the state to Terminated
-        simulation.state = 'Terminated';
-        simulation.date_term = Date.now();
+    // Remove the simulation model from the database
+    // TODO: We need to check to make sure the simulation instance has been
+    // terminated
+    simulation.remove(function(err) {
+        if (err) {
+            return res.send('users/signup', {
+                errors: err.errors,
+                Simulation: simulation
+            });
+        } else {
+            res.jsonp(simulation);
+        }
+    });
+};
 
-        simulation.save(function(err) {
-            if (err) {
-                return res.send('users/signup', {
-                    errors: err.errors,
-                    Simulation: simulation
-                });
-            } else {
-                res.jsonp(simulation);
-            }
-        });
-    }
+/////////////////////////////////////////////////
+/// Terminate a running simulation
+/// @param[in] req Nodejs request object.
+/// @param[out] res Nodejs response object.
+/// @return Destroy function
+exports.terminate = function(req, res) {
+
+    // Get the simulation model
+    var simulation = req.simulation;
+
+    simulation.state = 'Terminated';
+    simulation.date_term = Date.now();
+
+    simulation.save(function(err) {
+        if (err) {
+            return res.send('users/signup', {
+                errors: err.errors,
+                Simulation: simulation
+            });
+        } else {
+            res.jsonp(simulation);
+        }
+    });
 };
 
 /////////////////////////////////////////////////
@@ -195,7 +206,8 @@ exports.show = function(req, res) {
 exports.all = function(req, res) {
     var filter = {};
     if (req.query.state) {
-        filter = {state: req.query.state};
+        var queryStates = req.query.state.split(',');
+        filter = {state: { $in : queryStates}};
     }
 
     // Get all simulation models, in creation order, for a user
