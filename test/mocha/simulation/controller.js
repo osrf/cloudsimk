@@ -62,7 +62,7 @@ describe('<Unit Test>', function() {
         });
 
         describe('Check Create Simulation', function() {
-            it('should be able to create a simulation', function(done) {
+            it('should be possible to create a simulation', function(done) {
                 agent
                 .post('/simulations')
                 .set('Acccept', 'application/json')
@@ -103,7 +103,7 @@ describe('<Unit Test>', function() {
         });
 
         describe('Check Get Simulation by ID', function() {
-            it('should be able to get the first running simulation', function(done) {
+            it('should be possible to get the first running simulation', function(done) {
                 agent
                 .get('/simulations/0')
                 .end(function(err,res){
@@ -123,7 +123,7 @@ describe('<Unit Test>', function() {
         });
 
         describe('Check Create Second Simulation', function() {
-            it('should be able to create another simulation', function(done) {
+            it('should be possible to create another simulation', function(done) {
                 agent
                 .post('/simulations')
                 .set('Acccept', 'application/json')
@@ -171,7 +171,7 @@ describe('<Unit Test>', function() {
         });
 
         describe('Check Get Second Simulation by ID', function() {
-            it('should be able to get the second running simulation', function(done) {
+            it('should be possible to get the second running simulation', function(done) {
                 agent
                 .get('/simulations/1')
                 .end(function(err,res){
@@ -191,7 +191,7 @@ describe('<Unit Test>', function() {
         });
 
         describe('Check Update Running Simulation by ID', function() {
-            it('should not be able to change the region of a running simulation', function(done) {
+            it('should not be possible to change the region of a running simulation', function(done) {
                 agent
                 .put('/simulations/1')
                 .send({ world: 'blank_update.world', region:'europe' })
@@ -208,31 +208,8 @@ describe('<Unit Test>', function() {
             });
         });
 
-
-        describe('Check Update Running Simulation by ID with region', function() {
-            it('should be able to update a running simulation with correct region', function(done) {
-                agent
-                .put('/simulations/1')
-                .send({ world: 'blank_update.world', region:'US East' })
-                .end(function(err,res){
-                    util.log_res(res);
-                    res.should.have.status(200);
-                    res.redirect.should.equal(false);
-                    var text = JSON.parse(res.text);
-                    console.log('\n\n********\n********\n*****' + require('util').inspect(text));
-                    text.user.name.should.equal('User Tester');
-                    text.user.username.should.equal('user');
-                    text.sim_id.should.be.exactly(1);
-                    text.state.should.equal('Launching');
-                    text.region.should.equal('US East');
-                    text.world.should.equal('blank_update.world');
-                    done();
-                });
-            });
-        });
-
         describe('Check Update Running Simulation by ID without region', function() {
-            it('should be able to update a running simulation with no region specified', function(done) {
+            it('should be possible to update a running simulation with no region specified', function(done) {
                 agent
                 .put('/simulations/1')
                 .send({ world: 'blank_update.world'})
@@ -245,7 +222,7 @@ describe('<Unit Test>', function() {
                     text.user.username.should.equal('user');
                     text.sim_id.should.be.exactly(1);
                     text.state.should.equal('Launching');
-                    text.region.should.equal('US East');
+                    text.region.should.equal('Ireland');
                     text.world.should.equal('blank_update.world');
                     done();
                 });
@@ -253,7 +230,7 @@ describe('<Unit Test>', function() {
         });
 
         describe('Check Get Updated Running Simulation by ID', function() {
-            it('should be able to see the updated simulation', function(done) {
+            it('should be possible to see the updated simulation', function(done) {
                 agent
                 .get('/simulations/1')
                 .end(function(err,res){
@@ -265,7 +242,7 @@ describe('<Unit Test>', function() {
                     text.user.username.should.equal('user');
                     text.sim_id.should.be.exactly(1);
                     text.state.should.equal('Launching');
-                    text.region.should.equal('asia');
+                    text.region.should.equal('Ireland');
                     text.world.should.equal('blank_update.world');
                     done();
                 });
@@ -274,7 +251,7 @@ describe('<Unit Test>', function() {
 
 
         describe('Check Terminate Simulation', function() {
-            it('should be able to terminate a running simulation', function(done) {
+            it('should be possible to terminate a running simulation', function(done) {
                 agent
                 .del('/simulations/running/0')
                 .set('Acccept', 'application/json')
@@ -288,7 +265,7 @@ describe('<Unit Test>', function() {
         });
 
         describe('Check Get Simulation By ID Valid State', function() {
-            it('should be able to get the first simulation by id and verify its new state', function(done) {
+            it('should be possible to get the first simulation by id and verify its new state', function(done) {
                 agent
                 .get('/simulations/0')
                 .end(function(err,res){
@@ -322,7 +299,7 @@ describe('<Unit Test>', function() {
                     text[0].user.username.should.equal('user');
                     text[0].sim_id.should.be.exactly(1);
                     text[0].state.should.equal('Launching');
-                    text[0].region.should.equal('asia');
+                    text[0].region.should.equal('Ireland');
                     text[0].world.should.equal('blank_update.world');
                     done();
                 });
@@ -373,7 +350,7 @@ describe('<Unit Test>', function() {
         });
 
         describe('Check Get Updated Simulation History by ID', function() {
-            it('should be able to see the terminated simulation remain unchanged', function(done) {
+            it('should be possible to see the terminated simulation remain unchanged', function(done) {
                 agent
                 .get('/simulations/0')
                 .end(function(err,res){
@@ -386,7 +363,7 @@ describe('<Unit Test>', function() {
                     text.sim_id.should.be.exactly(0);
                     text.state.should.equal('Terminated');
                     // region and world should remain unchanged.
-                    text.region.should.equal('Ireland');
+                    text.region.should.equal('US East');
                     text.world.should.equal('empty.world');
                     done();
                 });
@@ -394,7 +371,7 @@ describe('<Unit Test>', function() {
         });
 
         describe('Check Delete Simulation In History', function() {
-            it('should be able to delete a simulation in history', function(done) {
+            it('should be possible to delete a simulation in history', function(done) {
                 agent
                 .del('/simulations/history/0')
                 .set('Acccept', 'application/json')

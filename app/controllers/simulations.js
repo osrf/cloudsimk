@@ -11,14 +11,13 @@ var mongoose = require('mongoose'),
 
 
 var cloud_service;
-console.log('process.env.CLOUDSIM_CLOUD: ' + process.env.CLOUDSIM_CLOUD);
- 
-if(process.env.CLOUDSIM_CLOUD === 'FAKE') {
-    console.log('using the fake cloud');
-    cloud_service = require('../lib/fake_cloud_services.js');
-} else {
+
+if(process.env.AWS_ACCESS_KEY_ID) {
     console.log('using the real cloud_services!');
     cloud_service = require('../lib/cloud_services.js');
+} else { 
+    console.log('process.env.AWS_ACCESS_KEY_ID not defined: using the fake cloud');
+    cloud_service = require('../lib/fake_cloud_services.js');
 }
 
 var util = require('util');
