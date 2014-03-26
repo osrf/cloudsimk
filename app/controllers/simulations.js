@@ -10,14 +10,14 @@ var mongoose = require('mongoose'),
     _ = require('lodash');
 
 
-var cloud_service;
+var cloudServices;
 
 if(process.env.AWS_ACCESS_KEY_ID) {
-    console.log('using the real cloud_services!');
-    cloud_service = require('../lib/cloud_services.js');
-} else { 
-    console.log('process.env.AWS_ACCESS_KEY_ID not defined: using the fake cloud');
-    cloud_service = require('../lib/fake_cloud_services.js');
+    console.log('using the real cloud services!');
+    cloudServices = require('../lib/cloud_services.js');
+} else {
+    console.log('process.env.AWS_ACCESS_KEY_ID not defined: using the fake cloud services');
+    cloudServices = require('../lib/fake_cloud_services.js');
 }
 
 var util = require('util');
@@ -94,10 +94,10 @@ exports.create = function(req, res) {
         simulation.sim_id = user.next_sim_id++;
 
         var keyName = 'cs-hugo@osrfoundation.org';
-       // we pick the appropriate machine based on the region specified
+        // we pick the appropriate machine based on the region specified
         // by the user
         var serverDetails = awsData[simulation.region];
-        cloud_service.launchSimulator(  req.user.username,
+        cloudServices.launchSimulator(  req.user.username,
                                         keyName,
                                         simulation.sim_id,
                                         serverDetails.region,
@@ -107,7 +107,6 @@ exports.create = function(req, res) {
             if(err) {
                 res.jsonp(500, { error: err });
             } else {
-                console.log('launchSimulator returned: ' + util.inspect(machineInfo));
                 simulation.machine_id = machineInfo.id;
                 simulation.server_price = serverDetails.price;
                 simulation.machine_ip = 'N/A';
@@ -116,7 +115,7 @@ exports.create = function(req, res) {
                     
                     simulation.machine_ip = 'waiting';
                     console.log('TIMED OUT ' + util.inspect(machineInfo));
-                    cloud_service.simulatorStatus(machineInfo, function(err, state) {
+                    cloudServices.simulatorStatus(machineInfo, function(err, state) {
                         console.log('got status: ' + util.inspect(state));
                         simulation.machine_ip = state.ip;
                         simulation.save(function(err) {
@@ -238,7 +237,7 @@ exports.terminate = function(req, res) {
     var machineInfo = {region: awsData[simulation.region].region,
                     id: simulation.machine_id};
     console.log('Cloud terminate: ' + util.inspect(machineInfo));
-    cloud_service.terminateSimulator(machineInfo, function(err, info) {
+    cloudServices.terminateSimulator(machineInfo, function(err, info) {
         if(err) {
             res.jsonp(500, { error: err });
         } else {
