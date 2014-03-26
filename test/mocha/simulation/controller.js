@@ -50,7 +50,7 @@ describe('<Unit Test>', function() {
         describe('Check Empty Running Simulation', function() {
             it('should be no running simulations at the beginning', function(done) {
                 agent
-                .get('/simulations/running')
+                .get('/simulations?state=Launching')
                 .end(function(err,res){
                     util.log_res(res);
                     res.should.have.status(200);
@@ -84,7 +84,7 @@ describe('<Unit Test>', function() {
         describe('Check One Simulation Created', function() {
             it('should be one running simulation', function(done) {
                 agent
-                .get('/simulations/running')
+                .get('/simulations?state=Launching')
                 .end(function(err,res){
                     util.log_res(res);
                     res.should.have.status(200);
@@ -146,7 +146,7 @@ describe('<Unit Test>', function() {
         describe('Check Two Simulations Created', function() {
             it('should be two running simulations', function(done) {
                 agent
-                .get('/simulations/running')
+                .get('/simulations?state=Launching')
                 .end(function(err,res){
                     util.log_res(res);
                     res.should.have.status(200);
@@ -275,7 +275,7 @@ describe('<Unit Test>', function() {
         describe('Check Terminate Simulation', function() {
             it('should be able to terminate a running simulation', function(done) {
                 agent
-                .del('/simulations/running/0')
+                .del('/simulations/0')
                 .set('Acccept', 'application/json')
                 .end(function(err,res){
                     util.log_res(res);
@@ -310,7 +310,7 @@ describe('<Unit Test>', function() {
         describe('Check One Simulation Left', function() {
             it('should be one running simulation with sim id 1', function(done) {
                 agent
-                .get('/simulations/running')
+                .get('/simulations?state=Launching')
                 .end(function(err,res){
                     util.log_res(res);
                     res.should.have.status(200);
@@ -331,7 +331,7 @@ describe('<Unit Test>', function() {
         describe('Check One Simulation In History', function() {
             it('should be one simulation in history', function(done) {
                 agent
-                .get('/simulations/history')
+                .get('/simulations?state=Terminated')
                 .end(function(err,res){
                     util.log_res(res);
                     res.should.have.status(200);
@@ -395,7 +395,7 @@ describe('<Unit Test>', function() {
         describe('Check Delete Simulation In History', function() {
             it('should be able to delete a simulation in history', function(done) {
                 agent
-                .del('/simulations/history/0')
+                .del('/simulations/0')
                 .set('Acccept', 'application/json')
                 .end(function(err,res){
                     util.log_res(res);
@@ -409,7 +409,7 @@ describe('<Unit Test>', function() {
         describe('Check Empty Simulation In History', function() {
             it('should be no more simulations in history', function(done) {
                 agent
-                .get('/simulations/history')
+                .get('/simulations?state=Terminated')
                 .end(function(err,res){
                     util.log_res(res);
                     res.should.have.status(200);
@@ -425,7 +425,7 @@ describe('<Unit Test>', function() {
             it('should not be able to see running simulations', function(done) {
                 var agentUnauthorized = supertest.agent(app);
                 agentUnauthorized
-                .get('/simulations/running')
+                .get('/simulations?state=Launching')
                 .end(function(err,res){
                     util.log_res(res);
                     res.should.have.status(401);
@@ -464,7 +464,7 @@ describe('<Unit Test>', function() {
             it('should not be able to terminate running simulation by id', function(done) {
                 var agentUnauthorized = supertest.agent(app);
                 agentUnauthorized
-                .del('/simulations/running/1')
+                .del('/simulations/1')
                 .set('Acccept', 'application/json')
                 .end(function(err,res){
                     util.log_res(res);
@@ -478,7 +478,7 @@ describe('<Unit Test>', function() {
             it('should not be able to see simulation history', function(done) {
                 var agentUnauthorized = supertest.agent(app);
                 agentUnauthorized
-                .get('/simulations/history')
+                .get('/simulations/?state=Terminated')
                 .end(function(err,res){
                     util.log_res(res);
                     res.should.have.status(401);
@@ -493,4 +493,3 @@ describe('<Unit Test>', function() {
         });
     });
 });
-
