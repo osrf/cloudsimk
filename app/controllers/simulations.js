@@ -134,7 +134,8 @@ exports.update = function(req, res) {
 };
 
 /////////////////////////////////////////////////
-/// Delete a simulation
+/// Delete a simulation. Remove from database if it's already terminated.
+/// Otherwise set its state to Terminated.
 /// @param[in] req Nodejs request object.
 /// @param[out] res Nodejs response object.
 /// @return Destroy function
@@ -143,44 +144,39 @@ exports.destroy = function(req, res) {
     // Get the simulation model
     var simulation = req.simulation;
 
-    // Remove the simulation model from the database
-    // TODO: We need to check to make sure the simulation instance has been
-    // terminated
-    simulation.remove(function(err) {
-        if (err) {
-            return res.send('users/signup', {
-                errors: err.errors,
-                Simulation: simulation
-            });
-        } else {
-            res.jsonp(simulation);
-        }
-    });
-};
+    // If the simulation is already terminated
+    // then remove it from the database
+    if (simulation.state === 'Terminated') {
+        // Remove the simulation model from the database
+        // TODO: We need to check to make sure the simulation instance has been
+        // terminated
+        simulation.remove(function(err) {
+            if (err) {
+                return res.send('users/signup', {
+                    errors: err.errors,
+                    Simulation: simulation
+                });
+            } else {
+                res.jsonp(simulation);
+            }
+        });
+    }
+    else {
+        // Set the state to Terminated
+        simulation.state = 'Terminated';
+        simulation.date_term = Date.now();
 
-/////////////////////////////////////////////////
-/// Terminate a running simulation
-/// @param[in] req Nodejs request object.
-/// @param[out] res Nodejs response object.
-/// @return Destroy function
-exports.terminate = function(req, res) {
-
-    // Get the simulation model
-    var simulation = req.simulation;
-
-    simulation.state = 'Terminated';
-    simulation.date_term = Date.now();
-
-    simulation.save(function(err) {
-        if (err) {
-            return res.send('users/signup', {
-                errors: err.errors,
-                Simulation: simulation
-            });
-        } else {
-            res.jsonp(simulation);
-        }
-    });
+        simulation.save(function(err) {
+            if (err) {
+                return res.send('users/signup', {
+                    errors: err.errors,
+                    Simulation: simulation
+                });
+            } else {
+                res.jsonp(simulation);
+            }
+        });
+    }
 };
 
 /////////////////////////////////////////////////
@@ -197,44 +193,13 @@ exports.show = function(req, res) {
 /// @param[out] res Nodejs response object.
 /// @return Function to get all simulation instances for a user.
 exports.all = function(req, res) {
+    var filter = {};
+    if (req.query.state) {
+        filter = {state: req.query.state};
+    }
+
     // Get all simulation models, in creation order, for a user
-    Simulation.find().sort('-created').populate('user', 'name username')
-      .exec(function(err, simulations) {
-        if (err) {
-            res.render('error', {
-                status: 500
-            });
-        } else {
-            res.jsonp(simulations);
-        }
-    });
-};
-
-/////////////////////////////////////////////////
-/// List of running simulations for a user.
-/// @param[in] req Nodejs request object.
-/// @param[out] res Nodejs response object.
-/// @return Function to get all simulation instances for a user.
-exports.running = function(req, res) {
-    // Get all running simulation models, in creation order, for a user
-    Simulation.find({state: {$ne: 'Terminated'}}).sort('-date_launch').populate('user', 'name username')
-      .exec(function(err, simulations) {
-        if (err) {
-            res.render('error', {
-                status: 500
-            });
-        } else {
-            res.jsonp(simulations);
-        }
-    });
-};
-
-/////////////////////////////////////////////////
-/// List of simulations
-/// @param[in] req Nodejs request object.
-/// @param[out] res Nodejs response object.
-exports.history = function(req, res) {
-    Simulation.find({state: 'Terminated'}).sort('-date_term').populate('user', 'name username')
+    Simulation.find(filter).sort('-date_launch').populate('user', 'name username')
       .exec(function(err, simulations) {
         if (err) {
             res.render('error', {
