@@ -19,7 +19,7 @@ var SimulationSchema = new Schema({
     /* The date and time on which the simulation instance was started */
     date_launch: {
         type: Date,
-        default: Date.now
+        default: Date.now()
     },
 
     /* The date and time on which the simulation instance was terminated */

@@ -11,29 +11,24 @@ angular.module('cloudsim.simulations').controller('SimulationsController', ['$sc
     // TODO: Retrieve this list from the server.
     $scope.regions = ['US East', 'US West', 'Ireland'];
 
+    /// Get all the running simulations.
+    $scope.simulations = Simulations.query();
+
+    /// The current page of simulations
+    $scope.currentPage = 1;
+
+    /// Number of simulations to diplay per page
+    $scope.simPerPage = 5;
+
     /// Launch a simulation.
     $scope.launch = function() {
-
-        var simulation = new Simulations({
-            world: $scope.world,
-            region: $scope.region
+        var sim = new Simulations({
+            sim_id: 0,
+            state: 'Launching',
+            region: $scope.launch.region,
+            world: $scope.launch.world
         });
-        simulation.$save(function(response) {
-            $location.path('simulations/' + response._id);
-        });
-    };
-
-    $scope.find = function() {
-        Simulations.query(function(simulations) {
-            $scope.simulations = simulations;
-        });
-    };
-
-    $scope.findOne = function() {
-        Simulations.get({
-            sim_id: $stateParams.sim_id
-        }, function(simulation) {
-            $scope.simulation = simulation;
-        });
+        sim.$save();
+        $scope.simulations.unshift(sim);
     };
 }]);
