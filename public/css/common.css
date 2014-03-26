@@ -154,22 +154,24 @@ p {
   color:#4d4d4d;
 }
 
-.col-sm-6 {
+#landing .col-sm-6 {
   padding-bottom: 50px;
 }
 
-.col-sm-offset-6 {
+#landing .col-sm-offset-6 {
   padding-bottom: 50px;
 }
 
-.col-sm-2{
+#landing .col-sm-2{
   padding-bottom: 20px;
 }
 
 .content {
     margin-top:70px;
+    margin-bottom: 90px;
     width:100%
 }
+
 
  #bigheader {
   color: #b3b3b3;
@@ -189,15 +191,29 @@ p {
 
 
 footer {
-    position:fixed;
     left:0px;
     bottom:0px;
-    height:30px;
+    /*If this is changed, change the .content margin-bottom as much*/
+    height:100px;
     width:100%;
-    background:#ddd;
+    background:#262626;
     -webkit-box-shadow:0 8px 6px 6px black;
     -moz-box-shadow:0 8px 6px 6px black;
-    box-shadow:0 8px 6px 6px black
+    box-shadow:0 8px 6px 6px black;
+    padding-top: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+    color: #b3b3b3;
+}
+
+
+footer a, footer a:link, footer a:visited{
+  color: #b3b3b3;
+}
+
+footer a:hover{
+  color: #b3b3b3;
+  text-decoration: underline;
 }
 
 .jumbotron {
@@ -205,7 +221,12 @@ footer {
   background-repeat: repeat;
 }
 
+
 footer p {
     padding:5px 0 12px 10px
+}
+
+footer .row {
+  padding-bottom: 5px;
 }
 
