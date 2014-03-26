@@ -57,9 +57,24 @@ var SimulationSchema = new Schema({
     user: {
         type: Schema.ObjectId,
         ref: 'User'
+    },
+    
+    // a cloud provider machine id (necessary for termination)
+    // for AWS, this is the "instance id"
+    machine_id: {
+        type: String
+    },
+
+    // ip address of the machine
+    machine_ip: {
+        type: String
+    },
+    
+    // cost per hr
+    server_price: {
+        type: Number
     }
 
-   /* TODO: Addserver cost per hr (nb) */
 
 });
 

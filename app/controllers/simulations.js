@@ -10,7 +10,23 @@ var mongoose = require('mongoose'),
     _ = require('lodash');
 
 var cloud_service = require('../lib/cloud_services.js');
+var util = require('util');
 
+
+var awsData = { 'US West': {region: 'us-west-2',
+                            image: 'ami-cc95f8fc', // cloudsim // 'ami-b8d2b088',
+                            hardware: 'm1.small',
+                            price: 0},
+                 'US East': {region: 'us-east-1',
+                             image: 'ami-4d8d8924',
+                             hardware: 'g2.2xlarge',
+                             price: 0},
+                 'Ireland': {region: 'eu-west-1',
+                             image: 'ami-b4e313c3',
+                             hardware: 'g2.2xlarge',
+                             price: 0}
+};
+ 
 /////////////////////////////////////////////////
 /// Find Simulation by id
 /// @param[in] req Nodejs request object.
@@ -46,6 +62,8 @@ exports.simulation = function(req, res, next, id) {
     });
 };
 
+
+
 /////////////////////////////////////////////////
 /// Create a simulation
 /// @param[in] req Nodejs request object.
@@ -55,6 +73,7 @@ exports.create = function(req, res) {
 
     // Create a new simulation instance based on the content of the
     // request
+    console.log('body: ' + util.inspect(req.body));
     var simulation = new Simulation(req.body);
 
     // Set the simulation user
@@ -63,22 +82,59 @@ exports.create = function(req, res) {
     User.load(req.user.id, function(err, user) {
 
         simulation.sim_id = user.next_sim_id++;
-        // Save the simulation instance to the database
-        simulation.save(function(err) {
-            if (err) {
-                return res.send('users/signup', {
-                    errors: err.errors,
-                    Simulation: simulation
-                });
+
+        var keyName = 'cs-hugo@osrfoundation.org';
+       // we pick the appropriate machine based on the region specified
+        // by the user
+        var serverDetails = awsData[simulation.region];
+        cloud_service.launchSimulator(  req.user.username,
+                                        keyName,
+                                        simulation.sim_id,
+                                        serverDetails.region,
+                                        serverDetails.hardware,
+                                        serverDetails.image,
+                                        function (err, machineInfo) {
+            if(err) {
+                res.jsonp(500, { error: err });
             } else {
-                user.save(function(err) {
+                console.log('machine: ' + util.machineInfo);
+                simulation.machine_id = machineInfo.id;
+                simulation.server_price = serverDetails.price;
+                simulation.machine_ip = 'N/A';
+
+                setTimeout(function () {
+                    
+                    simulation.machine_ip = 'waiting';
+                    console.log('TIMED OUT ' + util.inspect(machineInfo));
+                    cloud_service.simulatorStatus(machineInfo, function(err, state) {
+                        console.log('got status: ' + util.inspect(state));
+                        simulation.machine_ip = state.ip;
+                        simulation.save(function(err) {
+                            console.log('SAVING SIM: ' + simulation);
+                            console.log(' err: ' + err);
+                            console.log('machine IP: ' + simulation.machine_ip);
+                        });
+                    });
+                }, 30000);
+                
+                // Save the simulation instance to the database
+                simulation.save(function(err) {
                     if (err) {
                         return res.send('users/signup', {
                             errors: err.errors,
                             Simulation: simulation
                         });
                     } else {
-                        res.jsonp(simulation);
+                        user.save(function(err) {
+                            if (err) {
+                                return res.send('users/signup', {
+                                    errors: err.errors,
+                                    Simulation: simulation
+                                });
+                            } else {
+                                res.jsonp(simulation);
+                            }
+                        });
                     }
                 });
             }
@@ -105,10 +161,10 @@ exports.update = function(req, res) {
     // Check to make sure the region is not modified.
     if (req.body.region && simulation.region !== req.body.region) {
 
-        // Create an error message. The id is currently arbitrary.
+        // Create an error message.
         var error = {error: {
             msg: 'Cannot change the region of a running simulation',
-            id: 0
+            id: req.simulation.sim_id
         }};
 
         // Can't change the world.
@@ -169,17 +225,27 @@ exports.terminate = function(req, res) {
     // Get the simulation model
     var simulation = req.simulation;
 
-    simulation.state = 'Terminated';
-    simulation.date_term = Date.now();
-
-    simulation.save(function(err) {
-        if (err) {
-            return res.send('users/signup', {
-                errors: err.errors,
-                Simulation: simulation
-            });
+    var machineInfo = {region: awsData[simulation.region].region,
+                    id: simulation.machine_id};
+    console.log('Cloud terminate: ' + util.inspect(machineInfo));
+    cloud_service.terminateSimulator(machineInfo, function(err, info) {
+        if(err) {
+            res.jsonp(500, { error: err });
         } else {
-            res.jsonp(simulation);
+            simulation.state = 'Terminated';
+            simulation.date_term = Date.now();
+    
+            simulation.save(function(err) {
+                if (err) {
+                    return res.send('users/signup', {
+                        errors: err.errors,
+                        Simulation: simulation
+                    });
+                } else {
+                    console.log('Simulator terminated: ' + info);
+                    res.jsonp(simulation);
+                }
+            });
         }
     });
 };

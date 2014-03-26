@@ -19,7 +19,12 @@ angular.module('mean.simulations').controller('SimulationsController', ['$scope'
             region: $scope.region
         });
         simulation.$save(function(response) {
-            $location.path('simulations/' + response._id);
+          //  $location.path('simulations/' + response._id);
+            console.log('your response: ' + response);
+
+        }, function(error) {
+            console.log('your error: ' + error);
+            alert('AWS error: ' + error.data.error.message);
         });
     };
 

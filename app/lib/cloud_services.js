@@ -4,12 +4,13 @@
 var AWS = require('aws-sdk');
 var util = require('util');
 
-// perform AWS calls only in production
-var dryRun = process.env.NODE_ENV !== 'production';
-console.log('AWS calls dry run enabled: ' + dryRun);
+// configure what to do for cloud API calls:
+var dryRun = process.env.CLOUDSIM_CLOUD === 'DRY_RUN';
+console.log('CLOUDSIM_CLOUD ["", DRY_RUN, FAKE]: ' +  process.env.CLOUDSIM_CLOUD);
 
 // Async functions to launch machines on a cloud provider
 // AWS is the only supported one for now
+
 
 /////////////////////////////////////////////////////////////
 // Launch a simulator machine, given:
@@ -25,18 +26,26 @@ exports.launchSimulator = function (username, keyName, simId, region, hardware, 
     // set AWS region
     AWS.config.region = region;
 
+    console.log('Launching simulator: for: ' + username);
+    console.log('SSH key: ' +  keyName);
+    console.log('SimId: ' + simId);
+    console.log('region:' + region);
+    console.log('hardware: ' +  hardware);
+    console.log('image: ' + image);
+
     var awsParams = {
         KeyName: keyName,
         ImageId: image,
         InstanceType: hardware,
         MinCount:1,
-        MaxCoiunt: 1,
+        MaxCount: 1,
         DryRun: dryRun
     };
 
     var ec2 = new AWS.EC2();
     ec2.runInstances(awsParams, function (err, data) {
         if(err) {
+            console.log('AWS launch error: ' + err);
             cb(err);
         }
         else {
@@ -51,7 +60,7 @@ exports.launchSimulator = function (username, keyName, simId, region, hardware, 
                 var params = {Resources: [machineInfo.id], Tags: [
                     {Key: 'Name', Value: 'simulator'},
                     {Key: 'user', Value: username},
-                    {Key: 'id', Value: simId}
+                    {Key: 'id', Value: 'sim_' + simId}
                 ]};
                 ec2.createTags(params, function(err) {
                     if (err) {

@@ -6,7 +6,7 @@ module.exports = {
         name: 'CloudSim - Cloud-hosted robot simulation'
     },
     google: {
-        returnURL: 'http://cloudsim.io/auth/google/callback',
+        returnURL: 'http://cloudsim.io/auth.google/callback',
         realmURL: 'http://cloudsim.io/'
     },
     yahoo: {
