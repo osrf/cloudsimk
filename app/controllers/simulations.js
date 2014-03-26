@@ -295,7 +295,7 @@ exports.all = function(req, res) {
 /// @return Function to get all simulation instances for a user.
 exports.running = function(req, res) {
     // Get all running simulation models, in creation order, for a user
-    Simulation.find({state: {$ne: 'Terminated'}}).sort('-created').populate('user', 'name username')
+    Simulation.find({state: {$ne: 'Terminated'}}).sort('-date_launch').populate('user', 'name username')
       .exec(function(err, simulations) {
         if (err) {
             res.render('error', {

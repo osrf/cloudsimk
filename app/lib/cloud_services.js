@@ -117,7 +117,7 @@ exports.simulatorStatus = function (machineInfo, cb) {
 
 ////////////////////////////////////////////////////
 // Terminates a simulator machine.
-// machineInfo must constain:
+// machineInfo must contain:
 //       id: the AWS instance id
 //       region: the region where the machine exists
 exports.terminateSimulator = function (machineInfo, cb) {

@@ -74,7 +74,7 @@ describe('<Unit Test>', function() {
                     var text = JSON.parse(res.text);
                     text.sim_id.should.be.exactly(0);
                     text.state.should.equal('Launching');
-                    text.region.should.equal('US East')
+                    text.region.should.equal('US East');
                     text.world.should.equal('empty.world');
                     done();
                 });
