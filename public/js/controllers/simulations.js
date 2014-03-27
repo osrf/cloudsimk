@@ -12,7 +12,7 @@ angular.module('mean.simulations').controller('SimulationsController', ['$scope'
     $scope.regions = ['US East', 'US West', 'Ireland'];
 
     /// Get all the running simulations.
-    $scope.simulations = Simulations.query();
+    $scope.simulations = Simulations.query({state:'Launching'});
 
     /// The current page of simulations
     $scope.currentPage = 1;
@@ -33,12 +33,6 @@ angular.module('mean.simulations').controller('SimulationsController', ['$scope'
         $scope.simulations.unshift(sim);
     };
 
-
-    var getShutdownButtonActive = function () {
-      return ($scope.getPageSimulations().length > 0) ? '' : 'disabled';
-    }
-
-
     var shutdownDialog = null;
     $scope.showShutdownDialog = function () {
         shutdownDialog = $modal.open({
@@ -49,13 +43,14 @@ angular.module('mean.simulations').controller('SimulationsController', ['$scope'
         shutdownDialog.result.then(function () {
             var currentPageSims = $scope.getPageSimulations();
             var selected = currentPageSims.filter(function(sim) {
-              return sim.selected === true;
+                return sim.selected === true;
             });
 
             for (var i = 0; i < selected.length; ++i) {
-                console.log ('selected state ' + selected[i].state);
                 selected[i].state = 'Terminated';
-                // shutdown machine here
+                selected[i].$update({simulationId:selected[i].sim_id});
+                $scope.simulations.splice(
+                    $scope.simulations.indexOf(selected[i]), 1);
             }
         }, function () {});
     };
@@ -64,7 +59,7 @@ angular.module('mean.simulations').controller('SimulationsController', ['$scope'
         var start = ($scope.currentPage-1)*$scope.simPerPage;
         var end = start + $scope.simPerPage;
         return $scope.simulations.slice(start, end);
-    }
+    };
 
     var shutdownDialogCtrl = function ($scope, $modalInstance) {
         $scope.confirmShutdown = function (terminate) {
