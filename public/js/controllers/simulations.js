@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('mean.simulations').controller('SimulationsController', ['$scope', '$stateParams', '$location', 'Global', 'Simulations', function ($scope, $stateParams, $location, Global, Simulations) {
+angular.module('mean.simulations').controller('SimulationsController', ['$scope', '$stateParams', '$location', '$modal', 'Global', 'Simulations', function ($scope, $stateParams, $location, $modal, Global, Simulations) {
     $scope.global = Global;
 
     /// All the worlds available to the user.
@@ -31,4 +31,29 @@ angular.module('mean.simulations').controller('SimulationsController', ['$scope'
         sim.$save();
         $scope.simulations.unshift(sim);
     };
+
+
+    var modalInstance = null;
+    $scope.showShutdownDialog = function () {
+        modalInstance = $modal.open({
+            templateUrl: 'shutdown.html',
+            controller: ModalInstanceCtrl
+        });
+
+        modalInstance.result.then(function () {
+            // shutdown machine here
+        }, function () {});
+    };
+
+    var ModalInstanceCtrl = function ($scope, $modalInstance) {
+        $scope.confirmShutdown = function (terminate) {
+            if (terminate) {
+                $modalInstance.close();
+            }
+            else {
+                $modalInstance.dismiss();
+            }
+        };
+    };
+
 }]);

@@ -33,4 +33,21 @@
       </tr>
     </tbody>
   </table>
+
+
+  <script type="text/ng-template" id="shutdown.html">
+    <div class="modal-header">
+      <h3>Shutdown</h3>
+    </div>
+    <div class="modal-body">
+      Are you sure you want to shut down the machine(s)?
+      <br>Your current state will be lost.</br>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" ng-click="confirmShutdown(d)">Yes</button>
+      <button class="btn btn-warning" ng-click="confirmShutdown(d)">No</button>
+    </div>
+  </script>
+  <button class="btn btn-primary" ng-click="showShutdownDialog()">Shutdown</button>
+
 </div>
