@@ -60,7 +60,7 @@ exports.launchSimulator = function (username, keyName, simId, region, hardware, 
             }
             else
             {
-                cb('No instance returned!'); 
+                cb('No instance returned!');
             }
         }
     });
