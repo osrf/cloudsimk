@@ -29,23 +29,44 @@ angular.module('mean.simulations').controller('SimulationsController', ['$scope'
             world: $scope.launch.world
         });
         sim.$save();
+        sim.selected = false;
         $scope.simulations.unshift(sim);
     };
 
 
-    var modalInstance = null;
+    var getShutdownButtonActive = function () {
+      return ($scope.getPageSimulations().length > 0) ? '' : 'disabled';
+    }
+
+
+    var shutdownDialog = null;
     $scope.showShutdownDialog = function () {
-        modalInstance = $modal.open({
+        shutdownDialog = $modal.open({
             templateUrl: 'shutdown.html',
-            controller: ModalInstanceCtrl
+            controller: shutdownDialogCtrl
         });
 
-        modalInstance.result.then(function () {
-            // shutdown machine here
+        shutdownDialog.result.then(function () {
+            var currentPageSims = $scope.getPageSimulations();
+            var selected = currentPageSims.filter(function(sim) {
+              return sim.selected === true;
+            });
+
+            for (var i = 0; i < selected.length; ++i) {
+                console.log ('selected state ' + selected[i].state);
+                selected[i].state = 'Terminated';
+                // shutdown machine here
+            }
         }, function () {});
     };
 
-    var ModalInstanceCtrl = function ($scope, $modalInstance) {
+    $scope.getPageSimulations = function() {
+        var start = ($scope.currentPage-1)*$scope.simPerPage;
+        var end = start + $scope.simPerPage;
+        return $scope.simulations.slice(start, end);
+    }
+
+    var shutdownDialogCtrl = function ($scope, $modalInstance) {
         $scope.confirmShutdown = function (terminate) {
             if (terminate) {
                 $modalInstance.close();
