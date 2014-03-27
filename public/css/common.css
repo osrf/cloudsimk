@@ -168,7 +168,7 @@ p {
 
 .content {
     margin-top:70px;
-    margin-bottom: 90px;
+    margin-bottom: 80px;
     width:100%
 }
 
@@ -194,7 +194,7 @@ footer {
     left:0px;
     bottom:0px;
     /*If this is changed, change the .content margin-bottom as much*/
-    height:100px;
+    height:90px;
     width:100%;
     background:#262626;
     -webkit-box-shadow:0 8px 6px 6px black;
