@@ -13,20 +13,14 @@ var hasAuthorization = function(req, res, next) {
 };
 
 module.exports = function(app) {
-
-    /// GET /simulations/history
-    /// Return the simulation history for the user
-    app.get('/simulations/history',
-        authorization.requiresLogin, Simulations.history);
-
-    /// DEL /simulations/history:simulationId
-    /// Delete one simulation history instance
-    app.del('/simulations/history/:simulationId',
+    /// DEL /simulations/:simulationId
+    /// Delete one simulation instance
+    app.del('/simulations/:simulationId',
         authorization.requiresLogin, hasAuthorization, Simulations.destroy);
 
-    /// GET /simulations/running
-    /// Return all the running simulations
-    app.get('/simulations/running',
+     /// GET /simulations
+    /// Return all the simulations, running and terminated
+    app.get('/simulations',
         authorization.requiresLogin, Simulations.all);
 
     /// POST /simulations
@@ -45,5 +39,5 @@ module.exports = function(app) {
         authorization.requiresLogin, hasAuthorization, Simulations.update);
 
     /// Finish with setting up the simulationId param
-    app.param('simulationId', Simulations.Simulation);
+    app.param('simulationId', Simulations.simulation);
 };

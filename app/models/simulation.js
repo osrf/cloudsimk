@@ -19,7 +19,7 @@ var SimulationSchema = new Schema({
     /* The date and time on which the simulation instance was started */
     date_launch: {
         type: Date,
-        default: Date.now
+        default: Date.now()
     },
 
     /* The date and time on which the simulation instance was terminated */
@@ -27,7 +27,7 @@ var SimulationSchema = new Schema({
         type: Date,
         default: null
     },
-    
+
     /* Simulation id (starts at 0). The user is not allowed to modify
      * this value */
     sim_id: {
@@ -60,7 +60,7 @@ var SimulationSchema = new Schema({
     }
 
    /* TODO: Addserver cost per hr (nb) */
-   
+
 });
 
 /**
@@ -70,9 +70,9 @@ SimulationSchema.path('date_launch').validate(function(s) {
     return s !== null;
 }, 'Launch date must be set');
 
-SimulationSchema.path('date_term').validate(function(s) {
-    return s === null;
-}, 'Termination date must not be set');
+// SimulationSchema.path('date_term').validate(function(s) {
+//    return s === null;
+// }, 'Termination date must not be set');
 
 SimulationSchema.path('sim_id').validate(function(s) {
     return s >= 0;
@@ -87,19 +87,25 @@ SimulationSchema.path('region').validate(function(s) {
 }, 'Region cannot be blank');
 
 SimulationSchema.path('state').validate(function(s) {
-    return s === 'Launching';
-}, 'State of the simulation instance must be Launching');
+    return ['Launching', 'Terminated'].indexOf(s) > -1 ;
+}, 'State of the simulation instance must be Launching or Terminated');
 
 SimulationSchema.path('user').validate(function(s) {
     return s !== null;
 }, 'User must be set.');
 
-/**
- * Statics
- */
+/////////////////////////////////////////////////
+// Statics
 SimulationSchema.statics.load = function(id, cb) {
     this.findOne({
         _id: id
+    }).populate('user', 'name username').exec(cb);
+};
+
+SimulationSchema.statics.loadBySimId = function(userId, simId, cb) {
+    this.findOne({
+        user: userId,
+        sim_id: simId
     }).populate('user', 'name username').exec(cb);
 };
 

@@ -230,3 +230,7 @@ footer .row {
   padding-bottom: 5px;
 }
 
+
+/* Set the hover color for a table row */
+.table-hover>tbody>tr:hover>td {
+  background-color: #e8f4ff;
