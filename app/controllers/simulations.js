@@ -295,12 +295,12 @@ exports.show = function(req, res) {
 /// @param[out] res Nodejs response object.
 /// @return Function to get all simulation instances for a user.
 exports.all = function(req, res) {
-    var filter = {};
+    var filter = {user: req.user};
     if (req.query.state) {
         var queryStates = req.query.state.split(',');
-        filter = {state: { $in : queryStates}};
-    }
+        filter.state = {$in : queryStates};
 
+    }
     // Get all simulation models, in creation order, for a user
     Simulation.find(filter).sort('-date_launch').populate('user', 'name username')
       .exec(function(err, simulations) {
