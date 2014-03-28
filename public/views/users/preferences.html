@@ -1,0 +1,95 @@
+<div class="container" data-ng-controller="PreferencesController">
+  <div class="row">
+
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">OpenID Account</div>
+        <div class="panel-body">
+          <p>Current OpenID email: {{global.user.email}}</p>
+          <p>Select new OpenID</p>
+
+          <ul class="list-inline">
+            <li class='text-center'>
+                <a href="/auth/google"><img class="inline-block"
+                  alt="Google" src="/img/icons/google.svg"/><br/>Google</a>
+            </li>
+            <li class='text-center'>
+              <a href="/auth/yahoo"><img class="inline-block"
+                alt="Yahoo" src="/img/icons/yahoo.svg"><br/>Yahoo</a>
+            </li>
+            <li class='text-center'>
+              <a href="/auth/aol"><img class="inline-block"
+                alt="AOL" src="/img/icons/aol.svg"><br/>AOL</a>
+            </li>
+            <li class='text-center'>
+              <a href="/auth/openid"><img class="inline-block"
+                alt="OpenId" src="/img/icons/openid.svg"><br/>OpenId</a>
+            </li>
+          </ul>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">Billing Information</div>
+        <div class="panel-body">Current billing account...</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="row">
+
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">Email Settings</div>
+        <div class="panel-body">
+          <form class="form-horizontal" >
+
+            <!-- Change email -->
+            <div class="form-group">
+              <label for="email" class="col-sm-2 control-label">Email</label>
+              <div class="col-sm-10">
+                <input type="email" class="form-control"
+                ng-model="global.user.email"
+                required="required">
+              </div>
+            </div>
+
+            <label class="col-sm-12">Email me when...</label>
+
+            <div class="form-group">
+              <label for="spent"
+                class="col-sm-4 control-label">I have spent</label>
+              <div class="col-sm-4">
+                <input type="text" class="form-control"
+                ng-model="user.spent_trigger">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="balance"
+                class="col-sm-4 control-label">My balance is below</label>
+              <div class="col-sm-4">
+                <input type="text" class="form-control"
+                ng-model="user.balance_trigger">
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">SSH Keys</div>
+        <div class="panel-body">Panel body</div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
