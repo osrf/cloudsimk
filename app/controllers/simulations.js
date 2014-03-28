@@ -208,8 +208,9 @@ exports.all = function(req, res) {
     if (req.query.state) {
         var queryStates = req.query.state.split(',');
         filter = {state: { $in : queryStates}};
-    }
 
+   }
+    console.log('SIMULATION.ALL FILTER: ' + require('util').inspect(filter));
     // Get all simulation models, in creation order, for a user
     Simulation.find(filter).sort('-date_launch').populate('user', 'name username')
       .exec(function(err, simulations) {

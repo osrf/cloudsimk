@@ -13,6 +13,7 @@ var should = require('should');
 var supertest = require('supertest');
 
 var user;
+var user2;
 var agent;
 
 describe('<Unit Test>', function() {
@@ -26,25 +27,35 @@ describe('<Unit Test>', function() {
                 password: 'pass',
                 provider: 'local'
             });
-            user.save(function() {
-                agent = supertest.agent(app);
-                agent
-                .post('/users/session')
-                .set('Acccept', 'application/json')
-                .send({ email: 'user_test@test.com', password:'pass' })
-                .end(function(err,res){
-                    // 302 Moved Temporarily  200 OK
-                    res.should.have.status(302);
-
-                    // clear the simulation collection before the tests
-                    Simulation.remove({}, function(err){
-                        if (err){
-                            should.fail(err);
-                        }
-                        done();
+            user2 = new User({
+                open_id: 'myopenid2',
+                name: 'User Tester2',
+                email: 'user_test2@test.com',
+                username: 'user2',
+                password: 'pass2',
+                provider: 'local'
+            });
+                user2.save(function () {
+                    user.save(function() {
+                        agent = supertest.agent(app);
+                        agent
+                        .post('/users/session')
+                        .set('Acccept', 'application/json')
+                        .send({ email: 'user_test@test.com', password:'pass' })
+                        .end(function(err,res){
+                            // 302 Moved Temporarily  200 OK
+                            res.should.have.status(302);
+    
+                            // clear the simulation collection before the tests
+                            Simulation.remove({}, function(err){
+                                if (err){
+                                    should.fail(err);
+                                }
+                                done();
+                            });
+                        });
                     });
                 });
-            });
         });
 
         describe('Check Empty Running Simulation', function() {
@@ -62,7 +73,7 @@ describe('<Unit Test>', function() {
         });
 
         describe('Check Create Simulation', function() {
-            it('should be able to create a simulation', function(done) {
+            it('should be possible to create a simulation', function(done) {
                 agent
                 .post('/simulations')
                 .set('Acccept', 'application/json')
@@ -488,6 +499,29 @@ describe('<Unit Test>', function() {
                 });
             });
         });
+
+        describe('Check second user', function () {
+            it('Should be impossible for a user to see other sims', function(done) {
+            
+                var cookie;
+                supertest(app) 
+                .post('/users/session')
+                .set('Acccept', 'application/json')
+                .send({ email: 'user_test2@test.com', password:'pass2' })
+                .end(function(err,res){
+                    cookie = res.headers['set-cookie'];
+                    supertest(app).get('/simulations')
+                    .set('cookie', cookie)
+                    .end(function(err, res) {
+                        util.log_res(res);
+                        console.log('RES TEXT ' + res.text);
+                            var sims = JSON.parse(res.text);
+                            sims.length.should.equal(0);
+                        done();
+                    });
+                });
+            });
+       }); 
 
         after(function(done) {
             user.remove();

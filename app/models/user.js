@@ -114,7 +114,14 @@ UserSchema.methods = {
     ///  @return {Boolean}
     ///  @api public
     authenticate: function(plainText) {
-        return this.encryptPassword(plainText) === this.hashed_password;
+        var authenticated = false;
+        if( this.encryptPassword(plainText) === this.hashed_password) {
+            authenticated = true;
+        }
+        console.log('\n\n******\n******\nauthenticated: ' + authenticated + '**\n**');
+        console.log('user email:' + this.email);
+        console.log("***\n**");
+        return authenticated;
     },
 
     ///  Make salt
