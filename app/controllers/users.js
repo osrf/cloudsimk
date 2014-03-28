@@ -21,6 +21,12 @@ exports.authCallback = function(req, res) {
 /// @param[in] req Nodejs request object.
 /// @param[out] res Nodejs response object.
 exports.all = function(req, res) {
+
+    if (!req.user) {
+        res.redirect('/');
+        return;
+    }
+
     // Get all simulation models, in creation order, for a user
     User.find().sort('-created') //.populate('user', 'name username')
       .exec(function(err, users) {
@@ -82,7 +88,7 @@ exports.remove = function(req, res) {
     var user = req.profile;
 
     if (user.email === req.user.email) {
-        res.send(500,'Unable to delete yourself');
+        res.send(500, 'Unable to delete yourself');
         return;
     }
    
