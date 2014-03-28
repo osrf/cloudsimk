@@ -13,15 +13,9 @@ var hasAuthorization = function(req, res, next) {
 };
 
 module.exports = function(app) {
-
-    /// GET /simulations/history
-    /// Return the simulation history for the user
-    app.get('/simulations/history',
-        authorization.requiresLogin, Simulations.history);
-
-    /// DEL /simulations/history:simulationId
-    /// Delete one simulation history instance
-    app.del('/simulations/history/:simulationId',
+    /// DEL /simulations/:simulationId
+    /// Delete one simulation instance
+    app.del('/simulations/:simulationId',
         authorization.requiresLogin, hasAuthorization, Simulations.destroy);
 
     /// GET /simulations
@@ -29,20 +23,10 @@ module.exports = function(app) {
     app.get('/simulations',
         authorization.requiresLogin, Simulations.all);
 
-    /// GET /simulations/running
-    /// Return all the running simulations
-    app.get('/simulations/running',
-        authorization.requiresLogin, Simulations.running);
-
     /// POST /simulations
     /// Create a new simulation
     app.post('/simulations',
         authorization.requiresLogin, Simulations.create);
-
-    /// DEL /simulations/running/:simulationId
-    /// Terminate one running simulation instance
-    app.del('/simulations/running/:simulationId',
-        authorization.requiresLogin, hasAuthorization, Simulations.terminate);
 
     /// GET /simulations/:simulationId
     /// Return properties for one simulation

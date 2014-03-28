@@ -1,29 +1,46 @@
+h1, h2, h3, h4, h5, h6 {
+  font-family: Montserrat;
+  color: #4d4d4d;
+}
+
+p {
+  color:#4d4d4d;
+}
+
+.content {
+    margin-top:70px;
+    margin-bottom: -90px;
+    width:100%
+}
+
 .navbar .nav>li>a.brand {
   padding-left:20px;
   margin-left:0
-  background: #e8f4ff;
 }
 
-.navbar .brand, .navbar .nav > li > a:hover,
-.navbar .brand, .navbar .nav > li > a,
+.navbar-default
+ {
+  background: transparent;
+  background-color: #ffffff;
+  border: none;
+}
+
+/* Contains color of Login/Signup ON CLICK*/
 .navbar-default .navbar-nav>.open>a,
-.navbar-default .navbar-nav>.open>a:hover
-{
-  background: #e8f4ff;
+.navbar-default .navbar-nav>.open>a:hover {
+  background-color: #ffffff;
+  border: none; 
+  color: #4d4d4d;
 }
 
-.navbar {
-  background: #e8f4ff;
-  border-bottom: 1px solid #abd7ff;
+/*Default color of Login/Signup*/
+.navbar-default .navbar-nav >li>a {
+  color: #b3b3b3;
 }
 
-.navbar-default .navbar-toggle .icon-bar {
-  background: #abd7ff;
-}
-
-.navbar-default .navbar-toggle:hover,
-.navbar-default .navbar-toggle:focus {
-  background: #448ac9;
+/*Default color for HOVER of Login/Signup*/
+.navbar-default .navbar-nav >li>a:hover {
+  color: #4d4d4d;
 }
 
 .btn-help {
@@ -39,6 +56,7 @@
   background: transparent;
 }
 
+/* This sets the popover width. Done for the launch bar */
 .popover {
   width: 200px;
 }
@@ -56,36 +74,174 @@
   padding-top: 5px;
   margin-right: 0px;
   line-height: 50px;
-} 
+}
+
+
+/*First part of login dropdown*/
+.navbar .nav > li > .dropdown-menu::before {
+  position: absolute;
+  top: -7px;
+  right: 9px;
+  display: inline-block;
+  border-right: 7px solid transparent;
+  border-bottom: 7px solid #CCC;
+  border-left: 7px solid transparent;
+  border-bottom-color: rgba(0, 0, 0, 0.2);
+  content: '';
+}
+
+/*Second part of login dropdown*/
+.navbar .nav > li > .dropdown-menu::after {
+  position: absolute;
+  top: -6px;
+  right: 10px;
+  display: inline-block;
+  border-right: 6px solid transparent;
+  border-bottom: 7px solid white;
+  border-left: 6px solid transparent;
+  content: '';
+}
 
 .dropdown-menu > li > a:hover {
   background: transparent;
 }
 
+/*Hover state of images for Login options*/
 .dropdown-menu > li > a:hover > img {
   background: #448ac9;
+  border-color: #ffffff;
 }
 
-.content {
-    margin-top:70px;
-    width:100%
+/*Hover state of text for Login options*/
+.dropdown-menu > li > a:hover {
+  color: #448ac9;
+ }
+
+/* Set the hover color for a table row */
+.table-hover>tbody>tr:hover>td {
+  background-color: #e8f4ff;
 }
 
+/*************************************************/
+/*Modal for logging in/signing up*/
+
+.modal-header{
+  color;#333;
+}
+
+.modal-body {
+  color:#333;
+  line-height: 130%;
+  font-size: 18px;
+  font-family:  "Helvetica Neue",Helvetica,Arial,sans-serif; 
+}
+
+/*Adds padding to top of OpenID list*/
+.signin-modal{
+  padding-top: 20px;
+  text-align: center;
+}
+
+.signin-modal > li {
+  padding-right: 10px;
+}
+
+/*Settings for Login options text*/
+.signin-modal > li > a {
+  color:#333;
+  text-decoration: none;
+  list-style: none;
+} 
+
+/* Hover state for icons in signup modal*/
+.signin-modal > li > a:hover > img {
+  background: #448ac9;
+  border-color: #ffffff;
+}
+
+/* Hover state for OpenID option text in signup modal*/
+.signin-modal > li > a:hover {
+  color: #448ac9;
+}
+/*-------------------------------------------------*/
+
+
+/*************************************************/
+/* Landing page css */
+#landing .col-sm-6 {
+  padding-bottom: 50px;
+}
+
+#landing .col-sm-offset-6 {
+  padding-bottom: 50px;
+}
+
+#landing .col-sm-2{
+  padding-bottom: 20px;
+}
+
+#bigheader {
+  color: #b3b3b3;
+  font-size: 30px;
+  padding-bottom: 10px;
+  padding-top: 50px;
+  font-family: Montserrat;
+}
+
+.smallheader {
+  color: #b3b3b3 !important;
+  font-size: 13px;
+  text-align: center; 
+  padding-bottom: 8px;
+  font-family: Montserrat;
+}
+/*-------------------------------------------------*/
+
+
+/*************************************************/
+/* Footer css */
 footer {
-    position:fixed;
     left:0px;
     bottom:0px;
-    height:30px;
+    position: absolute;
+
+    /*If this is changed, change the .content margin-bottom as much*/
+    height:90px;
     width:100%;
-    background:#ddd;
+    background:#262626;
     -webkit-box-shadow:0 8px 6px 6px black;
     -moz-box-shadow:0 8px 6px 6px black;
-    box-shadow:0 8px 6px 6px black
+    box-shadow:0 8px 6px 6px black;
+    padding-top: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+    color: #b3b3b3;
 }
+
+
+footer a, footer a:link, footer a:visited{
+  color: #b3b3b3;
+}
+
+footer a:hover{
+  color: #b3b3b3;
+  text-decoration: underline;
+}
+
+.jumbotron {
+  background-image: url(../img/hexabump.png);
+  background-repeat: repeat;
+}
+
 
 footer p {
     padding:5px 0 12px 10px
 }
+
+footer .row {
+  padding-bottom: 5px;
+}
+/*-------------------------------------------------*/
 
 /* Set the hover color for a table row */
 .table-hover>tbody>tr:hover>td {
