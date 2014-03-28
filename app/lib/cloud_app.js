@@ -86,3 +86,30 @@ if (cmd === 'key') {
     });
 }
 
+if (cmd === 'genkey') {
+    
+    var keyName =  process.argv[3];
+    console.log('key name: ' + keyName);
+    var region = process.argv[4];
+    console.log('region: ' + region);
+
+    cloud_services.generateKey(keyName, region, function (err, key_str) {
+        if (err) console.log('err: ' + err);
+        else console.log('key: ' + key_str);
+    });
+
+}
+
+if (cmd === 'delkey') {
+
+    var keyName =  process.argv[3];
+    console.log('key name: ' + keyName);
+    var region = process.argv[4];
+    console.log('region: ' + region);
+
+    cloud_services.deleteKey(keyName, region, function (err, data) {
+        if (err) console.log('err: ' + err);
+        else console.log(require('util').inspect(data) );
+    });
+}
+

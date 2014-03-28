@@ -8,6 +8,52 @@ var util = require('util');
 // Async functions to launch machines on a cloud provider
 // AWS is the only supported one for now
 
+
+//////////////////////////////////////////////////////////////////
+// Generates a new ssh key, registers the public key on the cloud
+// provider and saves the private key
+// @param[in] keyName the key name
+// @param[in] region the region where the server is
+//            located
+exports.generateKey = function (keyName, region, cb) {
+    AWS.config.region = region;
+    var ec2 = new AWS.EC2();
+    var params = {
+        DryRun: false,
+        KeyName: keyName
+    }
+    ec2.createKeyPair(params, function(err, data) {
+        if(err) {
+            cb(err);
+        } else {
+            cb(null, data.KeyMaterial);
+        }
+    });
+};
+
+
+///////////////////////////////////////////////////////////
+// Deletes a public ssh key from AWS
+// @param[in] keyName the key name
+// @param[in] region the region where the key is located
+exports.deleteKey = function (keyName, region, cb) {
+    AWS.config.region = region;
+    var ec2 = new AWS.EC2();
+    var params = {
+        DryRun: false,
+        KeyName: keyName
+    }
+    ec2.deleteKeyPair(params, function(err, data) {
+        if(err) {
+            cb(err);
+        } else {
+            cb(null, data.return);
+        }
+    });
+};
+
+
+
 /////////////////////////////////////////////////////////////
 // Launch a simulator machine, given:
 // @param[in] username Username (for info on the AWS console)
