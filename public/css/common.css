@@ -5,7 +5,9 @@
 }
 
 .navbar .brand, .navbar .nav > li > a:hover,
-.navbar .brand, .navbar .nav > li > a
+.navbar .brand, .navbar .nav > li > a,
+.navbar-default .navbar-nav>.open>a,
+.navbar-default .navbar-nav>.open>a:hover
 {
   background: #e8f4ff;
 }
@@ -85,7 +87,28 @@ footer p {
     padding:5px 0 12px 10px
 }
 
+/* Display UL horizontally */
+
 /* Set the hover color for a table row */
 .table-hover>tbody>tr:hover>td {
   background-color: #e8f4ff;
+
+.slide.ng-leave {
+  position: relative;
+}
+.slide.ng-enter {
+  position: absolute;
+}
+.slide.ng-enter, .slide.ng-leave {
+  -webkit-transition: 0.2s linear opacity;
+  -moz-transition: 0.2s linear opacity;
+  -o-transition: 0.2s linear opacity;
+  transition: 0.2s linear opacity;
+}
+
+.slide.ng-enter, .slide.ng-leave.ng-leave-active {
+  opacity: 0;
+}
+.slide, .slide.ng-enter.ng-enter-active {
+  opacity: 1;
 }

@@ -1,7 +1,7 @@
 'use strict';
 
 // Setting up route
-angular.module('mean').config(['$stateProvider', '$urlRouterProvider',
+angular.module('cloudsim').config(['$stateProvider', '$urlRouterProvider',
   function($stateProvider, $urlRouterProvider) {
     // For unmatched routes:
     $urlRouterProvider.otherwise('/');
@@ -21,7 +21,16 @@ angular.module('mean').config(['$stateProvider', '$urlRouterProvider',
         url: '/simulations/:simulationId',
         templateUrl: 'views/simulations/view.html'
     })*/
-      .state('home', {
+    // Route to the admin view
+    .state('admin', {
+        url: '/admin',
+        templateUrl: 'views/users/admin.html'
+    })
+    .state('preferences', {
+        url: '/preferences',
+        templateUrl: 'views/users/preferences.html'
+    })
+    .state('home', {
         url: '/',
         templateUrl: 'views/index.html'
     });
@@ -29,7 +38,7 @@ angular.module('mean').config(['$stateProvider', '$urlRouterProvider',
 ]);
 
 // Setting HTML5 Location Mode
-angular.module('mean').config(['$locationProvider',
+angular.module('cloudsim').config(['$locationProvider',
   function($locationProvider) {
     $locationProvider.hashPrefix('!');
 }

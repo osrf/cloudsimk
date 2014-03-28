@@ -1,7 +1,9 @@
 <!-- swig template -->
 {% extends 'layouts/default.html' %}
 {% block content %}
-    <section data-ui-view />
+   <div class="container">
+     <div data-ui-view class="slide"></div>
+   </div>
     <script type="text/javascript">
         window.user = {{user|safe}};
     </script>

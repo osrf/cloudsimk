@@ -2,16 +2,16 @@
 
 (function() {
     describe('CloudSim controllers', function() {
-        describe('HeaderController', function() {
+        describe('UsersController', function() {
             // Load the controllers module
             beforeEach(module('cloudsim'));
 
-            var scope, HeaderController;
+            var scope, UsersController;
 
             beforeEach(inject(function($controller, $rootScope) {
                 scope = $rootScope.$new();
 
-                HeaderController = $controller('HeaderController', {
+                UsersController = $controller('UsersController', {
                     $scope: scope
                 });
             }));
@@ -19,11 +19,6 @@
             it('should expose some global scope', function() {
                 expect(scope.global).toBeTruthy();
             });
-
-            it('should not be authenticated', function() {
-                expect(scope.global.authenticated).toBe(false);
-            });
-
         });
     });
 })();
