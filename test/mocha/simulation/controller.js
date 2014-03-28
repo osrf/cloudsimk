@@ -35,27 +35,27 @@ describe('<Unit Test>', function() {
                 password: 'pass2',
                 provider: 'local'
             });
-                user2.save(function () {
-                    user.save(function() {
-                        agent = supertest.agent(app);
-                        agent
-                        .post('/users/session')
-                        .set('Acccept', 'application/json')
-                        .send({ email: 'user_test@test.com', password:'pass' })
-                        .end(function(err,res){
-                            // 302 Moved Temporarily  200 OK
-                            res.should.have.status(302);
+            user2.save(function () {
+                user.save(function() {
+                    agent = supertest.agent(app);
+                    agent
+                    .post('/users/session')
+                    .set('Acccept', 'application/json')
+                    .send({ email: 'user_test@test.com', password:'pass' })
+                    .end(function(err,res){
+                        // 302 Moved Temporarily  200 OK
+                        res.should.have.status(302);
     
-                            // clear the simulation collection before the tests
-                            Simulation.remove({}, function(err){
-                                if (err){
-                                    should.fail(err);
-                                }
-                                done();
-                            });
+                        // clear the simulation collection before the tests
+                        Simulation.remove({}, function(err){
+                            if (err){
+                                should.fail(err);
+                            }
+                            done();
                         });
                     });
                 });
+            });
         });
 
         describe('Check Empty Running Simulation', function() {
@@ -504,7 +504,7 @@ describe('<Unit Test>', function() {
             it('Should be impossible for a user to see other sims', function(done) {
             
                 var cookie;
-                supertest(app) 
+                supertest(app)
                 .post('/users/session')
                 .set('Acccept', 'application/json')
                 .send({ email: 'user_test2@test.com', password:'pass2' })
@@ -515,13 +515,13 @@ describe('<Unit Test>', function() {
                     .end(function(err, res) {
                         util.log_res(res);
                         console.log('RES TEXT ' + res.text);
-                            var sims = JSON.parse(res.text);
-                            sims.length.should.equal(0);
+                        var sims = JSON.parse(res.text);
+                        sims.length.should.equal(0);
                         done();
                     });
                 });
             });
-       }); 
+        });
 
         after(function(done) {
             user.remove();

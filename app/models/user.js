@@ -118,9 +118,6 @@ UserSchema.methods = {
         if( this.encryptPassword(plainText) === this.hashed_password) {
             authenticated = true;
         }
-        console.log('\n\n******\n******\nauthenticated: ' + authenticated + '**\n**');
-        console.log('user email:' + this.email);
-        console.log("***\n**");
         return authenticated;
     },
 
