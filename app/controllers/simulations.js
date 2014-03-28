@@ -167,6 +167,13 @@ exports.update = function(req, res) {
         return;
     }
 
+    // Check if the update operation is to terminate a simulation
+    if (req.body.state !== simulation.state &&
+        req.body.state === 'Terminated') {
+        exports.terminate(req, res);
+        return;
+    }
+
     // Check to make sure the region is not modified.
     if (req.body.region && simulation.region !== req.body.region) {
 
@@ -200,7 +207,7 @@ exports.update = function(req, res) {
 };
 
 /////////////////////////////////////////////////
-/// Delete a simulation
+/// Delete a simulation.
 /// @param[in] req Nodejs request object.
 /// @param[out] res Nodejs response object.
 /// @return Destroy function
@@ -273,44 +280,14 @@ exports.show = function(req, res) {
 /// @param[out] res Nodejs response object.
 /// @return Function to get all simulation instances for a user.
 exports.all = function(req, res) {
+    var filter = {};
+    if (req.query.state) {
+        var queryStates = req.query.state.split(',');
+        filter = {state: { $in : queryStates}};
+    }
+
     // Get all simulation models, in creation order, for a user
-    Simulation.find().sort('-created').populate('user', 'name username')
-      .exec(function(err, simulations) {
-        if (err) {
-            res.render('error', {
-                status: 500
-            });
-        } else {
-            res.jsonp(simulations);
-        }
-    });
-};
-
-/////////////////////////////////////////////////
-/// List of running simulations for a user.
-/// @param[in] req Nodejs request object.
-/// @param[out] res Nodejs response object.
-/// @return Function to get all simulation instances for a user.
-exports.running = function(req, res) {
-    // Get all running simulation models, in creation order, for a user
-    Simulation.find({state: {$ne: 'Terminated'}}).sort('-date_launch').populate('user', 'name username')
-      .exec(function(err, simulations) {
-        if (err) {
-            res.render('error', {
-                status: 500
-            });
-        } else {
-            res.jsonp(simulations);
-        }
-    });
-};
-
-/////////////////////////////////////////////////
-/// List of simulations
-/// @param[in] req Nodejs request object.
-/// @param[out] res Nodejs response object.
-exports.history = function(req, res) {
-    Simulation.find({state: 'Terminated'}).sort('-date_term').populate('user', 'name username')
+    Simulation.find(filter).sort('-date_launch').populate('user', 'name username')
       .exec(function(err, simulations) {
         if (err) {
             res.render('error', {
