@@ -1,7 +1,23 @@
+h1, h2, h3, h4, h5, h6 {
+  font-family: Montserrat;
+  color: #4d4d4d;
+}
+
+p {
+  color:#4d4d4d;
+}
+
+.content {
+    margin-top:70px;
+    margin-bottom: 80px;
+    width:100%
+}
+
 .navbar .nav>li>a.brand {
   padding-left:20px;
   margin-left:0
 }
+
 .navbar-default
  {
   background: transparent;
@@ -16,6 +32,7 @@
   border: none; 
   color: #4d4d4d;
 }
+
 /*Default color of Login/Signup*/
 .navbar-default .navbar-nav >li>a {
   color: #b3b3b3;
@@ -39,6 +56,7 @@
   background: transparent;
 }
 
+/* This sets the popover width. Done for the launch bar */
 .popover {
   width: 200px;
 }
@@ -99,7 +117,13 @@
   color: #448ac9;
  }
 
- /*MODAL FOR LOGGING IN/SIGNING UP*/
+/* Set the hover color for a table row */
+.table-hover>tbody>tr:hover>td {
+  background-color: #e8f4ff;
+}
+
+/*************************************************/
+/*Modal for logging in/signing up*/
 
 .modal-header{
   color;#333;
@@ -141,19 +165,11 @@ just right so it's in the middle of the modal?*/
 .dropdown-menu-modal > li > a:hover {
   color: #448ac9;
  }
+/*-------------------------------------------------*/
 
-/*MODAL COMMENTS END HERE*/
 
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: Montserrat;
-  color: #4d4d4d;
-}
-
-p {
-  color:#4d4d4d;
-}
-
+/*************************************************/
+/* Landing page css */
 #landing .col-sm-6 {
   padding-bottom: 50px;
 }
@@ -166,14 +182,7 @@ p {
   padding-bottom: 20px;
 }
 
-.content {
-    margin-top:70px;
-    margin-bottom: 80px;
-    width:100%
-}
-
-
- #bigheader {
+#bigheader {
   color: #b3b3b3;
   font-size: 30px;
   padding-bottom: 10px;
@@ -188,8 +197,11 @@ p {
   padding-bottom: 8px;
   font-family: Montserrat;
 }
+/*-------------------------------------------------*/
 
 
+/*************************************************/
+/* Footer css */
 footer {
     left:0px;
     bottom:0px;
@@ -229,8 +241,5 @@ footer p {
 footer .row {
   padding-bottom: 5px;
 }
+/*-------------------------------------------------*/
 
-
-/* Set the hover color for a table row */
-.table-hover>tbody>tr:hover>td {
-  background-color: #e8f4ff;
