@@ -9,7 +9,7 @@ p {
 
 .content {
     margin-top:70px;
-    margin-bottom: 80px;
+    margin-bottom: -90px;
     width:100%
 }
 
@@ -128,43 +128,41 @@ p {
 .modal-header{
   color;#333;
 }
- .modal-body {
+
+.modal-body {
   color:#333;
   line-height: 130%;
   font-size: 18px;
   font-family:  "Helvetica Neue",Helvetica,Arial,sans-serif; 
- }
+}
+
 /*Adds padding to top of OpenID list*/
- .dropdown-menu-modal{
+.signin-modal{
   padding-top: 20px;
- }
+  text-align: center;
+}
+
+.signin-modal > li {
+  padding-right: 10px;
+}
 
 /*Settings for Login options text*/
-.dropdown-menu-modal > li > a {
+.signin-modal > li > a {
   color:#333;
   text-decoration: none;
   list-style: none;
-/*I'm trying to left-align the li items in relation
-to one another, but then center-align the entire
-block of li's...This is a bad hack, I think. Will
-it mess up the responsiveness? How do I get the width
-just right so it's in the middle of the modal?*/
-  display: block;
-  text-align: left;
-  width:140px;
-  margin:0px auto;
 } 
 
 /* Hover state for icons in signup modal*/
- .dropdown-menu-modal > li > a:hover > img {
+.signin-modal > li > a:hover > img {
   background: #448ac9;
   border-color: #ffffff;
 }
 
 /* Hover state for OpenID option text in signup modal*/
-.dropdown-menu-modal > li > a:hover {
+.signin-modal > li > a:hover {
   color: #448ac9;
- }
+}
 /*-------------------------------------------------*/
 
 
@@ -205,6 +203,7 @@ just right so it's in the middle of the modal?*/
 footer {
     left:0px;
     bottom:0px;
+
     /*If this is changed, change the .content margin-bottom as much*/
     height:90px;
     width:100%;
@@ -242,4 +241,3 @@ footer .row {
   padding-bottom: 5px;
 }
 /*-------------------------------------------------*/
-
