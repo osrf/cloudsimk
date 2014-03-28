@@ -31,27 +31,4 @@ angular.module('mean.simulations').controller('SimulationsController', ['$scope'
         sim.$save();
         $scope.simulations.unshift(sim);
     };
-    // Tabs
-    var tabClasses;
-
-    function initTabs() {
-        tabClasses = ['','','',''];
-    }
-
-    $scope.getTabClass = function (tabNum) {
-        return tabClasses[tabNum];
-    };
-
-    $scope.getTabPaneClass = function (tabNum) {
-        return 'tab-pane fade ' + tabClasses[tabNum];
-    };
-
-    $scope.setActiveTab = function (tabNum) {
-        initTabs();
-        tabClasses[tabNum] = 'in active';
-    };
-
-    //Initialize tabs
-    initTabs();
-    $scope.setActiveTab(1);
 }]);

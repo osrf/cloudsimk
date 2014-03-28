@@ -1,52 +1,40 @@
 <div class="container">
-<!--<div class="tabbable tabs-left">-->
-  <div class="tabbable">
-    <ul class="nav nav-tabs">
-      <li ng-class="getTabClass(1)" ng-click="setActiveTab(1)">
-        <a href="#console" data-toggle="tab">Console</a>
-      </li>
-      <li ng-class="getTabClass(2)" ng-click="setActiveTab(2)">
-        <a href="#history" data-toggle="tab">History</a>
-      </li>
-    </ul>
-    <div class="tab-content">
-      <div ng-class="getTabPaneClass(1)" id="console">
-        <table class="table table-striped table-condensed table-hover">
-          <thead>
-            <tr>
-              <th><input type="checkbox"></th>
-              <th>Id</th>
-              <th>World</th>
-              <th>Status</th>
-              <th>Region</th>
-              <th>Uptime</th>
-              <th>Cost</th>
-            </tr>
-          </thead>
-          <tfoot>
-            <td colspan="7">
-              <div class='text-right'>
-                <pagination direction-links="true"
-                total-items="simulations.length" items-per-page="simPerPage"
-                page="currentPage" ng-model="currentPage"></pagination>
-               </div>
-            </td>
-          </tfoot>
-          <tbody>
-            <tr ng-repeat="simulation in simulations.slice((currentPage-1)*simPerPage, (currentPage-1)*simPerPage+simPerPage)">
-              <td><input type="checkbox"></td>
-              <td>{{simulation.sim_id}}</td>
-              <td>{{simulation.world}}</td>
-              <td>{{simulation.state}}</td>
-              <td>{{simulation.region}}</td>
-              <td>0</td>
-              <td>0</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div ng-class="getTabPaneClass(2)" id="history">
-      </div>
-    </div>
-  </div>
+  <tabset>
+    <tab heading='Console'>
+      <table class="table table-striped table-condensed table-hover">
+        <thead>
+          <tr>
+            <th><input type="checkbox"></th>
+            <th>Id</th>
+            <th>World</th>
+            <th>Status</th>
+            <th>Region</th>
+            <th>Uptime</th>
+            <th>Cost</th>
+          </tr>
+        </thead>
+        <tfoot>
+          <td colspan="7">
+            <div class='text-right'>
+              <pagination direction-links="true"
+              total-items="simulations.length" items-per-page="simPerPage"
+              page="currentPage" ng-model="currentPage"></pagination>
+             </div>
+          </td>
+        </tfoot>
+        <tbody>
+          <tr ng-repeat="simulation in simulations.slice((currentPage-1)*simPerPage, (currentPage-1)*simPerPage+simPerPage)">
+            <td><input type="checkbox"></td>
+            <td>{{simulation.sim_id}}</td>
+            <td>{{simulation.world}}</td>
+            <td>{{simulation.state}}</td>
+            <td>{{simulation.region}}</td>
+            <td>0</td>
+            <td>0</td>
+          </tr>
+        </tbody>
+      </table>
+  </tab>
+  <tab heading='History'>
+  </tab>
 </div>
