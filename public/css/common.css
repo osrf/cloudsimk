@@ -203,6 +203,7 @@ p {
 footer {
     left:0px;
     bottom:0px;
+    position: absolute;
 
     /*If this is changed, change the .content margin-bottom as much*/
     height:90px;
