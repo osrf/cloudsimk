@@ -1,3 +1,7 @@
+html, body {
+  height: 100%;
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-family: Montserrat;
   color: #4d4d4d;
@@ -15,7 +19,12 @@ p {
 #wrap {
   min-height: 100%;
   height: auto !important;
-  margin-bottom: -20px;
+  margin-bottom: -10px;
+}
+
+.jumbotron {
+  background-image: url(../img/hexabump.png);
+  background-repeat: repeat;
 }
 
 .navbar .nav>li>a.brand {
@@ -205,13 +214,13 @@ p {
 
 /*************************************************/
 /* Footer css */
-footer {
-    /*left:0px;
+#footer {
+    left:0px;
     bottom:0px;
-    position: absolute;*/
+    /*position: absolute;*/
 
     /*If this is changed, change the .content margin-bottom as much*/
-    height:90px;
+    height:100px;
     width:100%;
     background:#262626;
     -webkit-box-shadow:0 8px 6px 6px black;
@@ -224,26 +233,20 @@ footer {
 }
 
 
-footer a, footer a:link, footer a:visited{
+#footer a, footer a:link, footer a:visited{
   color: #b3b3b3;
 }
 
-footer a:hover{
+#footer a:hover{
   color: #b3b3b3;
   text-decoration: underline;
 }
 
-.jumbotron {
-  background-image: url(../img/hexabump.png);
-  background-repeat: repeat;
-}
-
-
-footer p {
+#footer p {
     padding:5px 0 12px 10px
 }
 
-footer .row {
+#footer .row {
   padding-bottom: 5px;
 }
 /*-------------------------------------------------*/

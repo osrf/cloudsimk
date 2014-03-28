@@ -7,7 +7,8 @@
 
     <!-- swig template -->
 	{% include '../includes/head.html' %}
-	<body>
+  <body>
+    <div id="wrap">
     <div class="navbar navbar-default navbar-fixed-top"
         data-ng-include="'views/header.html'" data-role="navigation">
     </div>
@@ -16,6 +17,7 @@
         {% block content %}{% endblock %}
      
     </section>
+    </div>
     {% include '../includes/foot.html' %}
   </body>
 </html>
