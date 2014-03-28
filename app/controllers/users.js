@@ -23,7 +23,7 @@ exports.authCallback = function(req, res) {
 exports.all = function(req, res) {
 
     if (!req.user) {
-        res.redirect('/');
+        res.send(500, 'Invalid permissions.');
         return;
     }
 
