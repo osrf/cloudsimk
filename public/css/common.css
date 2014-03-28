@@ -8,9 +8,10 @@ p {
 }
 
 .content {
-    margin-top:70px;
-    margin-bottom: -90px;
-    width:100%
+  min-height:100%;
+  margin-top:70px;
+  margin-bottom: -90px;
+  width:100%
 }
 
 .navbar .nav>li>a.brand {
@@ -201,9 +202,9 @@ p {
 /*************************************************/
 /* Footer css */
 footer {
-    left:0px;
+    /*left:0px;
     bottom:0px;
-    position: absolute;
+    position: absolute;*/
 
     /*If this is changed, change the .content margin-bottom as much*/
     height:90px;
