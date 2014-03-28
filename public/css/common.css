@@ -9,12 +9,13 @@ p {
 
 .content {
   margin-top:70px;
-  margin-bottom: -90px;
   width:100%
 }
 
 #wrap {
   min-height: 100%;
+  height: auto !important;
+  margin-bottom: -20px;
 }
 
 .navbar .nav>li>a.brand {
