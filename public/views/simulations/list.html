@@ -12,7 +12,12 @@
       </tr>
     </thead>
     <tfoot>
-      <td colspan="7">
+      <td>
+        <div class='text-left' style="margin-top: 20px; margin-bottom: 20px">
+          <button class="btn btn-primary" ng-click="showShutdownDialog()">Shutdown</button>
+        </div>
+      </td>
+      <td colspan="6">
         <div class='text-right'>
           <pagination direction-links="true"
           total-items="simulations.length" items-per-page="simPerPage"
@@ -48,6 +53,5 @@
       <button class="btn btn-primary" ng-click="confirmShutdown(false)">No</button>
     </div>
   </script>
-  <button class="btn btn-primary" ng-click="showShutdownDialog()">Shutdown</button>
 
 </div>
