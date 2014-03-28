@@ -19,7 +19,7 @@ angular.module('cloudsim.users').controller('UsersController', ['$scope', '$stat
     $scope.predicate = 'username';
     $scope.reverse = false;
 
-    $scope.error = "";
+    $scope.error = '';
 
     /////////////////////////////////////////////
     /// Callback that is used when an item in the user list is checked.
@@ -30,7 +30,7 @@ angular.module('cloudsim.users').controller('UsersController', ['$scope', '$stat
     /////////////////////////////////////////////
     /// Delete a user from the users collection
     $scope.deleteUser = function() {
-        $scope.error = "";
+        $scope.error = '';
 
         // Process each checked user
         angular.forEach($scope.selectedUsers, function(usr) {
@@ -42,7 +42,7 @@ angular.module('cloudsim.users').controller('UsersController', ['$scope', '$stat
             // deleting themselves.
             if (usr.email !== $scope.global.user.email) {
                 usr.$remove(
-                    function(success) {
+                    function() {
                         // Remove the user from the local users list.
                         $scope.users.splice(idx, 1);
                     },
@@ -52,7 +52,7 @@ angular.module('cloudsim.users').controller('UsersController', ['$scope', '$stat
                 );
             }
             else {
-                $scope.error = "Unable to delete yourself";
+                $scope.error = 'Unable to delete yourself';
             }
         });
         $scope.selectedUsers = [];

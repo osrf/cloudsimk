@@ -5,7 +5,6 @@
 // For an exmaple, see public/view/user/admin.html
 angular.module('cloudsim.tableFilters', []).filter('startFrom', function() {
     return function(input, start){
-        start = +start;
         return input.slice(start);
     };
 });
