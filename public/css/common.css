@@ -8,10 +8,13 @@ p {
 }
 
 .content {
-  min-height:100%;
   margin-top:70px;
   margin-bottom: -90px;
   width:100%
+}
+
+#wrap {
+  min-height: 100%;
 }
 
 .navbar .nav>li>a.brand {
