@@ -207,7 +207,7 @@ exports.all = function(req, res) {
     var filter = {user: req.user};
     if (req.query.state) {
         var queryStates = req.query.state.split(',');
-        filter = {state: { $in : queryStates}};
+        filter.state = {$in : queryStates};
 
     }
     // Get all simulation models, in creation order, for a user

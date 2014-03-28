@@ -4,6 +4,7 @@
 var mongoose = require('mongoose'),
     User = mongoose.model('User'),
     Simulation = mongoose.model('Simulation'),
+    User = mongoose.model('User'),
     app = require('../../../server'),
     util = require('../util');
 
@@ -15,43 +16,49 @@ var supertest = require('supertest');
 var user;
 var user2;
 var agent;
+var user2Cookie;
 
 describe('<Unit Test>', function() {
     describe('Simulation Controller:', function() {
         before(function(done) {
-            user = new User({
-                open_id: 'myopenid',
-                name: 'User Tester',
-                email: 'user_test@test.com',
-                username: 'user',
-                password: 'pass',
-                provider: 'local'
-            });
-            user2 = new User({
-                open_id: 'myopenid2',
-                name: 'User Tester2',
-                email: 'user_test2@test.com',
-                username: 'user2',
-                password: 'pass2',
-                provider: 'local'
-            });
-            user2.save(function () {
-                user.save(function() {
-                    agent = supertest.agent(app);
-                    agent
-                    .post('/users/session')
-                    .set('Acccept', 'application/json')
-                    .send({ email: 'user_test@test.com', password:'pass' })
-                    .end(function(err,res){
-                        // 302 Moved Temporarily  200 OK
-                        res.should.have.status(302);
-    
-                        // clear the simulation collection before the tests
-                        Simulation.remove({}, function(err){
-                            if (err){
-                                should.fail(err);
-                            }
-                            done();
+            User.remove({}, function(err){
+                if (err){
+                    should.fail(err);
+                }
+                user = new User({
+                    open_id: 'myopenid',
+                    name: 'User Tester',
+                    email: 'user_test@test.com',
+                    username: 'user',
+                    password: 'pass',
+                    provider: 'local'
+                });
+                user2 = new User({
+                    open_id: 'myopenid2',
+                    name: 'User Tester2',
+                    email: 'user_test2@test.com',
+                    username: 'user2',
+                    password: 'pass2',
+                    provider: 'local'
+                });
+                user2.save(function () {
+                    user.save(function() {
+                        agent = supertest.agent(app);
+                        agent
+                        .post('/users/session')
+                        .set('Acccept', 'application/json')
+                        .send({ email: 'user_test@test.com', password:'pass' })
+                        .end(function(err,res){
+                            // 302 Moved Temporarily  200 OK
+                            res.should.have.status(302);
+
+                            // clear the simulation collection before the tests
+                            Simulation.remove({}, function(err){
+                                if (err){
+                                    should.fail(err);
+                                }
+                                done();
+                            });
                         });
                     });
                 });
@@ -500,21 +507,18 @@ describe('<Unit Test>', function() {
             });
         });
 
-        describe('Check second user', function () {
+        describe('Check Second User', function () {
             it('Should be impossible for a user to see other sims', function(done) {
-            
-                var cookie;
                 supertest(app)
                 .post('/users/session')
                 .set('Acccept', 'application/json')
                 .send({ email: 'user_test2@test.com', password:'pass2' })
                 .end(function(err,res){
-                    cookie = res.headers['set-cookie'];
+                    user2Cookie = res.headers['set-cookie'];
                     supertest(app).get('/simulations')
-                    .set('cookie', cookie)
+                    .set('cookie', user2Cookie)
                     .end(function(err, res) {
                         util.log_res(res);
-                        console.log('RES TEXT ' + res.text);
                         var sims = JSON.parse(res.text);
                         sims.length.should.equal(0);
                         done();
@@ -523,8 +527,53 @@ describe('<Unit Test>', function() {
             });
         });
 
+        describe('Check Second User Create Simulation', function() {
+            it('should be possible to create a simulation', function(done) {
+                supertest(app)
+                .post('/simulations')
+                .set('Acccept', 'application/json')
+                .set('cookie', user2Cookie)
+                .send({ world: 'shapes.world', region:'US West' })
+                .end(function(err,res){
+                    util.log_res(res);
+                    res.should.have.status(200);
+                    res.redirect.should.equal(false);
+                    var text = JSON.parse(res.text);
+                    text.sim_id.should.be.exactly(0);
+                    text.state.should.equal('Launching');
+                    text.region.should.equal('US West');
+                    text.world.should.equal('shapes.world');
+                    done();
+                });
+            });
+        });
+
+        describe('Check Second User One Simulation Created', function() {
+            it('should be one running simulation', function(done) {
+                supertest(app)
+                .get('/simulations?state=Launching')
+                .set('cookie', user2Cookie)
+                .end(function(err,res){
+                    util.log_res(res);
+                    res.should.have.status(200);
+                    res.redirect.should.equal(false);
+                    var text = JSON.parse(res.text);
+                    console.log(text);
+                    text.length.should.be.exactly(1);
+                    text[0].user.name.should.equal('User Tester2');
+                    text[0].user.username.should.equal('user2');
+                    text[0].sim_id.should.be.exactly(0);
+                    text[0].state.should.equal('Launching');
+                    text[0].region.should.equal('US West');
+                    text[0].world.should.equal('shapes.world');
+                    done();
+                });
+            });
+        });
+
         after(function(done) {
             user.remove();
+            user2.remove();
             done();
         });
     });
