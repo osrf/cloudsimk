@@ -5,8 +5,8 @@ var AWS = require('aws-sdk');
 var util = require('util');
 
 // configure what to do for cloud API calls:
-var dryRun = process.env.CLOUDSIM_CLOUD === 'DRY_RUN';
-console.log('process.env.CLOUDSIM_CLOUD ["", DRY_RUN]: ' +  process.env.CLOUDSIM_CLOUD);
+var dryRun = process.env.CLOUDSIM_DRY_RUN === 'true';
+console.log('process.env.CLOUDSIM_DRY_RUN (true or false): ' +  process.env.CLOUDSIM_DRY_RUN);
 
 // Async functions to launch machines on a cloud provider
 // AWS is the only supported one for now

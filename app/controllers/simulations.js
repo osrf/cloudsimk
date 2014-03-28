@@ -119,9 +119,14 @@ exports.create = function(req, res) {
                         console.log('got status: ' + util.inspect(state));
                         simulation.machine_ip = state.ip;
                         simulation.save(function(err) {
-                            console.log('SAVING SIM: ' + simulation);
-                            console.log(' err: ' + err);
-                            console.log('machine IP: ' + simulation.machine_ip);
+                            if (err) {
+                                if(machineInfo.id) {
+                                    console.log('error saving simulation info to db: ' + err);
+                                    console.log('Terminating server ' + machineInfo.id);
+                                    cloudServices.terminateSimulator(machineInfo, function () {});
+                                }
+                                res.jsonp(500, { error: err });
+                            }
                         });
                     });
                 }, 30000);
@@ -129,6 +134,11 @@ exports.create = function(req, res) {
                 // Save the simulation instance to the database
                 simulation.save(function(err) {
                     if (err) {
+                        if(machineInfo.id) {
+                            console.log('error saving simulation info to db: ' + err);
+                            console.log('Terminating server ' +  machineInfo.id);
+                            cloudServices.terminateSimulator(machineInfo, function () {});
+                        }
                         return res.send('users/signup', {
                             errors: err.errors,
                             Simulation: simulation
@@ -136,6 +146,11 @@ exports.create = function(req, res) {
                     } else {
                         user.save(function(err) {
                             if (err) {
+                                if(machineInfo.id) {
+                                    console.log('error saving simulation info to db: ' + err);
+                                    console.log('Terminating server ' + machineInfo.id);
+                                    cloudServices.terminateSimulator(machineInfo, function () {});
+                                }
                                 return res.send('users/signup', {
                                     errors: err.errors,
                                     Simulation: simulation
