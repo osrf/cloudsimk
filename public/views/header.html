@@ -18,19 +18,19 @@
           <ul class="dropdown-menu">
             <li>
               <a href="/auth/google"><img class="inline-block"
-                 alt="Google" src="/img/icons/google.svg"/>Google</a>
+                 alt="Google" width="45" src="/img/icons/google.svg"/> Google</a>
             </li>
             <li>
               <a href="/auth/yahoo"><img class="inline-block"
-                 alt="Yahoo" src="/img/icons/yahoo.svg">Yahoo</a>
+                 alt="Yahoo" width="45" src="/img/icons/yahoo.svg"> Yahoo</a>
             </li>
             <li>
               <a href="/auth/aol"><img class="inline-block"
-                 alt="AOL" src="/img/icons/aol.svg">AOL</a>
+                 alt="AOL" width="45" src="/img/icons/aol.svg"> AOL</a>
             </li>
             <li>
               <a href="/auth/openid"><img class="inline-block"
-                 alt="OpenId" src="/img/icons/openid.svg">OpenId</a>
+                 alt="OpenId" width="45" src="/img/icons/openid.svg"> OpenId</a>
             </li>
           </ul>
         </li>
@@ -38,8 +38,17 @@
       <ul class="nav navbar-nav navbar-right"
           data-ng-show="global.authenticated">
           <li>
-            <span>Hi, {{global.user.name}}</span>
-            <span class="glyphicon glyphicon-user"></span> 
+            <a href="#" class="dropdown-toggle"
+             data-toggle="dropdown">Hi, {{global.user.name}}
+             <span class="glyphicon glyphicon-user"></span></a>
+             <ul class="dropdown-menu">
+               <li>
+                 <a href="/preferences">Prefrences</a>
+                 <a ui-sref="admin">Admin</a>
+               </li>
+             </ul>
+           </li>
+           <li>
             <span>|</span>
             <span><a href="/signout">Signout</a></span>
           </li>
