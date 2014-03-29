@@ -18,25 +18,32 @@
         <tfoot>
           <td colspan="2">
             <div class='text-left' style="margin-top: 20px; margin-bottom: 20px">
-              <button class="btn btn-primary" ng-click="showShutdownDialog()">Shutdown</button>
+              <button class="btn btn-primary" ng-click="showShutdownDialog()">
+                Shutdown
+              </button>
             </div>
           </td>
           <td colspan="6">
             <div class='text-right'>
               <pagination direction-links="true"
-              total-items="simulations.length" items-per-page="simPerPage"
-              page="$parent.currentPage"></pagination>
-             </div>
+                total-items="simulations.length"
+                items-per-page="pageSize"
+                page="currentPage">
+              </pagination>
+            </div>
           </td>
         </tfoot>
         <tbody>
-      <tr ng-repeat="simulation in simulations
-        | startFrom:(currentPage-1)*pageSize | limitTo:pageSize">
-        <td><input type="checkbox" ng-model="simulation.selected"></td>
+          <tr ng-repeat="simulation in (filtered = (simulations
+            | startFrom:(currentPage-1)*pageSize
+            | limitTo:pageSize
+            | filter:getConsoleSimulations))">
+            <td><input type="checkbox" ng-model="simulation.selected"></td>
             <td>{{simulation.sim_id}}</td>
             <td>{{simulation.world}}</td>
             <td>{{simulation.state}}</td>
-            <td>{{simulation.region}}</td>
+<!--            <td>{{simulation.region}}</td>-->
+            <td>{{filtered.length}}</td>
             <td>0</td>
             <td>0</td>
           </tr>
@@ -73,20 +80,26 @@
         <tfoot>
           <td colspan="2">
             <div class='text-left' style="margin-top: 20px; margin-bottom: 20px">
-              <button class="btn btn-primary" ng-click="showRelaunchDialog()">Relaunch</button>
+              <button class="btn btn-primary" ng-click="showRelaunchDialog()">
+                Relaunch
+              </button>
             </div>
           </td>
           <td colspan="6">
             <div class='text-right'>
               <pagination direction-links="true"
-              total-items="simulations.length" items-per-page="simPerPage"
-              page="currentPage" ng-model="currentPage"></pagination>
-             </div>
+                total-items="simulations.length"
+                items-per-page="$parent.pageSize"
+                page="$parent.currentPage">
+              </pagination>
+            </div>
           </td>
         </tfoot>
         <tbody>
           <tr ng-repeat="simulation in simulations
-            | startFrom:(currentPage-1)*pageSize | limitTo:pageSize">
+            | startFrom:($parent.currentPage-1)*$parent.pageSize
+            | limitTo:$parent.pageSize
+            | filter:getConsoleSimulations">
             <td><input type="checkbox"></td>
             <td>{{simulation.date_launch}}</td>
             <td>{{simulation.sim_id}}</td>

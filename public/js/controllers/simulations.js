@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('cloudsim.simulations').controller('SimulationsController', ['$scope', '$stateParams', '$location', 'Global', 'Simulations', function ($scope, $stateParams, $location, Global, Simulations) {
+angular.module('cloudsim.simulations').controller('SimulationsController', ['$scope', '$stateParams', '$location', '$modal', 'Global', 'Simulations', function ($scope, $stateParams, $location, $modal, Global, Simulations) {
     $scope.global = Global;
 
     /// All the worlds available to the user.
@@ -18,7 +18,9 @@ angular.module('cloudsim.simulations').controller('SimulationsController', ['$sc
     $scope.currentPage = 1;
 
     /// Number of simulations to diplay per page
-    $scope.simPerPage = 5;
+    $scope.pageSize = 5;
+
+    $scope.filtered = [];
 
     /// A modal confirmation dialog displayed when the the shutdown button
     /// is pressed
@@ -63,8 +65,8 @@ angular.module('cloudsim.simulations').controller('SimulationsController', ['$sc
 
     /// Get simulations in the current page of the table
     $scope.getPageSimulations = function() {
-        var start = ($scope.currentPage-1)*$scope.simPerPage;
-        var end = start + $scope.simPerPage;
+        var start = ($scope.currentPage-1)*$scope.pageSize;
+        var end = start + $scope.pageSize;
         return $scope.simulations.slice(start, end);
     };
 
@@ -82,17 +84,13 @@ angular.module('cloudsim.simulations').controller('SimulationsController', ['$sc
     };
 
     /// Get running simulations
-    $scope.getConsoleSimulations = function() {
-        $scope.simulations.filter(function(sim){
-          return sim.state != 'Terminated';
-        });
+    $scope.getConsoleSimulations = function(sim) {
+      return sim.state !== 'Terminated';
     };
 
     /// Get terminated simulations
-    $scope.getHistorySimulations = function() {
-        $scope.simulations.filter(function(sim){
-          return sim.state == 'Terminated';
-        });
+    $scope.getHistorySimulations = function(sim) {
+        return sim.state === 'Terminated';
     };
 
 }]);
