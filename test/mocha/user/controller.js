@@ -14,6 +14,30 @@ var cookie;
 var user;
 var agent;
 
+// Create a separate test where a user has not been inserted in the
+// database before the tests run.
+describe('No user in DB:', function() {
+    describe('Invalid user add', function() {
+        it('should be impossible to add a user when not authenticated', function(done) {
+            agent = supertest.agent(app);
+            console.log('HERE');
+            agent.post('/users')
+                .set('Accept', 'application/json')
+                .send({ email: 'user_test@test.com', open_id:'test',
+                        username: 'test', name: 'test' })
+                .end(function(err, res){
+                    util.log_res(res);
+                    res.should.have.status(200);
+                    res.redirect.should.equal(false);
+                    res.body.error.message.should.equal(
+                        'Only administrators can add users');
+                    done();
+                });
+        });
+    });
+});
+
+
 
 describe('<Unit Test>', function() {
     describe('Model User:', function() {
