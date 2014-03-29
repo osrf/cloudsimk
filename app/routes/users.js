@@ -10,8 +10,18 @@ module.exports = function(app, passport) {
     app.get('/signout', users.signout);
     app.get('/users/me', users.me);
 
-    // Setting up the users api
+    /// POST /users
+    /// Create a new user
     app.post('/users', users.create);
+
+    /// DEL /users
+    /// Delete a user
+    app.del('/users/:userId', users.remove);
+
+    /// Get all the users
+    /// This route should only return data if the user is logged in, and 
+    /// is and administrator.
+    app.get('/users', users.all);
 
     // Setting up the userId param
     app.param('userId', users.user);
