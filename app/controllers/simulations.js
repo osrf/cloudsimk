@@ -91,7 +91,6 @@ exports.create = function(req, res) {
 /// @param[out] res Nodejs response object
 /// @return Simulation update function.
 exports.update = function(req, res) {
-
     // Get the simulation from the request
     var simulation = req.simulation;
 
