@@ -60,7 +60,7 @@ exports.deleteKey = function (keyName, region, cb) {
 // Launch a simulator machine, given:
 // @param[in] username Username (for info on the AWS console)
 // @param[in] keyName Public ssh key name (must exist on AWS for that region)
-// @param[in] simId Simulation id (for info on the AWS console) 
+// @param[in] simId Simulation id (for info on the AWS console)
 // @param[in] region The region in which to launch the machine.
 // @param[in] hardware A hardware type
 // @param[in] image An AMI (image id registered in that region)
@@ -132,7 +132,7 @@ exports.launchSimulator = function (username, keyName, simId, region, hardware, 
 // @param[in] cb Callback function to use when this function is complete.
 exports.simulatorStatus = function (machineInfo, cb) {
     // the parameters for describeInstances call
-    // we only want information about a single 
+    // we only want information about a single
     // machine (machineInfo.id
     var params = {
         DryRun: dryRun,
@@ -166,7 +166,7 @@ exports.simulatorStatus = function (machineInfo, cb) {
 //       region: the region where the machine exists
 exports.terminateSimulator = function (machineInfo, cb) {
     // parameters for terminateInstances
-    // we specifiy which machine to 
+    // we specifiy which machine to
     // terminate in the InstanceIds array
     var params = {
         InstanceIds: [ machineInfo.id],
@@ -190,7 +190,7 @@ exports.terminateSimulator = function (machineInfo, cb) {
 
 //////////////////////////////////////////////////////
 // Uploads a public ssh key to a specific AWS region
-// The key name on AWS is 'cs-' + the specified username 
+// The key name on AWS is 'cs-' + the specified username
 exports.setupPublicKey = function (username, region, cb) {
     var params = {
         // required

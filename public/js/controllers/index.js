@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('mean.system').controller('IndexController',
+angular.module('cloudsim.system').controller('IndexController',
     ['$scope', 'Global', function ($scope, Global) {
         $scope.global = Global;
     }
