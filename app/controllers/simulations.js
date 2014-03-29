@@ -93,75 +93,80 @@ exports.create = function(req, res) {
 
         simulation.sim_id = user.next_sim_id++;
 
-        var keyName = 'cs-hugo@osrfoundation.org';
         // we pick the appropriate machine based on the region specified
         // by the user
         var serverDetails = awsData[simulation.region];
-        cloudServices.launchSimulator(  req.user.username,
-                                        keyName,
-                                        simulation.sim_id,
-                                        serverDetails.region,
-                                        serverDetails.hardware,
-                                        serverDetails.image,
-                                        function (err, machineInfo) {
-            if(err) {
-                res.jsonp(500, { error: err });
-            } else {
-                simulation.machine_id = machineInfo.id;
-                simulation.server_price = serverDetails.price;
-                simulation.machine_ip = 'N/A';
-
-                setTimeout(function () {
+     
+        var keyName = 'cs-' + simulation.sim_id  + req.user.email;
+        cloudservices.generateKey(keyName, serverDetails.region, function(err, key) {
+            
+            cloudServices.launchSimulator(  req.user.username,
+                                            keyName,
+                                            simulation.sim_id,
+                                            serverDetails.region,
+                                            serverDetails.hardware,
+                                            serverDetails.image,
+                                            function (err, machineInfo) {
+                if(err) {
+                    res.jsonp(500, { error: err });
+                } else {
+                    simulation.machine_id = machineInfo.id;
+                    simulation.server_price = serverDetails.price;
+                    simulation.machine_ip = 'N/A';
+    
+                    setTimeout(function () {
+                        
+                        simulation.machine_ip = 'waiting';
+                        console.log('TIMED OUT ' + util.inspect(machineInfo));
+                        cloudServices.simulatorStatus(machineInfo, function(err, state) {
+                            console.log('got status: ' + util.inspect(state));
+                            simulation.machine_ip = state.ip;
+                            simulation.save(function(err) {
+                                if (err) {
+                                    if(machineInfo.id) {
+                                        console.log('error saving simulation info to db: ' + err);
+                                        console.log('Terminating server ' + machineInfo.id);
+                                        cloudServices.terminateSimulator(machineInfo, function () {});
+                                    }
+                                    res.jsonp(500, { error: err });
+                                }
+                            });
+                        });
+                    }, 30000);
                     
-                    simulation.machine_ip = 'waiting';
-                    console.log('TIMED OUT ' + util.inspect(machineInfo));
-                    cloudServices.simulatorStatus(machineInfo, function(err, state) {
-                        console.log('got status: ' + util.inspect(state));
-                        simulation.machine_ip = state.ip;
-                        simulation.save(function(err) {
-                            if (err) {
-                                if(machineInfo.id) {
-                                    console.log('error saving simulation info to db: ' + err);
-                                    console.log('Terminating server ' + machineInfo.id);
-                                    cloudServices.terminateSimulator(machineInfo, function () {});
-                                }
-                                res.jsonp(500, { error: err });
+            
+                    // Save the simulation instance to the database
+                    simulation.save(function(err) {
+                        if (err) {
+                            if(machineInfo.id) {
+                                console.log('error saving simulation info to db: ' + err);
+                                console.log('Terminating server ' +  machineInfo.id);
+                                cloudServices.terminateSimulator(machineInfo, function () {});
                             }
-                        });
-                    });
-                }, 30000);
-                
-                // Save the simulation instance to the database
-                simulation.save(function(err) {
-                    if (err) {
-                        if(machineInfo.id) {
-                            console.log('error saving simulation info to db: ' + err);
-                            console.log('Terminating server ' +  machineInfo.id);
-                            cloudServices.terminateSimulator(machineInfo, function () {});
+                            return res.send('users/signup', {
+                                errors: err.errors,
+                                Simulation: simulation
+                            });
+                        } else {
+                            user.save(function(err) {
+                                if (err) {
+                                    if(machineInfo.id) {
+                                        console.log('error saving simulation info to db: ' + err);
+                                        console.log('Terminating server ' + machineInfo.id);
+                                        cloudServices.terminateSimulator(machineInfo, function () {});
+                                    }
+                                    return res.send('users/signup', {
+                                        errors: err.errors,
+                                        Simulation: simulation
+                                    });
+                                } else {
+                                    res.jsonp(simulation);
+                                }
+                            });
                         }
-                        return res.send('users/signup', {
-                            errors: err.errors,
-                            Simulation: simulation
-                        });
-                    } else {
-                        user.save(function(err) {
-                            if (err) {
-                                if(machineInfo.id) {
-                                    console.log('error saving simulation info to db: ' + err);
-                                    console.log('Terminating server ' + machineInfo.id);
-                                    cloudServices.terminateSimulator(machineInfo, function () {});
-                                }
-                                return res.send('users/signup', {
-                                    errors: err.errors,
-                                    Simulation: simulation
-                                });
-                            } else {
-                                res.jsonp(simulation);
-                            }
-                        });
-                    }
-                });
-            }
+                    });
+                }
+            });
         });
     });
 };
@@ -172,6 +177,7 @@ exports.create = function(req, res) {
 /// @param[out] res Nodejs response object
 /// @return Simulation update function.
 exports.update = function(req, res) {
+
     // Get the simulation from the request
     var simulation = req.simulation;
 
