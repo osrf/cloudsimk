@@ -34,7 +34,7 @@ angular.module('mean.simulations').controller('SimulationsController', ['$scope'
                 console.log('your error: ' + error);
                 alert('AWS error: ' + error.data.error.message);
             });
-          
+        sim.selected = false;  
         $scope.simulations.unshift(sim);
     };
 }]);
