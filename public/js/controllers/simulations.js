@@ -28,7 +28,13 @@ angular.module('mean.simulations').controller('SimulationsController', ['$scope'
             region: $scope.launch.region,
             world: $scope.launch.world
         });
-        sim.$save();
+        sim.$save(function(response) {
+                console.log('your response: ' + response);
+            }, function(error) {
+                console.log('your error: ' + error);
+                alert('AWS error: ' + error.data.error.message);
+            });
+          
         $scope.simulations.unshift(sim);
     };
 }]);

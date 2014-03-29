@@ -4,6 +4,9 @@
 var AWS = require('aws-sdk');
 var util = require('util');
 
+// configure what to do for cloud API calls:
+var dryRun = process.env.CLOUDSIM_DRY_RUN === 'true';
+console.log('process.env.CLOUDSIM_DRY_RUN (true or false): ' +  process.env.CLOUDSIM_DRY_RUN);
 
 // Async functions to launch machines on a cloud provider
 // AWS is the only supported one for now
@@ -53,7 +56,6 @@ exports.deleteKey = function (keyName, region, cb) {
 };
 
 
-
 /////////////////////////////////////////////////////////////
 // Launch a simulator machine, given:
 // @param[in] username Username (for info on the AWS console)
@@ -68,17 +70,26 @@ exports.launchSimulator = function (username, keyName, simId, region, hardware, 
     // set AWS region
     AWS.config.region = region;
 
+    console.log('Launching simulator: for: ' + username);
+    console.log('SSH key: ' +  keyName);
+    console.log('SimId: ' + simId);
+    console.log('region:' + region);
+    console.log('hardware: ' +  hardware);
+    console.log('image: ' + image);
+
     var awsParams = {
         KeyName: keyName,
         ImageId: image,
         InstanceType: hardware,
         MinCount:1,
-        MaxCount: 1
+        MaxCount: 1,
+        DryRun: dryRun
     };
 
     var ec2 = new AWS.EC2();
     ec2.runInstances(awsParams, function (err, data) {
         if(err) {
+            console.log('AWS launch error: ' + err);
             cb(err);
         }
         else {
@@ -93,7 +104,7 @@ exports.launchSimulator = function (username, keyName, simId, region, hardware, 
                 var params = {Resources: [machineInfo.id], Tags: [
                     {Key: 'Name', Value: 'simulator'},
                     {Key: 'user', Value: username},
-                    {Key: 'id', Value: simId}
+                    {Key: 'id', Value: 'sim_' + simId}
                 ]};
                 ec2.createTags(params, function(err) {
                     if (err) {
@@ -124,7 +135,7 @@ exports.simulatorStatus = function (machineInfo, cb) {
     // we only want information about a single 
     // machine (machineInfo.id
     var params = {
-        DryRun: false,
+        DryRun: dryRun,
         Filters: [],
         InstanceIds: [machineInfo.id]
     };
@@ -159,7 +170,7 @@ exports.terminateSimulator = function (machineInfo, cb) {
     // terminate in the InstanceIds array
     var params = {
         InstanceIds: [ machineInfo.id],
-        DryRun: false
+        DryRun: dryRun
     };
     AWS.config.region = machineInfo.region;
     var ec2 = new AWS.EC2();
@@ -186,7 +197,7 @@ exports.setupPublicKey = function (username, region, cb) {
         KeyName: 'cs-' + username,
         // required
         PublicKeyMaterial: 'BASE64_ENCODED_STRING',
-        DryRun: false
+        DryRun: dryRun
     };
 
     AWS.config.region = region;
