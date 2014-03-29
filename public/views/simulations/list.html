@@ -26,7 +26,7 @@
           <td colspan="6">
             <div class='text-right'>
               <pagination direction-links="true"
-                total-items="simulations.length"
+                total-items="consoleSimulations.length"
                 items-per-page="pageSize"
                 page="currentPage">
               </pagination>
@@ -34,16 +34,15 @@
           </td>
         </tfoot>
         <tbody>
-          <tr ng-repeat="simulation in (filtered = (simulations
+          <tr ng-repeat="simulation in (consoleSimulations = (simulations
+            | filter:getConsoleSimulations)
             | startFrom:(currentPage-1)*pageSize
-            | limitTo:pageSize
-            | filter:getConsoleSimulations))">
+            | limitTo:pageSize)">
             <td><input type="checkbox" ng-model="simulation.selected"></td>
             <td>{{simulation.sim_id}}</td>
             <td>{{simulation.world}}</td>
             <td>{{simulation.state}}</td>
-<!--            <td>{{simulation.region}}</td>-->
-            <td>{{filtered.length}}</td>
+            <td>{{simulation.region}}</td>
             <td>0</td>
             <td>0</td>
           </tr>
@@ -88,18 +87,18 @@
           <td colspan="6">
             <div class='text-right'>
               <pagination direction-links="true"
-                total-items="simulations.length"
-                items-per-page="$parent.pageSize"
-                page="$parent.currentPage">
+                total-items="historySimulations.length"
+                items-per-page="pageSize"
+                page="currentPage">
               </pagination>
             </div>
           </td>
         </tfoot>
         <tbody>
-          <tr ng-repeat="simulation in simulations
-            | startFrom:($parent.currentPage-1)*$parent.pageSize
-            | limitTo:$parent.pageSize
-            | filter:getConsoleSimulations">
+          <tr ng-repeat="simulation in (historySimulations = (simulations
+            | filter:getHistorySimulations)
+            | startFrom:(currentPage-1)*pageSize
+            | limitTo:pageSize)">
             <td><input type="checkbox"></td>
             <td>{{simulation.date_launch}}</td>
             <td>{{simulation.sim_id}}</td>
