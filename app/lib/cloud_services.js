@@ -24,7 +24,7 @@ exports.generateKey = function (keyName, region, cb) {
     var params = {
         DryRun: false,
         KeyName: keyName
-    }
+    };
     ec2.createKeyPair(params, function(err, data) {
         if(err) {
             cb(err);
@@ -45,7 +45,7 @@ exports.deleteKey = function (keyName, region, cb) {
     var params = {
         DryRun: false,
         KeyName: keyName
-    }
+    };
     ec2.deleteKeyPair(params, function(err, data) {
         if(err) {
             cb(err);
