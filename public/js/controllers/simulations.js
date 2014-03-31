@@ -110,6 +110,7 @@ angular.module('cloudsim.simulations').controller('SimulationsController', ['$sc
             // launched
             for (var i = 0; i < selected.length; ++i) {
                 $scope.launch(selected[i].world, selected[i].region);
+                selected[i].selected = false;
             }
         },
         // if the user cancels relaunching simulation
@@ -150,6 +151,11 @@ angular.module('cloudsim.simulations').controller('SimulationsController', ['$sc
     /// Get terminated simulations
     $scope.getHistorySimulations = function(sim) {
         return sim.state === 'Terminated';
+    };
+
+    $scope.formatDateTime = function(dateTime)
+    {
+        return new Date(dateTime).toString();
     };
 
 }]);
