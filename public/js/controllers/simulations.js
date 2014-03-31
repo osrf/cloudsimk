@@ -98,16 +98,17 @@ angular.module('cloudsim.simulations').controller('SimulationsController', ['$sc
             controller: relaunchDialogCtrl
         });
 
-        // if the user confirms shutting down simulation
+        // if the user confirms relaunching the simulation
         relaunchDialog.result.then(function () {
             var currentPageSims = $scope.getPageHistorySimulations();
             var selected = currentPageSims.filter(function(sim) {
                 return sim.selected === true;
             });
 
-            // Set the simulation state to Launching
+            // launch the simulations but keep the terminated ones in history
+            // TODO we should provide some feedback that new simulations are
+            // launched
             for (var i = 0; i < selected.length; ++i) {
-                selected[i].state = 'Relaunched';
                 $scope.launch(selected[i].world, selected[i].region);
             }
         },
