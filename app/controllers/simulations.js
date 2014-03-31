@@ -302,7 +302,7 @@ exports.all = function(req, res) {
 
     }
     // Get all simulation models, in creation order, for a user
-    Simulation.find(filter).sort('-date_launch').populate('user', 'name username')
+    Simulation.find(filter).sort().populate('user', 'name username')
       .exec(function(err, simulations) {
         if (err) {
             res.render('error', {

@@ -34,7 +34,7 @@
         </tfoot>
         <tbody>
           <tr ng-repeat="simulation in ($parent.$parent.consoleSimulations =
-            (simulations | filter:getConsoleSimulations)
+            (simulations | filter:getConsoleSimulations | orderBy: '-date_launch')
             | startFrom:($parent.$parent.consoleCurrentPage-1)*pageSize
             | limitTo:pageSize)">
             <td><input type="checkbox" ng-model="simulation.selected"></td>

@@ -170,6 +170,7 @@ describe('<Unit Test>', function() {
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     var text = JSON.parse(res.text);
+                    console.log (text);
                     text.length.should.be.exactly(2);
                     text[0].user.name.should.equal('User Tester');
                     text[0].user.username.should.equal('user');
@@ -536,7 +537,6 @@ describe('<Unit Test>', function() {
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     var text = JSON.parse(res.text);
-                    console.log(text);
                     text.length.should.be.exactly(1);
                     text[0].user.name.should.equal('User Tester2');
                     text[0].user.username.should.equal('user2');
