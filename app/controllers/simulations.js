@@ -72,6 +72,7 @@ exports.simulation = function(req, res, next, id) {
     });
 };
 
+
 //////////////////////////////////////////////////
 // generate a ssh key name from a user email and 
 // a simulation id (used with AWS to generate and
@@ -82,6 +83,7 @@ exports.simulation = function(req, res, next, id) {
 function getKeyName(email, sim_id) {
     return 'cs-' + sim_id + '-' + email;
 }
+
 
 /////////////////////////////////////////////////
 /// Create a simulation
@@ -184,6 +186,7 @@ exports.create = function(req, res) {
         }
     });  // User.load
 };
+
 
 /////////////////////////////////////////////////
 /// Update a simulation

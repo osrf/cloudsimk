@@ -38,7 +38,6 @@ angular.module('cloudsim.simulations').controller('SimulationsController', ['$sc
                 console.log('your error: ' + error);
                 alert('AWS error: ' + error.data.error.message);
             });
-          
         sim.selected = false;
         $scope.simulations.unshift(sim);
     };
