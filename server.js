@@ -14,8 +14,6 @@ var app = express(),
     server = http.createServer(app),
     io = require('socket.io').listen(server);
 
-
-
 // Main application entry file.
 // Please note that the order of loading is important.
 
@@ -99,14 +97,14 @@ io.sockets.on('connection', function(socket) {
     sockets.push(socket);
 });
 
+/*
 function tick () {
     var now = new Date().toUTCString();
     var msg = {data: now};
     io.sockets.emit('message', msg);
 }
-setInterval(tick, 500);
-
-
+ setInterval(tick, 500);
+*/
 
 
 // Expose app

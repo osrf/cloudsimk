@@ -118,6 +118,7 @@ exports.create = function(req, res) {
                     cloudServices.simulatorStatus(machineInfo, function(err, state) {
                         console.log('got status: ' + util.inspect(state));
                         simulation.machine_ip = state.ip;
+                        io.sockets.emit('message', {data: state });
                         simulation.save(function(err) {
                             if (err) {
                                 if(machineInfo.id) {
