@@ -99,8 +99,7 @@ exports.create = function(req, res) {
     // Set the simulation user
     simulation.user = req.user;
     User.load(req.user.id, function(err, user) {
-        if(err)
-        {
+        if(err) {
             // an unlikely error, since user is in req.
             console.log('Can\'t find user in database: ' + err);
             res.jsonp(500, { error: err });
@@ -132,9 +131,8 @@ exports.create = function(req, res) {
                             setTimeout(function () {
                                 
                                 simulation.machine_ip = 'waiting';
-                                console.log('TIMED OUT ' + util.inspect(machineInfo));
                                 cloudServices.simulatorStatus(machineInfo, function(err, state) {
-                                    console.log('got status: ' + util.inspect(state));
+                                    console.log('machine:' + util.inspect(machineInfo)  + ' status: ' + util.inspect(state));
                                     simulation.machine_ip = state.ip;
                                     simulation.save(function(err) {
                                         if (err) {
@@ -143,6 +141,7 @@ exports.create = function(req, res) {
                                                 console.log('Terminating server ' + machineInfo.id);
                                                 cloudServices.terminateSimulator(machineInfo, function () {});
                                             }
+                                            console.log('Error getting machine ip');
                                             res.jsonp(500, { error: err });
                                         }
                                     });
@@ -281,15 +280,11 @@ exports.terminate = function(req, res) {
     var machineInfo = {region: region,
                        id: simulation.machine_id};
     var keyName = getKeyName(user.email, simulation.sim_id);
-    console.log('Cloud terminate: ' + util.inspect(machineInfo) + ' key: ' + keyName);
     // delete the ssh key. If there is an error, report it 
     // but try to shutdown the machine anyways
     cloudServices.deleteKey(keyName, region, function(err) {
         if(err) {
             console.log('Error deleting key "' + keyName  +  '": ' + err);
-        }
-        else {
-            console.log('Key "' + keyName + '" in region "' + region + '" deleted');
         }
     });
     cloudServices.terminateSimulator(machineInfo, function(err, info) {
@@ -305,13 +300,12 @@ exports.terminate = function(req, res) {
                         Simulation: simulation
                     });
                 } else {
-                    console.log('Simulator terminated: ' + util.inspect(info));
+                    console.log('Simulator terminated: ' + util.inspect(info) + ' key: ' + keyName);
                     res.jsonp(simulation);
                 }
             });
         }
     });
-
 };
 
 /////////////////////////////////////////////////
