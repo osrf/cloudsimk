@@ -1,6 +1,9 @@
 'use strict';
 
-angular.module('cloudsim.simulations').controller('SimulationsController', ['$scope', '$stateParams', '$location', 'Global', 'Simulations', function ($scope, $stateParams, $location, Global, Simulations) {
+angular.module('cloudsim.simulations').controller('SimulationsController',
+    ['$scope', '$stateParams', '$location', '$modal', 'Global', 'Simulations',
+    function ($scope, $stateParams, $location, $modal, Global, Simulations) {
+
     $scope.global = Global;
 
     /// All the worlds available to the user.
@@ -38,7 +41,7 @@ angular.module('cloudsim.simulations').controller('SimulationsController', ['$sc
                 console.log('your error: ' + error);
                 alert('AWS error: ' + error.data.error.message);
             });
-        sim.selected = false;  
+        sim.selected = false;
         $scope.simulations.unshift(sim);
     };
 
