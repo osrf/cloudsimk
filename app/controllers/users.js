@@ -21,6 +21,12 @@ exports.authCallback = function(req, res) {
 /// @param[in] req Nodejs request object.
 /// @param[out] res Nodejs response object.
 exports.all = function(req, res) {
+
+    if (!req.user) {
+        res.send(500, 'Invalid permissions.');
+        return;
+    }
+
     // Get all simulation models, in creation order, for a user
     User.find().sort('-created') //.populate('user', 'name username')
       .exec(function(err, users) {
@@ -79,14 +85,17 @@ exports.session = function(req, res) {
 /// @param[out] res Nodejs response object.
 /// @return Function to create a user.
 exports.remove = function(req, res) {
-    console.log('Remove');
-    console.log(req.profile);
     var user = req.profile;
 
+    if (user.email === req.user.email) {
+        res.send(500, 'Unable to delete yourself');
+        return;
+    }
+   
     user.remove(function(err) {
         if (err) {
             res.jsonp({ error: {
-                message: 'Unable to delete user',
+                message: 'Unable to delete user'
             }});
         }
         else {

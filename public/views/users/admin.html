@@ -58,7 +58,7 @@
           <tr ng-repeat="user in users | orderBy:predicate:reverse | startFrom:(currentPage-1)*pageSize | limitTo:pageSize">
             <td>
               <input type="checkbox"
-              ng-click="setSelected(user);"/>
+              ng-click="setSelected(user);" ng-model="user.selected"/>
             </td>
             <td>{{user.username}}</td>
             <td>{{user.email}}</td>
@@ -71,6 +71,11 @@
       </table>
       </form>
 
+      <div class="alert alert-danger" ng-show="error.length" ng-model="error">
+        {{error}}
+        <button type="button" class="close"
+          ng-click="error = null">&times;</button>
+      </div>
     </div>
   </div>
 </div>

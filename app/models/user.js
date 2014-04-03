@@ -114,7 +114,11 @@ UserSchema.methods = {
     ///  @return {Boolean}
     ///  @api public
     authenticate: function(plainText) {
-        return this.encryptPassword(plainText) === this.hashed_password;
+        var authenticated = false;
+        if( this.encryptPassword(plainText) === this.hashed_password) {
+            authenticated = true;
+        }
+        return authenticated;
     },
 
     ///  Make salt

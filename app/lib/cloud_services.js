@@ -4,15 +4,19 @@
 var AWS = require('aws-sdk');
 var util = require('util');
 
+// configure what to do for cloud API calls:
+var dryRun = process.env.CLOUDSIM_DRY_RUN === 'true';
+console.log('process.env.CLOUDSIM_DRY_RUN (true or false): ' +  process.env.CLOUDSIM_DRY_RUN);
 
 // Async functions to launch machines on a cloud provider
 // AWS is the only supported one for now
+
 
 /////////////////////////////////////////////////////////////
 // Launch a simulator machine, given:
 // @param[in] username Username (for info on the AWS console)
 // @param[in] keyName Public ssh key name (must exist on AWS for that region)
-// @param[in] simId Simulation id (for info on the AWS console) 
+// @param[in] simId Simulation id (for info on the AWS console)
 // @param[in] region The region in which to launch the machine.
 // @param[in] hardware A hardware type
 // @param[in] image An AMI (image id registered in that region)
@@ -22,17 +26,26 @@ exports.launchSimulator = function (username, keyName, simId, region, hardware, 
     // set AWS region
     AWS.config.region = region;
 
+    console.log('Launching simulator: for: ' + username);
+    console.log('SSH key: ' +  keyName);
+    console.log('SimId: ' + simId);
+    console.log('region:' + region);
+    console.log('hardware: ' +  hardware);
+    console.log('image: ' + image);
+
     var awsParams = {
         KeyName: keyName,
         ImageId: image,
         InstanceType: hardware,
         MinCount:1,
-        MaxCount: 1
+        MaxCount: 1,
+        DryRun: dryRun
     };
 
     var ec2 = new AWS.EC2();
     ec2.runInstances(awsParams, function (err, data) {
         if(err) {
+            console.log('AWS launch error: ' + err);
             cb(err);
         }
         else {
@@ -47,7 +60,7 @@ exports.launchSimulator = function (username, keyName, simId, region, hardware, 
                 var params = {Resources: [machineInfo.id], Tags: [
                     {Key: 'Name', Value: 'simulator'},
                     {Key: 'user', Value: username},
-                    {Key: 'id', Value: simId}
+                    {Key: 'id', Value: 'sim_' + simId}
                 ]};
                 ec2.createTags(params, function(err) {
                     if (err) {
@@ -75,10 +88,10 @@ exports.launchSimulator = function (username, keyName, simId, region, hardware, 
 // @param[in] cb Callback function to use when this function is complete.
 exports.simulatorStatus = function (machineInfo, cb) {
     // the parameters for describeInstances call
-    // we only want information about a single 
+    // we only want information about a single
     // machine (machineInfo.id
     var params = {
-        DryRun: false,
+        DryRun: dryRun,
         Filters: [],
         InstanceIds: [machineInfo.id]
     };
@@ -109,11 +122,11 @@ exports.simulatorStatus = function (machineInfo, cb) {
 //       region: the region where the machine exists
 exports.terminateSimulator = function (machineInfo, cb) {
     // parameters for terminateInstances
-    // we specifiy which machine to 
+    // we specifiy which machine to
     // terminate in the InstanceIds array
     var params = {
         InstanceIds: [ machineInfo.id],
-        DryRun: false
+        DryRun: dryRun
     };
     AWS.config.region = machineInfo.region;
     var ec2 = new AWS.EC2();
@@ -133,14 +146,14 @@ exports.terminateSimulator = function (machineInfo, cb) {
 
 //////////////////////////////////////////////////////
 // Uploads a public ssh key to a specific AWS region
-// The key name on AWS is 'cs-' + the specified username 
+// The key name on AWS is 'cs-' + the specified username
 exports.setupPublicKey = function (username, region, cb) {
     var params = {
         // required
         KeyName: 'cs-' + username,
         // required
         PublicKeyMaterial: 'BASE64_ENCODED_STRING',
-        DryRun: false
+        DryRun: dryRun
     };
 
     AWS.config.region = region;
