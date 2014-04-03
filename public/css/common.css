@@ -251,10 +251,8 @@ p {
 }
 /*-------------------------------------------------*/
 
-/* Set the hover color for a table row */
-.table-hover>tbody>tr:hover>td {
-  background-color: #e8f4ff;
-
+/*************************************************/
+/* Fade functionality when switch pages in angular */
 .slide.ng-leave {
   position: relative;
 }
@@ -274,3 +272,12 @@ p {
 .slide, .slide.ng-enter.ng-enter-active {
   opacity: 1;
 }
+/*-------------------------------------------------*/
+
+
+/* Set the hover color for a table row */
+.table-hover>tbody>tr:hover>td {
+  background-color: #e8f4ff;
+}
+
+
