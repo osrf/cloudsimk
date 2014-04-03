@@ -60,6 +60,12 @@
           <button class="btn btn-primary" ng-click="confirmShutdown(false)">No</button>
         </div>
       </script>
+      <div class="alert alert-danger" ng-show="error.length"
+        ng-model="error">
+        {{error}}
+        <button type="button" class="close"
+          ng-click="error = ''">&times;</button>
+      </div>
     </tab>
 
     <!-- History: Terminated Simulations -->
