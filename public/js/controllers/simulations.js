@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('cloudsim.simulations').controller('SimulationsController',
-    ['$scope', '$stateParams', '$location', 'Global', 'Simulations',
-    function ($scope, $stateParams, $location, Global, Simulations) {
+    ['$scope', '$stateParams', '$location', '$modal', 'Global', 'Simulations',
+    function ($scope, $stateParams, $location, $modal, Global, Simulations) {
 
     $scope.global = Global;
 
@@ -32,6 +32,14 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
     /// Array of simulations displayed in the history table
     $scope.historySimulations = [];
 
+    /// A modal confirmation dialog displayed when the shutdown button
+    /// is pressed
+    var shutdownDialog = null;
+
+    /// A modal confirmation dialog displayed when the relaunch button
+    /// is pressed
+    var relaunchDialog = null;
+
     /// Launch a simulation.
     $scope.launch = function(launchWorld, launchRegion) {
         var sim = new Simulations({
@@ -50,34 +58,78 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
         $scope.simulations.unshift(sim);
     };
 
-    // shutdown selected machines
-    $scope.shutdownSelectedSimulations = function() {
-        var currentPageSims = $scope.getPageConsoleSimulations();
-        var selected = currentPageSims.filter(function(sim) {
-            return sim.selected === true;
+    /// Pop up a dialog to confirm shutting down a simulation
+    $scope.showShutdownDialog = function () {
+        shutdownDialog = $modal.open({
+            templateUrl: 'shutdown.html',
+            controller: shutdownDialogCtrl
         });
 
-        // Set the simulation state to Terminated
-        for (var i = 0; i < selected.length; ++i) {
-            selected[i].state = 'Terminated';
-            selected[i].$update({simulationId:selected[i].sim_id});
-        }
+        // if the user confirms shutting down simulation
+        shutdownDialog.result.then(function () {
+            var currentPageSims = $scope.getPageConsoleSimulations();
+            var selected = currentPageSims.filter(function(sim) {
+                return sim.selected === true;
+            });
+
+            // Set the simulation state to Terminated
+            for (var i = 0; i < selected.length; ++i) {
+                selected[i].state = 'Terminated';
+                selected[i].$update({simulationId:selected[i].sim_id});
+            }
+        },
+        // if the user cancels shutting down simulation
+        function () {});
     };
 
-    // relaunch selected machines
-    $scope.relaunchSelectedSimulations = function() {
-        var currentPageSims = $scope.getPageHistorySimulations();
-        var selected = currentPageSims.filter(function(sim) {
-            return sim.selected === true;
+    /// A controller for closing dimissing the shutdown dialog
+    var shutdownDialogCtrl = function ($scope, $modalInstance) {
+        $scope.confirmShutdown = function (terminate) {
+            if (terminate) {
+                $modalInstance.close();
+            }
+            else {
+                $modalInstance.dismiss();
+            }
+        };
+    };
+
+    /// Pop up a dialog to confirm relaunching a terminated simulation
+    $scope.showRelaunchDialog = function () {
+        relaunchDialog = $modal.open({
+            templateUrl: 'relaunch.html',
+            controller: relaunchDialogCtrl
         });
 
-        // launch the simulations but keep the terminated ones in history
-        // TODO we should provide some feedback that new simulations are
-        // launched
-        for (var i = 0; i < selected.length; ++i) {
-            $scope.launch(selected[i].world, selected[i].region);
-            selected[i].selected = false;
-        }
+        // if the user confirms relaunching the simulation
+        relaunchDialog.result.then(function () {
+            var currentPageSims = $scope.getPageHistorySimulations();
+            var selected = currentPageSims.filter(function(sim) {
+                return sim.selected === true;
+            });
+
+            // launch the simulations but keep the terminated ones in history
+            // TODO we should provide some feedback that new simulations are
+            // launched
+            for (var i = 0; i < selected.length; ++i) {
+                $scope.launch(selected[i].world, selected[i].region);
+                selected[i].selected = false;
+            }
+        },
+        // if the user cancels relaunching simulation
+        function () {});
+    };
+
+    /// A controller for closing dimissing the relaunch dialog
+    var relaunchDialogCtrl = function ($scope, $modalInstance) {
+        $scope.confirmRelaunch = function (relaunch) {
+            if (relaunch) {
+                $modalInstance.close();
+            }
+            else {
+                $modalInstance.dismiss();
+            }
+        };
     };
 
     /// Get simulations in the current page of the console table
