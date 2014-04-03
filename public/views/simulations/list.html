@@ -1,4 +1,7 @@
 <div class="container">
+
+
+
   <tabset>
     <!-- Console: Running Simulations -->
     <tab heading='Console'>
@@ -17,8 +20,9 @@
         <tfoot>
           <td colspan="2">
             <div class='text-left' style="margin-top: 20px; margin-bottom: 20px">
-              <button class="btn btn-primary" ng-click="showShutdownDialog()">
-                Shutdown
+              <button class="btn btn-primary" data-toggle="modal"
+                  data-target=".shutdown-modal">
+                  Shutdown
               </button>
             </div>
           </td>
@@ -47,19 +51,31 @@
           </tr>
         </tbody>
       </table>
-      <script type="text/ng-template" id="shutdown.html">
-        <div class="modal-header">
-          <h3>Shutdown</h3>
+
+      <div class="modal fade shutdown-modal" id="shutdownModal" tabindex="-1"
+        role="dialog" aria-labelledby="shutdownModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3>Shutdown</h3>
+            </div>
+            <div class="modal-body">
+              Are you sure you want to shut down the machine(s)?
+              <br>Your data will be lost.</br>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-primary" data-dismiss="modal"
+                ng-click="shutdownSelectedSimulations()">
+                Yes
+              </button>
+              <button class="btn btn-primary" data-dismiss="modal">
+                No
+              </button>
+            </div>
+          </div>
         </div>
-        <div class="modal-body">
-          Are you sure you want to shut down the machine(s)?
-          <br>Your data will be lost.</br>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-primary" ng-click="confirmShutdown(true)">Yes</button>
-          <button class="btn btn-primary" ng-click="confirmShutdown(false)">No</button>
-        </div>
-      </script>
+      </div>
     </tab>
 
     <!-- History: Terminated Simulations -->
@@ -79,8 +95,9 @@
         <tfoot>
           <td colspan="2">
             <div class='text-left' style="margin-top: 20px; margin-bottom: 20px">
-              <button class="btn btn-primary" ng-click="showRelaunchDialog()">
-                Relaunch
+              <button class="btn btn-primary" data-toggle="modal"
+                  data-target=".relaunch-modal">
+                  Relaunch
               </button>
             </div>
           </td>
@@ -109,19 +126,29 @@
           </tr>
         </tbody>
       </table>
-      <script type="text/ng-template" id="relaunch.html">
-        <div class="modal-header">
-          <h3>Relaunch</h3>
+      <div class="modal fade relaunch-modal" tabindex="-1" role="dialog"
+        aria-labelledby="shutdownModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3>Relaunch</h3>
+            </div>
+            <div class="modal-body">
+              Are you sure you want to relaunch?
+              <br>You will be charged $X.XX per hour once you click Yes.</br>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-primary" data-dismiss="modal"
+                ng-click="relaunchSelectedSimulations()">
+                Yes
+              </button>
+              <button class="btn btn-primary" data-dismiss="modal">
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
-        <div class="modal-body">
-          Are you sure you want to relaunch?
-          <br>You will be charged $X.XX per hour once you click Yes.</br>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-primary" ng-click="confirmRelaunch(true)">Yes</button>
-          <button class="btn btn-primary" ng-click="confirmRelaunch(false)">Cancel</button>
-        </div>
-      </script>
+      </div>
     </tab>
   </tabset>
 </div>
