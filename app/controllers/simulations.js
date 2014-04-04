@@ -94,7 +94,6 @@ exports.create = function(req, res) {
 
     // Create a new simulation instance based on the content of the
     // request
-    console.log('create simulation request body: ' + util.inspect(req.body));
     var simulation = new Simulation(req.body);
     // Set the simulation user
     simulation.user = req.user;
@@ -184,84 +183,6 @@ exports.create = function(req, res) {
             });  // gerenateKey
         }
     });  // User.load
-};
-
-    User.load(req.user.id, function(err, user) {
-
-        simulation.sim_id = user.next_sim_id++;
-
-        var keyName = 'cs-hugo@osrfoundation.org';
-        // we pick the appropriate machine based on the region specified
-        // by the user
-        var serverDetails = awsData[simulation.region];
-        cloudServices.launchSimulator(  req.user.username,
-                                        keyName,
-                                        simulation.sim_id,
-                                        serverDetails.region,
-                                        serverDetails.hardware,
-                                        serverDetails.image,
-                                        function (err, machineInfo) {
-            if(err) {
-                res.jsonp(500, { error: err });
-            } else {
-                simulation.machine_id = machineInfo.id;
-                simulation.server_price = serverDetails.price;
-                simulation.machine_ip = 'N/A';
-                simulation.date_launch = Date.now();
-
-                setTimeout(function () {
-
-                    simulation.machine_ip = 'waiting';
-                    console.log('TIMED OUT ' + util.inspect(machineInfo));
-                    cloudServices.simulatorStatus(machineInfo, function(err, state) {
-                        console.log('got status: ' + util.inspect(state));
-                        simulation.machine_ip = state.ip;
-                        simulation.save(function(err) {
-                            if (err) {
-                                if(machineInfo.id) {
-                                    console.log('error saving simulation info to db: ' + err);
-                                    console.log('Terminating server ' + machineInfo.id);
-                                    cloudServices.terminateSimulator(machineInfo, function () {});
-                                }
-                                res.jsonp(500, { error: err });
-                            }
-                        });
-                    });
-                }, 30000);
-
-                // Save the simulation instance to the database
-                simulation.save(function(err) {
-                    if (err) {
-                        if(machineInfo.id) {
-                            console.log('error saving simulation info to db: ' + err);
-                            console.log('Terminating server ' +  machineInfo.id);
-                            cloudServices.terminateSimulator(machineInfo, function () {});
-                        }
-                        return res.send('users/signup', {
-                            errors: err.errors,
-                            Simulation: simulation
-                        });
-                    } else {
-                        user.save(function(err) {
-                            if (err) {
-                                if(machineInfo.id) {
-                                    console.log('error saving simulation info to db: ' + err);
-                                    console.log('Terminating server ' + machineInfo.id);
-                                    cloudServices.terminateSimulator(machineInfo, function () {});
-                                }
-                                return res.send('users/signup', {
-                                    errors: err.errors,
-                                    Simulation: simulation
-                                });
-                            } else {
-                                res.jsonp(simulation);
-                            }
-                        });
-                    }
-                });
-            }
-        });
-    });
 };
 
 
