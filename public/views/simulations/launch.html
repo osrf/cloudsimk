@@ -3,7 +3,7 @@
     <div class="col-sm-12 text-center">
     <!-- Form to launch a simulation. This form uses the launch() function
          in SimulationsController -->
-    <form class="form-inline form-horizontal" ng-submit="launch()">
+    <form class="form-inline form-horizontal" ng-submit="launch(launch.world, launch.region)">
 
       <!-- Create a control group for the world -->
       <div class="form-group">
