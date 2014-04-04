@@ -22,7 +22,6 @@ var Session = mongoose.model('Session', sessionSchema);
 // collection, and his id is returned. 
 function findUserId(cookieData, cb) {
     var secret = config.sessionSecret;
-    var cookieParser = express.cookieParser(secret);
     var p = cookie.parse(cookieData);
     var sessionIdEncrypted = p['connect.sid'];
     var sessionId  = connectUtils.parseSignedCookie(sessionIdEncrypted, secret);
@@ -39,9 +38,15 @@ function findUserId(cookieData, cb) {
                     console.log('Cannot find user for this session:' + err);
                     cb(err);
                 } else {
-                    var userId = users[0]._id;                    
-                    console.log('USER ID: ' + userId);
-                    cb(null, userId);
+                    console.log('USERS FOUND: ' + users.length);
+                    if(users.length == 1 ) {
+                        var userId = users[0]._id;                    
+                        console.log('USER ID: ' + userId);
+                        cb(null, userId);
+                    }
+                    else {
+                        cb('can\'t find user for this session');
+                    }
                 }
             });
         }        
@@ -55,6 +60,8 @@ function findUserId(cookieData, cb) {
 function SocketDict() {
 
     this.sockets = {};
+    // a reference to the socket.io library
+    this.io = null;
 
     this.addSocket = function (user, socket) {
         if (!this.sockets[user]) {
@@ -88,6 +95,10 @@ function SocketDict() {
             s.emit(channel, data);
         }
     };
+
+    this.notifyAll = function (channel, msg) {
+        this.io.sockets.emit(channel, msg);    
+    };
 }
 
 var userSockets = new SocketDict();
@@ -97,7 +108,22 @@ exports.getUserSockets = function () {
 };
 
 
+/////////////////////////////////////////////////////////////////////////////
+// broadcasts the server time periodically
+function tick() {
+    var now = new Date().toUTCString();
+    userSockets.notifyAll('time', {data:now});
+}
+
+////////////////////////////////////////////////////////////////////////////
+// Initialises the socket.io library, and sets up functions called each time 
+// a new connection is established or destroyed
+//
 exports.init = function(io) {
+    userSockets.io = io;
+
+    // call tick periodically (30 sec)
+    setInterval(tick, 30000);
 
     console.log('Init websockets');
     io.set('authorization', function (data, accept) {

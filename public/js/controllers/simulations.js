@@ -1,8 +1,15 @@
 'use strict';
 
 var socket = io.connect();
-socket.on('message', function (info) {
-    console.log('SOCKET message: ' + info.data);
+
+socket.on('time', function (msg) {
+    console.log('server time: ' + msg.data);
+});
+
+socket.on('simulation_update', function (info) {
+   
+    console.log('Simulation update: ' + JSON.stringify(info));
+    
 });
 
 
@@ -43,9 +50,9 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
             world: $scope.launch.world
         });
         sim.$save(function(response) {
-                console.log('your response: ' + response);
+                console.log('simulation saved: ' + response);
             }, function(error) {
-                console.log('your error: ' + error);
+                console.log('error: ' + error);
                 alert('AWS error: ' + error.data.error.message);
             });
         sim.selected = false;

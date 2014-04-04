@@ -9,9 +9,10 @@ var mongoose = require('mongoose'),
     User = mongoose.model('User'),
     _ = require('lodash');
 
+var sockets = require('../lib/sockets');
 
+// initialise cloudServices, depending on the environment
 var cloudServices;
-
 if(process.env.AWS_ACCESS_KEY_ID) {
     console.log('using the real cloud services!');
     cloudServices = require('../lib/cloud_services.js');
@@ -22,7 +23,9 @@ if(process.env.AWS_ACCESS_KEY_ID) {
 
 var util = require('util');
 
-
+////////////////////////////////////
+// The AWS server information
+//
 var awsData = { 'US West': {region: 'us-west-2',
                             image: 'ami-cc95f8fc', // cloudsim // 'ami-b8d2b088',
                             hardware: 'm1.small',
@@ -118,7 +121,6 @@ exports.create = function(req, res) {
                     cloudServices.simulatorStatus(machineInfo, function(err, state) {
                         console.log('got status: ' + util.inspect(state));
                         simulation.machine_ip = state.ip;
-                        // io.sockets.emit('message', {data: state });
                         simulation.save(function(err) {
                             if (err) {
                                 if(machineInfo.id) {
@@ -127,6 +129,12 @@ exports.create = function(req, res) {
                                     cloudServices.terminateSimulator(machineInfo, function () {});
                                 }
                                 res.jsonp(500, { error: err });
+                            } else {
+                                // New IP: broadcast the news 
+                                sockets.getUserSockets().notifyUser(req.user.id,
+                                                                    'simulation_update',
+                                                                    {data:simulation});
+                                
                             }
                         });
                     });
