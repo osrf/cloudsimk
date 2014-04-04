@@ -60,11 +60,11 @@
           <button class="btn btn-primary" ng-click="confirmShutdown(false)">No</button>
         </div>
       </script>
-      <div class="alert alert-danger" ng-show="error.length"
-        ng-model="error">
-        {{error}}
+      <div class="alert alert-danger" ng-show="$parent.$parent.error.length"
+        ng-model="$parent.$parent.error">
+        {{$parent.$parent.error}}
         <button type="button" class="close"
-          ng-click="error = ''">&times;</button>
+          ng-click="$parent.$parent.error = ''">&times;</button>
       </div>
     </tab>
 
