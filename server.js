@@ -90,22 +90,8 @@ walk(routes_path);
 logger.init(app, passport, mongoose);
 
 // Sockets setup
-var sockets =[];
-
-io.sockets.on('connection', function(socket) {
-    console.log('HOUSTON, we have a Connection!');
-    sockets.push(socket);
-});
-
-/*
-function tick () {
-    var now = new Date().toUTCString();
-    var msg = {data: now};
-    io.sockets.emit('message', msg);
-}
- setInterval(tick, 500);
-*/
-
+var sockets = require('./app/lib/sockets');
+sockets.init(io);
 
 // Expose app
 exports = module.exports = app;

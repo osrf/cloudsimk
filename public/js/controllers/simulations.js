@@ -1,12 +1,8 @@
 'use strict';
 
-
-
 var socket = io.connect();
-console.log("Hello :-)");
-
 socket.on('message', function (info) {
-    console.log(info.data);
+    console.log('SOCKET message: ' + info.data);
 });
 
 
