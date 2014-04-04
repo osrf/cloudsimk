@@ -1,9 +1,20 @@
 'use strict';
 
 console.log('*');
+console.log('*');
 console.log('* THIS IS THE FAKE CLOUD SERVICE....');
 console.log('*');
 
+
+exports.generateKey = function (keyName, region, cb) {
+    console.log('FAKE generate Key ' + keyName + ' in region ' + region);
+    cb(null, 'START FAKE KEY\n=====346785893bjhdfgsd847edjhvcs\nEND FAKE KEY');
+};
+
+exports.deleteKey = function (keyName, region, cb) {
+    console.log('FAKE delete Key ' + keyName + ' in region ' + region);
+    cb(null, 'true');
+};
 
 exports.launchSimulator = function (username, keyName, simId, region, hardware, image, cb) {
 

@@ -72,7 +72,8 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
 
         // if the user confirms shutting down simulation
         shutdownDialog.result.then(function () {
-            var currentPageSims = $scope.getPageConsoleSimulations();
+            var currentPageSims =
+                $scope.getPageSimulations($scope.tableType.console);
             var selected = currentPageSims.filter(function(sim) {
                 return sim.selected === true;
             });
@@ -108,7 +109,8 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
 
         // if the user confirms relaunching the simulation
         relaunchDialog.result.then(function () {
-            var currentPageSims = $scope.getPageHistorySimulations();
+            var currentPageSims =
+                $scope.getPageSimulations($scope.tableType.history);
             var selected = currentPageSims.filter(function(sim) {
                 return sim.selected === true;
             });

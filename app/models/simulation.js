@@ -65,6 +65,11 @@ var SimulationSchema = new Schema({
         type: String
     },
 
+    // the ssh private key for this machine, in pem format
+    ssh_private_key: {
+        type: String
+    },
+
     // ip address of the machine
     machine_ip: {
         type: String
