@@ -6,12 +6,13 @@ socket.on('time', function (msg) {
     console.log('server time: ' + msg.data);
 });
 
-socket.on('simulation_update', function (info) {
-   
+socket.on('simulation_update', function (msg) {
     console.log('Simulation update: ' + JSON.stringify(info));
-    
 });
 
+socket.on('simulation_create', function (msg) {
+    console.log('Simulation created: ' + JSON.stringify(info));
+});
 
 
 angular.module('cloudsim.simulations').controller('SimulationsController',
