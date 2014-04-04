@@ -280,4 +280,17 @@ p {
   background-color: #e8f4ff;
 }
 
+/*************************************************/
+/* Styles for the SSH Key user preferences pane*/
+.sshkey_date {
+  width: 105px;
+}
 
+.sshkey_actions {
+  width: 80px;
+}
+
+.sshkey_edit {
+  margin-right: 10px;
+}
+/*-------------------------------------------------*/

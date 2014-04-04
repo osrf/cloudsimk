@@ -10,19 +10,19 @@
 
           <ul class="list-inline">
             <li class='text-center'>
-                <a href="/auth/google"><img class="inline-block"
+                <a href=""><img class="inline-block"
                   alt="Google" src="/img/icons/google.svg"/><br/>Google</a>
             </li>
             <li class='text-center'>
-              <a href="/auth/yahoo"><img class="inline-block"
+              <a href=""><img class="inline-block"
                 alt="Yahoo" src="/img/icons/yahoo.svg"><br/>Yahoo</a>
             </li>
             <li class='text-center'>
-              <a href="/auth/aol"><img class="inline-block"
+              <a href=""><img class="inline-block"
                 alt="AOL" src="/img/icons/aol.svg"><br/>AOL</a>
             </li>
             <li class='text-center'>
-              <a href="/auth/openid"><img class="inline-block"
+              <a href=""><img class="inline-block"
                 alt="OpenId" src="/img/icons/openid.svg"><br/>OpenId</a>
             </li>
           </ul>
@@ -63,8 +63,9 @@
             <div class="form-group">
               <label for="spent"
                 class="col-sm-4 control-label">I have spent</label>
-              <div class="col-sm-4">
-                <input type="text" class="form-control"
+              <div class="col-sm-4 input-group">
+                <span class='input-group-addon'>$</span>
+                <input type="number" class="form-control"
                 ng-model="user.spent_trigger">
               </div>
             </div>
@@ -72,8 +73,9 @@
             <div class="form-group">
               <label for="balance"
                 class="col-sm-4 control-label">My balance is below</label>
-              <div class="col-sm-4">
-                <input type="text" class="form-control"
+              <div class="col-sm-4 input-group">
+                <span class='input-group-addon'>$</span>
+                <input type="number" class="form-control"
                 ng-model="user.balance_trigger">
               </div>
             </div>
@@ -86,10 +88,34 @@
     <div class="col-md-6">
       <div class="panel panel-default">
         <div class="panel-heading">SSH Keys</div>
-        <div class="panel-body">Panel body</div>
+        <div class="panel-body">
+          <p>
+          Use ssh keys to gain shell access to simulations.
+          </p>
+          <button type="button" class="btn btn-primary" ng-click="openSSHKeyModal()">Add key</button>
+        <table class="table table-striped table-condensed table-hover">
+          <thead>
+            <tr>
+              <th>Key</th>
+              <th class='text-right sshkey_date'>Added</th>
+              <th class="sshkey_actions"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="key in sshKeys">
+              <td>{{key.label}}</td>
+              <td class='text-right sshkey_date' >{{key.date}}</td>
+              <td class='text-right sshkey-actions'>
+                <a href="" ng-click="openSSHKeyModal($index)"
+                  class="sshkey_edit">Edit</a>
+                <a href="" ng-click="removeSSHKey($index)"><span class="glyphicon glyphicon-remove-circle"></span></a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        </div>
       </div>
     </div>
-
   </div>
-
 </div>
