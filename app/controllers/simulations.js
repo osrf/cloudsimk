@@ -39,7 +39,7 @@ var awsData = { 'US West': {region: 'us-west-2',
                              hardware: 'g2.2xlarge',
                              price: 0}
 };
- 
+
 /////////////////////////////////////////////////
 /// Find Simulation by id
 /// @param[in] req Nodejs request object.
@@ -113,9 +113,10 @@ exports.create = function(req, res) {
                 simulation.machine_id = machineInfo.id;
                 simulation.server_price = serverDetails.price;
                 simulation.machine_ip = 'N/A';
+                simulation.date_launch = Date.now();
 
                 setTimeout(function () {
-                    
+
                     simulation.machine_ip = 'waiting';
                     console.log('TIMED OUT ' + util.inspect(machineInfo));
                     cloudServices.simulatorStatus(machineInfo, function(err, state) {
@@ -139,7 +140,7 @@ exports.create = function(req, res) {
                         });
                     });
                 }, 30000);
-                
+
                 // Save the simulation instance to the database
                 simulation.save(function(err) {
                     if (err) {
@@ -273,7 +274,7 @@ exports.terminate = function(req, res) {
         } else {
             simulation.state = 'Terminated';
             simulation.date_term = Date.now();
-    
+
             simulation.save(function(err) {
                 if (err) {
                     return res.send('users/signup', {
@@ -310,7 +311,7 @@ exports.all = function(req, res) {
 
     }
     // Get all simulation models, in creation order, for a user
-    Simulation.find(filter).sort('-date_launch').populate('user', 'name username')
+    Simulation.find(filter).sort().populate('user', 'name username')
       .exec(function(err, simulations) {
         if (err) {
             res.render('error', {
