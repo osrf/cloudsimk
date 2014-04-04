@@ -32,6 +32,11 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
     /// Array of simulations displayed in the history table
     $scope.historySimulations = [];
 
+    $scope.tableType = {
+        console : 0,
+        history : 1
+    };
+
     /// A modal confirmation dialog displayed when the shutdown button
     /// is pressed
     var shutdownDialog = null;
@@ -132,18 +137,21 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
         };
     };
 
-    /// Get simulations in the current page of the console table
-    $scope.getPageConsoleSimulations = function() {
-        var start = ($scope.consoleCurrentPage-1) * $scope.pageSize;
+    /// Get simulations in the current page of the table
+    $scope.getPageSimulations = function(type) {
+        var currentPage;
+        var simulations;
+        if (type === $scope.tableType.console) {
+            currentPage = $scope.consoleCurrentPage;
+            simulations = $scope.consoleSimulations;
+        }
+        else if (type === $scope.tableType.history) {
+            currentPage = $scope.historyCurrentPage;
+            simulations = $scope.historySimulations;
+        }
+        var start = (currentPage-1) * $scope.pageSize;
         var end = start + $scope.pageSize;
-        return $scope.consoleSimulations.slice(start, end);
-    };
-
-    /// Get simulations in the current page of the history table
-    $scope.getPageHistorySimulations = function() {
-        var start = ($scope.historyCurrentPage-1) * $scope.pageSize;
-        var end = start + $scope.pageSize;
-        return $scope.historySimulations.slice(start, end);
+        return simulations.slice(start, end);
     };
 
     /// Get running simulations
@@ -156,9 +164,35 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
         return sim.state === 'Terminated';
     };
 
+    /// Select all simulations in the current page of the table
+    $scope.selectPageSimulations = function(type) {
+        var selected = !$scope.getPageSimulationsSelected(type);
+        var simulations = $scope.getPageSimulations(type);
+        if (simulations.length > 0) {
+            for (var i = 0; i < simulations.length; ++i) {
+                simulations[i].selected = selected;
+            }
+        }
+    };
+
+    /// Check if all simulations in the current page of the table are selected
+    $scope.getPageSimulationsSelected = function(type) {
+        var simulations = $scope.getPageSimulations(type);
+        if (simulations.length > 0) {
+            simulations = simulations.filter(function(sim) {
+                return sim.selected === true;
+            });
+            if (simulations.length === $scope.pageSize)
+                return true;
+            return false;
+        }
+        return false;
+    };
+
     $scope.formatDateTime = function(dateTime)
     {
         return new Date(dateTime).toString();
     };
+
 
 }]);

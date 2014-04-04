@@ -1,11 +1,14 @@
 <div class="container">
   <tabset>
     <!-- Console: Running Simulations -->
+<!--ng-init="selected = getPageSimulationsSelected({{'console'}})"-->
     <tab heading='Console'>
       <table class="table table-striped table-condensed table-hover">
         <thead>
           <tr>
-            <th><input type="checkbox"></th>
+            <th><input type="checkbox"
+              ng-checked="getPageSimulationsSelected(tableType.console)"
+              ng-click="selectPageSimulations(tableType.console)"></th>
             <th>Id</th>
             <th>World</th>
             <th>Status</th>
@@ -67,7 +70,9 @@
       <table class="table table-striped table-condensed table-hover">
         <thead>
           <tr>
-            <th><input type="checkbox"></th>
+            <th><input type="checkbox"
+              ng-checked="getPageSimulationsSelected(tableType.history)"
+              ng-click="selectPageSimulations(tableType.history)"></th>
             <th>Date Launched</th>
             <th>Id</th>
             <th>World</th>
