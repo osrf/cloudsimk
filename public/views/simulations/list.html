@@ -1,57 +1,127 @@
 <div class="container">
-  <table class="table table-striped table-condensed table-hover">
-    <thead>
-      <tr>
-        <th><input type="checkbox"></th>
-        <th>Id</th>
-        <th>World</th>
-        <th>Status</th>
-        <th>Region</th>
-        <th>Uptime</th>
-        <th>Cost</th>
-      </tr>
-    </thead>
-    <tfoot>
-      <td colspan="2">
-        <div class='text-left' style="margin-top: 20px; margin-bottom: 20px">
-          <button class="btn btn-primary" ng-click="showShutdownDialog()">Shutdown</button>
+  <tabset>
+    <!-- Console: Running Simulations -->
+    <tab heading='Console'>
+      <table class="table table-striped table-condensed table-hover">
+        <thead>
+          <tr>
+            <th><input type="checkbox"></th>
+            <th>Id</th>
+            <th>World</th>
+            <th>Status</th>
+            <th>Region</th>
+            <th>Uptime</th>
+            <th>Cost</th>
+          </tr>
+        </thead>
+        <tfoot>
+          <td colspan="2">
+            <div class='text-left' style="margin-top: 20px; margin-bottom: 20px">
+              <button class="btn btn-primary" ng-click="showShutdownDialog()">
+                Shutdown
+              </button>
+            </div>
+          </td>
+          <td colspan="6">
+            <div class='text-right'>
+              <pagination direction-links="true"
+                total-items="$parent.$parent.consoleSimulations.length"
+                items-per-page="pageSize"
+                page="$parent.$parent.consoleCurrentPage">
+              </pagination>
+            </div>
+          </td>
+        </tfoot>
+        <tbody>
+          <tr ng-repeat="simulation in ($parent.$parent.consoleSimulations =
+            (simulations | filter:getConsoleSimulations | orderBy: '-date_launch')
+            | startFrom:($parent.$parent.consoleCurrentPage-1)*pageSize
+            | limitTo:pageSize)">
+            <td><input type="checkbox" ng-model="simulation.selected"></td>
+            <td>{{simulation.sim_id}}</td>
+            <td>{{simulation.world}}</td>
+            <td>{{simulation.state}}</td>
+            <td>{{simulation.region}}</td>
+            <td>0</td>
+            <td>{{simulation.server_price}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <script type="text/ng-template" id="shutdown.html">
+        <div class="modal-header">
+          <h3>Shutdown</h3>
         </div>
-      </td>
-      <td colspan="6">
-        <div class='text-right'>
-          <pagination direction-links="true"
-          total-items="simulations.length" items-per-page="simPerPage"
-          page="$parent.currentPage"></pagination>
-         </div>
-      </td>
-    </tfoot>
+        <div class="modal-body">
+          Are you sure you want to shut down the machine(s)?
+          <br>Your data will be lost.</br>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" ng-click="confirmShutdown(true)">Yes</button>
+          <button class="btn btn-primary" ng-click="confirmShutdown(false)">No</button>
+        </div>
+      </script>
+    </tab>
 
-    <tbody>
-      <tr ng-repeat="simulation in simulations.slice(($parent.currentPage-1)*simPerPage, ($parent.currentPage-1)*simPerPage+simPerPage)">
-        <td><input type="checkbox" ng-model="simulation.selected"></td>
-        <td>{{simulation.sim_id}}</td>
-        <td>{{simulation.world}}</td>
-        <td>{{simulation.state}}</td>
-        <td>{{simulation.region}}</td>
-        <td>0</td>
-        <td>0</td>
-      </tr>
-    </tbody>
-  </table>
-
-
-  <script type="text/ng-template" id="shutdown.html">
-    <div class="modal-header">
-      <h3>Shutdown</h3>
-    </div>
-    <div class="modal-body">
-      Are you sure you want to shut down the machine(s)?
-      <br>Your data will be lost.</br>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary" ng-click="confirmShutdown(true)">Yes</button>
-      <button class="btn btn-primary" ng-click="confirmShutdown(false)">No</button>
-    </div>
-  </script>
-
+    <!-- History: Terminated Simulations -->
+    <tab heading='History'>
+      <table class="table table-striped table-condensed table-hover">
+        <thead>
+          <tr>
+            <th><input type="checkbox"></th>
+            <th>Date Launched</th>
+            <th>Id</th>
+            <th>World</th>
+            <th>Region</th>
+            <th>Uptime</th>
+            <th>Cost</th>
+          </tr>
+        </thead>
+        <tfoot>
+          <td colspan="2">
+            <div class='text-left' style="margin-top: 20px; margin-bottom: 20px">
+              <button class="btn btn-primary" ng-click="showRelaunchDialog()">
+                Relaunch
+              </button>
+            </div>
+          </td>
+          <td colspan="6">
+            <div class='text-right'>
+              <pagination direction-links="true"
+                total-items="$parent.$parent.historySimulations.length"
+                items-per-page="pageSize"
+                page="$parent.$parent.historyCurrentPage">
+              </pagination>
+            </div>
+          </td>
+        </tfoot>
+        <tbody>
+          <tr ng-repeat="simulation in ($parent.$parent.historySimulations =
+            (simulations | filter:getHistorySimulations | orderBy: '-date_term')
+            | startFrom:($parent.$parent.historyCurrentPage-1)*pageSize
+            | limitTo:pageSize)">
+            <td><input type="checkbox" ng-model="simulation.selected"></td>
+            <td>{{formatDateTime(simulation.date_launch)}}</td>
+            <td>{{simulation.sim_id}}</td>
+            <td>{{simulation.world}}</td>
+            <td>{{simulation.region}}</td>
+            <td>0</td>
+            <td>{{simulation.server_price}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <script type="text/ng-template" id="relaunch.html">
+        <div class="modal-header">
+          <h3>Relaunch</h3>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to relaunch?
+          <br>You will be charged $X.XX per hour once you click Yes.</br>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" ng-click="confirmRelaunch(true)">Yes</button>
+          <button class="btn btn-primary" ng-click="confirmRelaunch(false)">Cancel</button>
+        </div>
+      </script>
+    </tab>
+  </tabset>
 </div>
