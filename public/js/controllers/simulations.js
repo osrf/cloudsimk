@@ -48,7 +48,6 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
     /// Launch a simulation.
     $scope.launch = function(launchWorld, launchRegion) {
         var sim = new Simulations({
-            sim_id: 0,
             state: 'Launching',
             region: launchRegion,
             world: launchWorld
