@@ -1,5 +1,7 @@
 'use strict';
 
+// keep jslint happy: suppress the undefined io message
+/*globals io*/
 var socket = io.connect();
 
 socket.on('time', function (msg) {
@@ -7,11 +9,15 @@ socket.on('time', function (msg) {
 });
 
 socket.on('simulation_update', function (msg) {
-    console.log('Simulation update: ' + JSON.stringify(info));
+    console.log('Simulation update: ' + JSON.stringify(msg));
 });
 
 socket.on('simulation_create', function (msg) {
-    console.log('Simulation created: ' + JSON.stringify(info));
+    console.log('Simulation created: ' + JSON.stringify(msg));
+});
+
+socket.on('simulation_terminate', function (msg) {
+    console.log('Simulation terminated: ' + JSON.stringify(msg));
 });
 
 
@@ -63,8 +69,8 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
             region: launchRegion,
             world: launchWorld
         });
-        sim.$save(function(response) {
-                console.log('simulation saved: ' + response);
+        sim.$save(function() {
+                console.log('simulation created');
             }, function(error) {
                 console.log('error: ' + error);
                 alert('AWS error: ' + error.data.error.message);

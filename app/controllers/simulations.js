@@ -182,7 +182,7 @@ exports.create = function(req, res) {
                                             });
                                         } else {
                                             res.jsonp(simulation);
-                                             sockets.getUserSockets().notifyUser(req.user.id,
+                                            sockets.getUserSockets().notifyUser(req.user.id,
                                                                     'simulation_create',
                                                                     {data:simulation});
 
@@ -240,7 +240,7 @@ exports.update = function(req, res) {
     // request body
     simulation = _.extend(simulation, req.body);
 
-    /* Save the updated simulation to the database */
+    // Save the updated simulation to the database
     simulation.save(function(err) {
         if (err) {
             return res.send('users/signup', {
@@ -249,6 +249,9 @@ exports.update = function(req, res) {
             });
         } else {
             res.jsonp(simulation);
+            sockets.getUserSockets().notifyUser(req.user.id,
+                                                'simulation_update',
+                                                 {data:simulation});
         }
     });
 };
@@ -274,6 +277,8 @@ exports.destroy = function(req, res) {
             });
         } else {
             res.jsonp(simulation);
+            // notify the user from the other browsers
+            
         }
     });
 };
@@ -313,6 +318,9 @@ exports.terminate = function(req, res) {
                 } else {
                     console.log('Simulator terminated: ' + util.inspect(info) + ' key: ' + keyName);
                     res.jsonp(simulation);
+                    sockets.getUserSockets().notifyUser(req.user.id,
+                                                        'simulation_terminate',
+                                                        {data:simulation});
                 }
             });
         }

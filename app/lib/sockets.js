@@ -3,7 +3,6 @@
 var mongoose = require('mongoose'),
     User = mongoose.model('User');
 
-var express = require('express');
 var config = require('../../config/config');
 var cookie = require('express/node_modules/cookie');
 var connectUtils = require('express/node_modules/connect/lib/utils');
@@ -11,6 +10,7 @@ var connectUtils = require('express/node_modules/connect/lib/utils');
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 
+// Create a schema to access the session documents created by passport / connect
 var sessionSchema = new Schema({ _id: String,  session: String, expires: String });
 var Session = mongoose.model('Session', sessionSchema);
 
@@ -39,7 +39,7 @@ function findUserId(cookieData, cb) {
                     cb(err);
                 } else {
                     console.log('USERS FOUND: ' + users.length);
-                    if(users.length == 1 ) {
+                    if(users.length === 1 ) {
                         var userId = users[0]._id;                    
                         console.log('USER ID: ' + userId);
                         cb(null, userId);
