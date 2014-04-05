@@ -196,5 +196,4 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
         return new Date(dateTime).toString();
     };
 
-
 }]);
