@@ -127,7 +127,7 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
         function () {});
     };
 
-    /// A controller for closing dimissing the relaunch dialog
+    /// A controller for closing / dimissing the relaunch dialog
     var relaunchDialogCtrl = function ($scope, $modalInstance) {
         $scope.confirmRelaunch = function (relaunch) {
             if (relaunch) {
@@ -181,18 +181,18 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
     $scope.getPageSimulationsSelected = function(type) {
         var simulations = $scope.getPageSimulations(type);
         if (simulations.length > 0) {
-            simulations = simulations.filter(function(sim) {
+            var selectedSimulations = simulations.filter(function(sim) {
                 return sim.selected === true;
             });
-            if (simulations.length === $scope.pageSize)
+            if (selectedSimulations.length === simulations.length)
                 return true;
             return false;
         }
         return false;
     };
 
-    $scope.formatDateTime = function(dateTime)
-    {
+    /// Get time as a string
+    $scope.formatDateTime = function(dateTime) {
         return new Date(dateTime).toString();
     };
 
