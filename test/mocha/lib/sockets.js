@@ -27,6 +27,7 @@ describe('Socket test', function() {
                     callBackCount += 1;
                 }};
                 socketDict.addSocket('Alice', mockSocket);
+                socketDict.getSockets('Alice').should.be.instanceof(Array).and.have.lengthOf(1);
                 socketDict.notifyUser('Alice', 'message', {});
                 callBackCount.should.equal(1);
 
