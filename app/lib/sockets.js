@@ -38,10 +38,8 @@ function findUserId(cookieData, cb) {
                     console.log('Cannot find user for this session:' + err);
                     cb(err);
                 } else {
-                    console.log('USERS FOUND: ' + users.length);
                     if(users.length === 1 ) {
                         var userId = users[0]._id;                    
-                        console.log('USER ID: ' + userId);
                         cb(null, userId);
                     }
                     else {
@@ -111,7 +109,7 @@ exports.getUserSockets = function () {
 /////////////////////////////////////////////////////////////////////////////
 // broadcasts the server time periodically
 function tick() {
-    var now = new Date().toUTCString();
+    var now = new Date().toISOString();
     userSockets.notifyAll('time', {data:now});
 }
 
@@ -121,7 +119,8 @@ function tick() {
 //
 exports.init = function(io) {
     userSockets.io = io;
-
+    // reduce log verbosity
+    io.set('log level', 1);
     // call tick periodically (30 sec)
     setInterval(tick, 30000);
 
@@ -130,7 +129,6 @@ exports.init = function(io) {
         var cookie = data.headers.cookie;
         findUserId(cookie, function(err, userId) {
             if(err) {
-                console.log('Can\'t find socket user from cookie: ' + cookie );
                 accept(null, false);
             } else {
                 data.userId = userId;
@@ -141,10 +139,8 @@ exports.init = function(io) {
 
     io.sockets.on('connection', function (socket) {
         var user = socket.handshake.userId;
-        console.log('New connection : ' + user);
         userSockets.addSocket(user, socket);
         socket.on('disconnect', function() {
-            console.log('SOCKET DEAD!');
             userSockets.removeSocket(user, socket);
         });
     });
