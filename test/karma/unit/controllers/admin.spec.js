@@ -2,16 +2,16 @@
 
 (function() {
     describe('CloudSim controllers', function() {
-        describe('UsersController', function() {
+        describe('AdminController', function() {
             // Load the controllers module
             beforeEach(module('cloudsim'));
 
-            var scope, UsersController;
+            var scope, AdminController;
 
             beforeEach(inject(function($controller, $rootScope) {
                 scope = $rootScope.$new();
 
-                UsersController = $controller('UsersController', {
+                AdminController = $controller('AdminController', {
                     $scope: scope
                 });
             }));
