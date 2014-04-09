@@ -7,8 +7,8 @@ angular.module('cloudsim.preferences').controller('PreferencesController', ['$sc
     $scope.sshKeys = [];
 
     /////////////////////////////////////////////
-    /// \brief Open a modal to confirm the deletion of an ssh key.
-    /// \param[in] index Index of the key to delete.
+    /// @brief Open a modal to confirm the deletion of an ssh key.
+    /// @param[in] index Index of the key to delete.
     $scope.removeSSHKey = function(index) {
         if (index >= 0 && index < $scope.sshKeys.length) {
             // Open the modal, and pass in (resolve) the ssh key label.
@@ -43,7 +43,7 @@ angular.module('cloudsim.preferences').controller('PreferencesController', ['$sc
     };
 
     /////////////////////////////////////////////
-    /// \brief A function that opens the add/edit ssh key modal.
+    /// @brief A function that opens the add/edit ssh key modal.
     /// Addition and modifications to keys will be sent to the sever when
     /// the form in the modal window is submitted.
     $scope.openSSHKeyModal = function(index) {
@@ -80,9 +80,9 @@ angular.module('cloudsim.preferences').controller('PreferencesController', ['$sc
 
     /////////////////////////////////////////////
     /// Controller for the add/edit ssh key modal
-    /// \param[in] index Index into the sshKeys array of the key to edit.
+    /// @param[in] index Index into the sshKeys array of the key to edit.
     ///                  Undefined if adding a new key.
-    /// \param[in] sshKeys The array of ssh keys.
+    /// @param[in] sshKeys The array of ssh keys.
     var SSHKeyModelCtrl = function($scope, $modalInstance, index, sshKeys) {
         // Grab the label and key, if editing a key. We do this so that
         // editing the values in the form does not directly change the
