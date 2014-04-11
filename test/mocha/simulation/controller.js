@@ -80,7 +80,7 @@ describe('<Unit Test>', function() {
         });
 
         describe('Check Create Simulation', function() {
-            it('should be possible to create a simulation', function(done) {
+            it('should be possible to create a first simulation', function(done) {
                 agent
                 .post('/simulations')
                 .set('Acccept', 'application/json')
@@ -507,7 +507,7 @@ describe('<Unit Test>', function() {
         });
 
         describe('Check Second User Create Simulation', function() {
-            it('should be possible to create a simulation', function(done) {
+            it('should be possible to create a simulation for the second user', function(done) {
                 supertest(app)
                 .post('/simulations')
                 .set('Acccept', 'application/json')

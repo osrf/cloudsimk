@@ -54,7 +54,7 @@ function findUserId(cookieData, cb) {
 ///////////////////////////////////////////////
 // A type that maintains an association between
 // sockets and users. Fast lookup of socket 
-// list per user. Removing  
+// list per user.  
 function SocketDict() {
 
     this.sockets = {};
@@ -80,9 +80,7 @@ function SocketDict() {
     };
 
     this.getSockets = function (user) {
-        var sockets = this.sockets[user];
-        if(sockets) return sockets;
-        return [];
+        return user in this.sockets ? this.sockets[user] : [];
     };
     
     this.notifyUser = function (user, channel, data) {

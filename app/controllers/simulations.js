@@ -27,8 +27,10 @@ var util = require('util');
 // The AWS server information
 //
 var awsData = { 'US West': {region: 'us-west-2',
-                            image: 'ami-cc95f8fc', // cloudsim // 'ami-b8d2b088',
-                            hardware: 'm1.small',
+                            // image: 'ami-cc95f8fc', // cloudsim m1 small
+                            // hardware: 'm1.small',
+                            image: 'ami-b8d2b088',  // simulator-stable 2.0.3
+                            hardware: 'g2.2xlarge',
                             price: 0},
                  'US East': {region: 'us-east-1',
                              image: 'ami-4d8d8924',
