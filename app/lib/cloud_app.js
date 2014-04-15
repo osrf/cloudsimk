@@ -27,14 +27,17 @@ var sim_id = 'sim_0';
 var username = 'test@test.com';
 var image = 'ami-b8d2b088';
 var hardware = 'g2.2xlarge';
+var region = 'us-west-2';
 var cmd = process.argv[2];
 
 console.log('cmd: ' + cmd);
 
 if (cmd === 'launch') {
-    var region = process.argv[3];
-    console.log('region: ' + region);
-    var keyName = process.argv[4];
+    
+    hardware = 'm1.small';
+    image = 'ami-cc95f8fc';
+
+    var keyName = process.argv[3];
     console.log('keyName: ' + keyName);
 
     cloud_services.launchSimulator(username, keyName, sim_id, region, hardware, image, function (err, machineInfo) {

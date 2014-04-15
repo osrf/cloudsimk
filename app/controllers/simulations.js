@@ -4,6 +4,7 @@
 
 
 /// Module dependencies.
+var uuid = require('node-uuid');
 var mongoose = require('mongoose'),
     Simulation = mongoose.model('Simulation'),
     User = mongoose.model('User'),
@@ -21,7 +22,6 @@ if(process.env.AWS_ACCESS_KEY_ID) {
 }
 
 var util = require('util');
-
 
 var awsData = { 'US West': {region: 'us-west-2',
                             image: 'ami-cc95f8fc', // cloudsim // 'ami-b8d2b088',
@@ -84,6 +84,20 @@ function getKeyName(email, sim_id) {
     return 'cs-' + sim_id + '-' + email;
 }
 
+////////////////////////////////////////////////////////////////
+// Generates a script that will be executed when the simulation
+// server is booted for the first time.
+// @param[in] secret_token this token is used to call Cloudsim
+//            to let it know who is calling.
+// @param[in] the simulation world to load.
+function generate_callback_script(secret_token, world)
+{
+    var s = '';
+    s += '#!/usr/bin/env bash\n\n';
+    s += '# cloudsim script to signal server ready\n\n';
+    s += '/home/ubuntu/cloudsimk/callback_to_cloudsim_io.bash ' + world + ' ' + secret_token;
+    return s;
+}
 
 /////////////////////////////////////////////////
 /// Create a simulation
@@ -113,12 +127,20 @@ exports.create = function(req, res) {
                     console.log('Error generating key: ' + err);
                     res.jsonp(500, { error: err });
                 } else {
-                    cloudServices.launchSimulator(  req.user.username,
+                    var tags = {Name: 'simulator',
+                            user: req.user.username,
+                            id: simulation.sim_id}
+                    // create a callback script with a secret token. This script will be executed when the
+                    // server is booted for the first time. It can be found on the server at this path:
+                    //    /var/lib/cloud/instance/user-data.txt
+                    var token = uuid.v4();
+                    var script = generate_callback_script(token, simulation.world);
+                    cloudServices.launchSimulator(  serverDetails.region,
                                                     keyName,
-                                                    simulation.sim_id,
-                                                    serverDetails.region,
                                                     serverDetails.hardware,
                                                     serverDetails.image,
+                                                    tags,
+                                                    script,
                                                     function (err, machineInfo) {
                         if(err) {
                             res.jsonp(500, { error: err });

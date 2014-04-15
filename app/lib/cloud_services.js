@@ -1,12 +1,13 @@
 'use strict';
 
 // Load the SDK and UUID
-var AWS = require('aws-sdk');
-var util = require('util');
+var AWS = require ('aws-sdk');
+var uuid = require ('node-uuid');
+var util = require ('util');
 
 // configure what to do for cloud API calls:
 var dryRun = process.env.CLOUDSIM_DRY_RUN === 'true';
-console.log('process.env.CLOUDSIM_DRY_RUN (true or false): ' +  process.env.CLOUDSIM_DRY_RUN);
+console.log('process.env.CLOUDSIM_DRY_RUN (true means enabled): ' +  process.env.CLOUDSIM_DRY_RUN);
 
 // Async functions to launch machines on a cloud provider
 // AWS is the only supported one for now
@@ -65,17 +66,22 @@ exports.deleteKey = function (keyName, region, cb) {
 // @param[in] hardware A hardware type
 // @param[in] image An AMI (image id registered in that region)
 // @param[in] a call back function
-exports.launchSimulator = function (username, keyName, simId, region, hardware, image, cb) {
+exports.launchSimulator = function (region, keyName, hardware, image, script, cb) {
 
     // set AWS region
     AWS.config.region = region;
 
     console.log('Launching simulator: for: ' + username);
     console.log('SSH key: ' +  keyName);
+    console.log('world: ' + world);
     console.log('SimId: ' + simId);
     console.log('region:' + region);
     console.log('hardware: ' +  hardware);
     console.log('image: ' + image);
+
+    var script = generate_callback_script(token, world);
+    // AWS requires the script to be Base64-encoded MIME
+    var userData = new Buffer(script).toString('base64');
 
     var awsParams = {
         KeyName: keyName,
@@ -83,6 +89,7 @@ exports.launchSimulator = function (username, keyName, simId, region, hardware, 
         InstanceType: hardware,
         MinCount:1,
         MaxCount: 1,
+        UserData: userData,
         DryRun: dryRun
     };
 

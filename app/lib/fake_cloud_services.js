@@ -16,7 +16,7 @@ exports.deleteKey = function (keyName, region, cb) {
     cb(null, 'true');
 };
 
-exports.launchSimulator = function (username, keyName, simId, region, hardware, image, cb) {
+exports.launchSimulator = function (region, keyName, hardware, image, tags, script, cb) {
 
     var machineInfo = { id: 'x-424242',
                         region: 'us-east-1'
