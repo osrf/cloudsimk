@@ -254,6 +254,7 @@ p {
 /* Set the hover color for a table row */
 .table-hover>tbody>tr:hover>td {
   background-color: #e8f4ff;
+}
 
 .slide.ng-leave {
   position: relative;
@@ -273,4 +274,9 @@ p {
 }
 .slide, .slide.ng-enter.ng-enter-active {
   opacity: 1;
+}
+
+.cloudsim-alert {
+  margin-top: 10px;
+  margin-bottom: 0px;
 }
