@@ -169,10 +169,8 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
     $scope.selectPageSimulations = function(type) {
         var selected = !$scope.getPageSimulationsSelected(type);
         var simulations = $scope.getPageSimulations(type);
-        if (simulations.length > 0) {
-            for (var i = 0; i < simulations.length; ++i) {
-                simulations[i].selected = selected;
-            }
+        for (var i = 0; i < simulations.length; ++i) {
+            simulations[i].selected = selected;
         }
     };
 

@@ -103,9 +103,14 @@ exports.create = function(req, res) {
     User.findByIdAndUpdate(req.user.id, {$inc:{next_sim_id: 1}}, function(err, user) {
         if(err) {
             // an unlikely error, since user is in req.
-            console.log('Can\'t find user in database: ' + err);
+            console.log('Create Simulation failed. Error updating user simulation sim id in database: ' + err);
             res.jsonp(500, { error: err });
         } else {
+            if (!user) {
+                console.log('Create Simulation failed. Error finding user in database: ' + err);
+                res.jsonp(500, { error: err });
+                return;
+            }
             // decrement because we update it first in findByIdAndUpdate
             simulation.sim_id = --user.next_sim_id;
             // we pick the appropriate machine based on the region specified
