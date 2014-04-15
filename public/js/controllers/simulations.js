@@ -40,6 +40,9 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
     /// is pressed
     var relaunchDialog = null;
 
+    /// Error messessage
+    $scope.error = '';
+
     /// Launch a simulation.
     $scope.launch = function(launchWorld, launchRegion) {
         var sim = new Simulations({
@@ -48,11 +51,10 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
             region: launchRegion,
             world: launchWorld
         });
-        sim.$save(function(response) {
-                console.log('your response: ' + response);
-            }, function(error) {
-                console.log('your error: ' + error);
-                alert('AWS error: ' + error.data.error.message);
+        sim.$save(function() {},
+            function(error) {
+                $scope.error = 'Error launching simulation: ' + error.data;
+                sim.state = 'Error';
             });
         sim.selected = false;
         $scope.simulations.unshift(sim);
@@ -160,5 +162,4 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
     {
         return new Date(dateTime).toString();
     };
-
 }]);
