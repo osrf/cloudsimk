@@ -74,7 +74,7 @@ exports.simulation = function(req, res, next, id) {
 
 
 //////////////////////////////////////////////////
-// generate a ssh key name from a user email and 
+// generate a ssh key name from a user email and
 // a simulation id (used with AWS to generate and
 // delete a unqiue key for each machine)
 // @param[in] email: the user's email
@@ -97,13 +97,22 @@ exports.create = function(req, res) {
     var simulation = new Simulation(req.body);
     // Set the simulation user
     simulation.user = req.user;
-    User.load(req.user.id, function(err, user) {
+
+    // find user and also update the next_sim_id to ensure a unique id
+    // when we get multiple concurrent POSTS
+    User.findByIdAndUpdate(req.user.id, {$inc:{next_sim_id: 1}}, function(err, user) {
         if(err) {
             // an unlikely error, since user is in req.
-            console.log('Can\'t find user in database: ' + err);
+            console.log('Create Simulation failed. Error updating user simulation sim id in database: ' + err);
             res.jsonp(500, { error: err });
         } else {
-            simulation.sim_id = user.next_sim_id++;
+            if (!user) {
+                console.log('Create Simulation failed. Error finding user in database: ' + err);
+                res.jsonp(500, { error: err });
+                return;
+            }
+            // decrement because we update it first in findByIdAndUpdate
+            simulation.sim_id = --user.next_sim_id;
             // we pick the appropriate machine based on the region specified
             // by the user
             var serverDetails = awsData[simulation.region];
@@ -128,7 +137,7 @@ exports.create = function(req, res) {
                             simulation.ssh_private_key = key;
                             simulation.machine_ip = 'N/A';
                             setTimeout(function () {
-                                
+
                                 simulation.machine_ip = 'waiting';
                                 cloudServices.simulatorStatus(machineInfo, function(err, state) {
                                     console.log('machine:' + util.inspect(machineInfo)  + ' status: ' + util.inspect(state));
@@ -146,7 +155,7 @@ exports.create = function(req, res) {
                                     });
                                 });
                             }, 30000);
-                            
+
                             // Save the simulation instance to the database
                             simulation.save(function(err) {
                                 if (err) {
@@ -159,23 +168,8 @@ exports.create = function(req, res) {
                                         errors: err.errors,
                                         Simulation: simulation
                                     });
-                                } else {
-                                    user.save(function(err) {
-                                        if (err) {
-                                            if(machineInfo.id) {
-                                                console.log('error saving simulation info to db: ' + err);
-                                                console.log('Terminating server ' + machineInfo.id);
-                                                cloudServices.terminateSimulator(machineInfo, function () {});
-                                            }
-                                            return res.send('users/signup', {
-                                                errors: err.errors,
-                                                Simulation: simulation
-                                            });
-                                        } else {
-                                            res.jsonp(simulation);
-                                        }
-                                    });  // user.save 
                                 }
+                                res.jsonp(simulation);
                             }); // simulation.save (simulatorInstance)
                         }
                     });  // launchSimulator
@@ -279,7 +273,7 @@ exports.terminate = function(req, res) {
     var machineInfo = {region: region,
                        id: simulation.machine_id};
     var keyName = getKeyName(user.email, simulation.sim_id);
-    // delete the ssh key. If there is an error, report it 
+    // delete the ssh key. If there is an error, report it
     // but try to shutdown the machine anyways
     cloudServices.deleteKey(keyName, region, function(err) {
         if(err) {

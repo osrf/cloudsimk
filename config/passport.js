@@ -59,8 +59,8 @@ module.exports = function(passport) {
         realm: config.google.realmURL
         },
         function(identifier, profile, done) {
-            // Check to see if the user's email exists in the 
-            // database. If it does, that mean's they were added 
+            // Check to see if the user's email exists in the
+            // database. If it does, that mean's they were added
             // by an admin or they are already registered.
             User.findOne({email: profile.emails[0].value},
                 function(err, addedUser) {
