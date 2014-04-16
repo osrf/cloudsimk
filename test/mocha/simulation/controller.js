@@ -79,6 +79,17 @@ describe('<Unit Test>', function() {
             });
         });
 
+        describe('Next sim id', function() {
+            it('should be zero', function(done) {
+                User.find({username: user.username}, function(err, users) {
+                    users.should.have.length(1);
+                    var theUser = users[0];
+                    theUser.next_sim_id.should.be.exactly(0);
+                    done();
+                });
+            });
+        });
+
         describe('Check Create Simulation', function() {
             it('should be possible to create a first simulation', function(done) {
                 agent
@@ -94,6 +105,17 @@ describe('<Unit Test>', function() {
                     text.state.should.equal('Launching');
                     text.region.should.equal('US East');
                     text.world.should.equal('empty.world');
+                    done();
+                });
+            });
+        });
+
+        describe('Next sim id', function() {
+            it('should have increased by one', function(done) {
+                User.find({username: user.username}, function(err, users) {
+                    users.should.have.length(1);
+                    var theUser = users[0];
+                    theUser.next_sim_id.should.be.exactly(1);
                     done();
                 });
             });

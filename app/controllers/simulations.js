@@ -200,7 +200,6 @@ exports.create = function(req, res) {
                                         }
                                     });  // user.save 
                                 }
-                                res.jsonp(simulation);
                             }); // simulation.save (simulatorInstance)
                         }
                     });  // launchSimulator
