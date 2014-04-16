@@ -7,7 +7,8 @@ console.log('*');
 
 // make traces silent by default. This is better for tests
 function log(s) {
-    //    console.log(s);
+    var doit = false;
+    if(doit) console.log(s);
 }
 
 exports.generateKey = function (keyName, region, cb) {
