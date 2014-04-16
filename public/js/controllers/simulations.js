@@ -32,6 +32,11 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
     /// Array of simulations displayed in the history table
     $scope.historySimulations = [];
 
+    $scope.tableType = {
+        console : 0,
+        history : 1
+    };
+
     /// A modal confirmation dialog displayed when the shutdown button
     /// is pressed
     var shutdownDialog = null;
@@ -40,19 +45,20 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
     /// is pressed
     var relaunchDialog = null;
 
+    /// Error messessage
+    $scope.error = '';
+
     /// Launch a simulation.
     $scope.launch = function(launchWorld, launchRegion) {
         var sim = new Simulations({
-            sim_id: 0,
             state: 'Launching',
             region: launchRegion,
             world: launchWorld
         });
-        sim.$save(function(response) {
-                console.log('your response: ' + response);
-            }, function(error) {
-                console.log('your error: ' + error);
-                alert('AWS error: ' + error.data.error.message);
+        sim.$save(function() {},
+            function(error) {
+                $scope.error = 'Error launching simulation: ' + error.data;
+                sim.state = 'Error';
             });
         sim.selected = false;
         $scope.simulations.unshift(sim);
@@ -67,7 +73,8 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
 
         // if the user confirms shutting down simulation
         shutdownDialog.result.then(function () {
-            var currentPageSims = $scope.getPageConsoleSimulations();
+            var currentPageSims =
+                $scope.getPageSimulations($scope.tableType.console);
             var selected = currentPageSims.filter(function(sim) {
                 return sim.selected === true;
             });
@@ -103,7 +110,8 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
 
         // if the user confirms relaunching the simulation
         relaunchDialog.result.then(function () {
-            var currentPageSims = $scope.getPageHistorySimulations();
+            var currentPageSims =
+                $scope.getPageSimulations($scope.tableType.history);
             var selected = currentPageSims.filter(function(sim) {
                 return sim.selected === true;
             });
@@ -120,7 +128,7 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
         function () {});
     };
 
-    /// A controller for closing dimissing the relaunch dialog
+    /// A controller for closing / dimissing the relaunch dialog
     var relaunchDialogCtrl = function ($scope, $modalInstance) {
         $scope.confirmRelaunch = function (relaunch) {
             if (relaunch) {
@@ -132,18 +140,21 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
         };
     };
 
-    /// Get simulations in the current page of the console table
-    $scope.getPageConsoleSimulations = function() {
-        var start = ($scope.consoleCurrentPage-1) * $scope.pageSize;
+    /// Get simulations in the current page of the table
+    $scope.getPageSimulations = function(type) {
+        var currentPage;
+        var simulations;
+        if (type === $scope.tableType.console) {
+            currentPage = $scope.consoleCurrentPage;
+            simulations = $scope.consoleSimulations;
+        }
+        else if (type === $scope.tableType.history) {
+            currentPage = $scope.historyCurrentPage;
+            simulations = $scope.historySimulations;
+        }
+        var start = (currentPage-1) * $scope.pageSize;
         var end = start + $scope.pageSize;
-        return $scope.consoleSimulations.slice(start, end);
-    };
-
-    /// Get simulations in the current page of the history table
-    $scope.getPageHistorySimulations = function() {
-        var start = ($scope.historyCurrentPage-1) * $scope.pageSize;
-        var end = start + $scope.pageSize;
-        return $scope.historySimulations.slice(start, end);
+        return simulations.slice(start, end);
     };
 
     /// Get running simulations
@@ -156,9 +167,31 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
         return sim.state === 'Terminated';
     };
 
-    $scope.formatDateTime = function(dateTime)
-    {
-        return new Date(dateTime).toString();
+    /// Select all simulations in the current page of the table
+    $scope.selectPageSimulations = function(type) {
+        var selected = !$scope.getPageSimulationsSelected(type);
+        var simulations = $scope.getPageSimulations(type);
+        for (var i = 0; i < simulations.length; ++i) {
+            simulations[i].selected = selected;
+        }
     };
 
+    /// Check if all simulations in the current page of the table are selected
+    $scope.getPageSimulationsSelected = function(type) {
+        var simulations = $scope.getPageSimulations(type);
+        if (simulations.length > 0) {
+            var selectedSimulations = simulations.filter(function(sim) {
+                return sim.selected === true;
+            });
+            if (selectedSimulations.length === simulations.length)
+                return true;
+            return false;
+        }
+        return false;
+    };
+
+    /// Get time as a string
+    $scope.formatDateTime = function(dateTime) {
+        return new Date(dateTime).toString();
+    };
 }]);
