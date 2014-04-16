@@ -549,6 +549,35 @@ describe('<Unit Test>', function() {
             });
         });
 
+        describe('Check Create Multiple Simulations With Unique ID', function() {
+            it('should be possible to create simulations with unique ids', function(done) {
+                var simCount = 0;
+                var simTotal = 10;
+                var simIds = [];
+                var callback = function(err,res) {
+                    util.log_res(res);
+                    res.should.have.status(200);
+                    res.redirect.should.equal(false);
+                    var text = JSON.parse(res.text);
+                    // check unique ids
+                    simIds.should.not.contain(text.sim_id);
+                    simIds.push(text.sim_id);
+                    text.region.should.equal('US East');
+                    text.world.should.equal('empty.world');
+                    simCount++;
+                    if (simCount === simTotal)
+                        done();
+                };
+                for (var i = 0; i < simTotal; ++i) {
+                    agent
+                    .post('/simulations')
+                    .set('Acccept', 'application/json')
+                    .send({ world: 'empty.world', region:'US East' })
+                    .end(callback);
+                }
+            });
+        });
+
         after(function(done) {
             user.remove();
             user2.remove();
