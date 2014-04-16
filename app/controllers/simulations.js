@@ -157,11 +157,11 @@ exports.create = function(req, res) {
                                             console.log('Error getting machine ip');
                                             res.jsonp(500, { error: err });
                                         } else {
-                                            // New IP: broadcast the news 
+                                            // New IP: broadcast the news
                                             sockets.getUserSockets().notifyUser(req.user.id,
                                                                     'simulation_update',
                                                                     {data:simulation});
-                                
+
                                         }
                                     });
                                 });
@@ -179,27 +179,14 @@ exports.create = function(req, res) {
                                         errors: err.errors,
                                         Simulation: simulation
                                     });
-                                } else {
-                                    user.save(function(err) {
-                                        if (err) {
-                                            if(machineInfo.id) {
-                                                console.log('error saving simulation info to db: ' + err);
-                                                console.log('Terminating server ' + machineInfo.id);
-                                                cloudServices.terminateSimulator(machineInfo, function () {});
-                                            }
-                                            return res.send('users/signup', {
-                                                errors: err.errors,
-                                                Simulation: simulation
-                                            });
-                                        } else {
-                                            res.jsonp(simulation);
-                                            sockets.getUserSockets().notifyUser(req.user.id,
-                                                                    'simulation_create',
-                                                                    {data:simulation});
-
-                                        }
-                                    });  // user.save 
                                 }
+
+
+                                res.jsonp(simulation);
+                                sockets.getUserSockets().notifyUser(req.user.id,
+                                                        'simulation_create',
+                                                         {data:simulation});
+
                             }); // simulation.save (simulatorInstance)
                         }
                     });  // launchSimulator
@@ -289,7 +276,7 @@ exports.destroy = function(req, res) {
         } else {
             res.jsonp(simulation);
             // notify the user from the other browsers
-            
+
         }
     });
 };
