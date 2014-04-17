@@ -21,7 +21,6 @@ exports.launchSimulator = function (region, keyName, hardware, image, tags, scri
     var machineInfo = { id: 'x-424242',
                         region: 'us-east-1'
                       };
-
     cb(null, machineInfo);
 };
 

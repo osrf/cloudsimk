@@ -93,9 +93,24 @@ function getKeyName(email, sim_id) {
 function generate_callback_script(secret_token, world)
 {
     var s = '';
-    s += '#!/usr/bin/env bash\n\n';
-    s += '# cloudsim script to signal server ready\n\n';
-    s += '/home/ubuntu/cloudsimk/callback_to_cloudsim_io.bash ' + world + ' ' + secret_token;
+    s += '#!/usr/bin/env bash\n';
+    s += 'set -ex\n';
+    s += 'logfile=/home/ubuntu/cloudsimi_setup.log\n';
+    s += 'exec > $logfile 2>&1\n';
+    s += '\n';
+    s += 'cd /home/ubuntu\n';
+    s += 'hg clone https://bitbucket.org/osrf/cloudsimi\n\n';
+
+    // checkout a specific branch
+    s += 'cd  /home/ubuntu/cloudsimi\n';
+    s += 'hg co init\n';
+
+    s += '# cloudsim script to signal server ready\n';
+    s += '/home/ubuntu/cloudsimi/callback_to_cloudsim_io.bash ';
+    s += 'http://cloudsim.io ' + world + ' ' + secret_token + '\n';
+    s += '\n';
+    s += 'echo done!\n'
+
     return s;
 }
 
@@ -138,7 +153,7 @@ exports.create = function(req, res) {
                 } else {
                     var tags = {Name: 'simulator',
                             user: req.user.username,
-                            id: simulation.sim_id}
+                            id: simulation.sim_id};
                     // create a callback script with a secret token. This script will be executed when the
                     // server is booted for the first time. It can be found on the server at this path:
                     //    /var/lib/cloud/instance/user-data.txt

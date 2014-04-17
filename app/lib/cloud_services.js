@@ -2,7 +2,6 @@
 
 // Load the SDK and UUID
 var AWS = require ('aws-sdk');
-var uuid = require ('node-uuid');
 var util = require ('util');
 
 // configure what to do for cloud API calls:
@@ -66,20 +65,18 @@ exports.deleteKey = function (keyName, region, cb) {
 // @param[in] hardware A hardware type
 // @param[in] image An AMI (image id registered in that region)
 // @param[in] a call back function
-exports.launchSimulator = function (region, keyName, hardware, image, script, cb) {
+exports.launchSimulator = function (region, keyName, hardware, image, tags, script, cb) {
 
     // set AWS region
     AWS.config.region = region;
 
-    console.log('Launching simulator: for: ' + username);
+    console.log('Launching simulator: ' + tags);
     console.log('SSH key: ' +  keyName);
-    console.log('world: ' + world);
-    console.log('SimId: ' + simId);
     console.log('region:' + region);
     console.log('hardware: ' +  hardware);
     console.log('image: ' + image);
+    console.log('tags: ' + util.inspect(tags));
 
-    var script = generate_callback_script(token, world);
     // AWS requires the script to be Base64-encoded MIME
     var userData = new Buffer(script).toString('base64');
 
@@ -96,7 +93,7 @@ exports.launchSimulator = function (region, keyName, hardware, image, script, cb
     var ec2 = new AWS.EC2();
     ec2.runInstances(awsParams, function (err, data) {
         if(err) {
-            console.log('AWS launch error: ' + err);
+            console.log('AWS launch error: ' + util.inspect(err));
             cb(err);
         }
         else {
@@ -106,15 +103,21 @@ exports.launchSimulator = function (region, keyName, hardware, image, script, cb
 
                 var machineInfo = { id: data.Instances[0].InstanceId,
                                     region: region
-                                //ip: data.Instaces[0].ip
                               };
-                var params = {Resources: [machineInfo.id], Tags: [
-                    {Key: 'Name', Value: 'simulator'},
-                    {Key: 'user', Value: username},
-                    {Key: 'id', Value: 'sim_' + simId}
-                ]};
+
+                // create tags with aws format:
+                var Tags = [];
+                for (var k in tags) {
+                    // make sure value is a string
+                    var v = '' + tags[k];
+                    var t = {Key: k, Value: v};
+                    Tags.push(t);
+                }
+
+                var params = {Resources: [machineInfo.id], Tags: Tags};
                 ec2.createTags(params, function(err) {
                     if (err) {
+                        console.log('Error creating tags for server: ' + util.inspect(err));
                         cb(err);
                     }
                     else {
