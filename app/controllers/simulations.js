@@ -109,7 +109,7 @@ function generate_callback_script(secret_token, world)
     s += '/home/ubuntu/cloudsimi/callback_to_cloudsim_io.bash ';
     s += 'http://cloudsim.io ' + world + ' ' + secret_token + '\n';
     s += '\n';
-    s += 'echo done!\n'
+    s += 'echo done!\n';
 
     return s;
 }
@@ -170,6 +170,7 @@ exports.create = function(req, res) {
                             res.jsonp(500, { error: err });
                         } else {
                             simulation.machine_id = machineInfo.id;
+                            simulation.secret_token = token;
                             simulation.server_price = serverDetails.price;
                             simulation.ssh_private_key = key;
                             simulation.machine_ip = 'N/A';
@@ -356,7 +357,6 @@ exports.all = function(req, res) {
     if (req.query.state) {
         var queryStates = req.query.state.split(',');
         filter.state = {$in : queryStates};
-
     }
     // Get all simulation models, in creation order, for a user
     Simulation.find(filter).sort().populate('user', 'name username')

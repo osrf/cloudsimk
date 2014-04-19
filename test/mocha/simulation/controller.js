@@ -18,6 +18,7 @@ var user2;
 var agent;
 var user2Cookie;
 
+
 describe('<Unit Test>', function() {
     describe('Simulation Controller:', function() {
         before(function(done) {
@@ -99,7 +100,7 @@ describe('<Unit Test>', function() {
             });
         });
 
-        describe('Check One Simulation Created', function() {
+       describe('Check One Simulation Created', function() {
             it('should be one running simulation', function(done) {
                 agent
                 .get('/simulations?state=Launching')
