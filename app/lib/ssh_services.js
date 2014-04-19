@@ -4,14 +4,16 @@ var fake = typeof(process.env.AWS_ACCESS_KEY) == 'undefined'
 
 exports.getSimulatorStatus = function(hostIp, sshPrivateKeyStr, cb) {
     console.log('PING_GAZEBO!!! ' + hostIp);
-    if(fake) cb(null, {status:'Running'});
+    if(fake){
+        console.log('FAKE ssh');
+        cb(null, {status:'Running'});
+        return;
+    }
     // error
-
-//    cb('can\'t');
-//    cb(null, false);
-//    cb(null, true);
-
-    var c = new Connection();
+    //    cb('can\'t');
+    //    cb(null, false);
+    //    cb(null, true);
+    var c = new ssh2();
     c.on('ready', function() {
         console.log('Connection :: ready');
         c.exec('cloudsimi/ping_gazebo.bash', function(err, stream) {
@@ -44,12 +46,12 @@ exports.getSimulatorStatus = function(hostIp, sshPrivateKeyStr, cb) {
     });
 
     c.connect({
-        host: ip,
+        host: hostIp,
         port: 22,
         username: 'ubuntu',
         privateKey: sshPrivateKeyStr // require('fs').readFileSync('/here/is/my/key')
     });
 
-
+    
 };
 

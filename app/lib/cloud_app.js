@@ -22,7 +22,6 @@ var cloud_services = require('./cloud_services');
 // node cloud_app.js term 
 
 
-
 var sim_id = 'sim_0';
 var username = 'test@test.com';
 var image = 'ami-b8d2b088';
