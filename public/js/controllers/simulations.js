@@ -190,6 +190,7 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
         return false;
     };
 
+    /// Get an array of selected simulations in the current page.
     $scope.getPageSimulationsSelected = function(type) {
         var simulations = $scope.getPageSimulations(type);
         if (simulations.length > 0) {
