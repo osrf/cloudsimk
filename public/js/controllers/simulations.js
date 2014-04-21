@@ -169,7 +169,7 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
 
     /// Select all simulations in the current page of the table
     $scope.selectPageSimulations = function(type) {
-        var selected = !$scope.getPageSimulationsSelected(type);
+        var selected = !$scope.getAllPageSimulationsSelected(type);
         var simulations = $scope.getPageSimulations(type);
         for (var i = 0; i < simulations.length; ++i) {
             simulations[i].selected = selected;
@@ -177,7 +177,7 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
     };
 
     /// Check if all simulations in the current page of the table are selected
-    $scope.getPageSimulationsSelected = function(type) {
+    $scope.getAllPageSimulationsSelected = function(type) {
         var simulations = $scope.getPageSimulations(type);
         if (simulations.length > 0) {
             var selectedSimulations = simulations.filter(function(sim) {
@@ -188,6 +188,17 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
             return false;
         }
         return false;
+    };
+
+    $scope.getPageSimulationsSelected = function(type) {
+        var simulations = $scope.getPageSimulations(type);
+        if (simulations.length > 0) {
+            var selectedSimulations = simulations.filter(function(sim) {
+                return sim.selected === true;
+            });
+            return selectedSimulations;
+        }
+        return simulations;
     };
 
     /// Get time as a string
