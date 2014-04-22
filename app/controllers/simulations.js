@@ -24,8 +24,8 @@ if(process.env.AWS_ACCESS_KEY_ID) {
 var util = require('util');
 
 var awsData = { 'US West': {region: 'us-west-2',
-                            image: 'ami-cc95f8fc', // cloudsim // 'ami-b8d2b088',
-                            hardware: 'm1.small',
+                            image: 'ami-b8d2b088',
+                            hardware: 'g2.2xlarge', // 'm1.small',  'ami-cc95f8fc',
                             price: 0},
                  'US East': {region: 'us-east-1',
                              image: 'ami-4d8d8924',

@@ -17,38 +17,40 @@ exports.simulatorCallback = function (req, res) {
             console.log(msg);
             res.jsonp({result: 'Error', message: msg});
         } else {
-            if(simulations.length == 1 ) {
+            if(simulations.length === 1 ) {
                 var sim = simulations[0];
-                sshServices.getSimulatorStatus(sim.machine_ip, sim.ssh_private_key, function (err, info){
+                sshServices.getSimulatorStatus(sim.machine_ip, sim.ssh_private_key, function (err, result){
                     if(err) {
                         var msg = 'error communicating with simulator: ' + err;
                         console.log(msg);
                         res.jsonp({result: 'Error', message: msg});
                     } else {
                         console.log('SIM: ' + require('util').inspect(sim));
-                        sim.state = 'Error';
-                        sim.state = 'Running';
+                        if(result.code !== 0) {
+                            sim.state = 'Error';
+                            console.log('Error getting simulation status for sim ' + sim._id + ': ' + result.output );
+                        } else {
+                            sim.state = 'Running';
+                        }
                         // save simulation state
                         sim.save(function(err) {
                             if(err) {
                                 var msg = 'Error saving sim: ' + err;
                                 console.log(msg);
+                                // db error? possible, but unlikely
                                 res.jsonp({result: 'Error', message: msg});
                             } else {
-                                // 
+                                // success: simulator found, status updated
                                 res.jsonp({result: 'OK', message: 'Update successful' });
                             }
                         });
                     }                  
                 });
             } else {
-                console.log('SIM:' + require('util').inspect(sim));
-                var msg = 'token "' + token  + '" not found';
-                res.jsonp({result: 'Error', message: msg});
+                // token is not associated with a simualator. An attack? A callback to the wrong address?
+                res.jsonp({result: 'Error', message: 'Can\'t find simulator for callback token: ' + token});
             }
         }
     });
-//    var resp = {result: 'OK'};
-//    res.jsonp(resp);
 };
 

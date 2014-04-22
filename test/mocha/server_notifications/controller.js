@@ -10,7 +10,6 @@ var mongoose = require('mongoose'),
     app = require('../../../server'),
     supertest = require('supertest');
 
-
 var user;
 var token;
 var agent;
@@ -80,7 +79,8 @@ describe('<Unit Test>', function() {
                     sim.sim_id.should.be.exactly(0);
                     sim.state.should.equal('Launching');
                     token = sim.secret_token;
-                    token.should.be.a.String;
+                    // this seems good, but jshint doesn't like it
+                    // token.should.be.a.String;
                     done();
                 });
             });
@@ -91,7 +91,7 @@ describe('<Unit Test>', function() {
                 agent
                 .post('/server_notifications')
                 .set('Accept', 'application/json')
-                .send({world: "empty.world", token:'8630333c-8093-4c68-8854-05a53a57d8f3' })
+                .send({world: 'empty.world', token:'8630333c-8093-4c68-8854-05a53a57d8f3' })
                 .end(function(err, res){
 
                     if(err) should.fail(err);
@@ -99,8 +99,8 @@ describe('<Unit Test>', function() {
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     console.log('res:' + res.text);
-                    var res = JSON.parse(res.text);
-                    res.result.should.equal('Error');
+                    var jres = JSON.parse(res.text);
+                    jres.result.should.equal('Error');
 
                     done();
                 });
@@ -112,7 +112,7 @@ describe('<Unit Test>', function() {
                 agent
                 .post('/server_notifications')
                 .set('Accept', 'application/json')
-                .send({world: "empty.world", token: token})
+                .send({world: 'empty.world', token: token})
                 .end(function(err, res){
                      
                     if(err) should.fail(err);
@@ -120,8 +120,8 @@ describe('<Unit Test>', function() {
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     console.log('res:' + res.text);
-                    var res = JSON.parse(res.text);
-                    res.result.should.equal('OK');
+                    var jres = JSON.parse(res.text);
+                    jres.result.should.equal('OK');
                     
                     done();
                 });
