@@ -9,6 +9,11 @@ var express = require('express'),
     logger = require('mean-logger');
 
 
+var app = express(),
+    http = require('http'),
+    server = http.createServer(app),
+    io = require('socket.io').listen(server);
+
 // Main application entry file.
 // Please note that the order of loading is important.
 
@@ -23,6 +28,12 @@ var config = require('./config/config'),
 
 // Bootstrap db connection
 var db = mongoose.connect(config.db);
+
+// Start the app by listening on <port>
+var port = process.env.PORT || config.port;
+server.listen(port);
+console.log('Express app started on port ' + port);
+
 
 // Bootstrap models
 var models_path = __dirname + '/app/models';
@@ -44,7 +55,6 @@ walk(models_path);
 // Bootstrap passport config
 require('./config/passport')(passport);
 
-var app = express();
 
 // Express settings
 require('./config/express')(app, passport, db);
@@ -71,13 +81,12 @@ var walk = function(path) {
 walk(routes_path);
 
 
-// Start the app by listening on <port>
-var port = process.env.PORT || config.port;
-app.listen(port);
-console.log('Express app started on port ' + port);
-
 // Initializing logger
 logger.init(app, passport, mongoose);
+
+// Sockets setup
+var sockets = require('./app/lib/sockets');
+sockets.init(io);
 
 // Expose app
 exports = module.exports = app;

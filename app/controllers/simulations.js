@@ -10,9 +10,10 @@ var mongoose = require('mongoose'),
     User = mongoose.model('User'),
     _ = require('lodash');
 
+var sockets = require('../lib/sockets');
 
+// initialise cloudServices, depending on the environment
 var cloudServices;
-
 if(process.env.AWS_ACCESS_KEY_ID) {
     console.log('using the real cloud services!');
     cloudServices = require('../lib/cloud_services.js');
@@ -23,6 +24,9 @@ if(process.env.AWS_ACCESS_KEY_ID) {
 
 var util = require('util');
 
+////////////////////////////////////
+// The AWS server information
+//
 var awsData = { 'US West': {region: 'us-west-2',
                             image: 'ami-b8d2b088',
                             hardware: 'g2.2xlarge', // 'm1.small',  'ami-cc95f8fc',
@@ -189,6 +193,12 @@ exports.create = function(req, res) {
                                             }
                                             console.log('Error getting machine ip');
                                             res.jsonp(500, { error: err });
+                                        } else {
+                                            // New IP: broadcast the news
+                                            sockets.getUserSockets().notifyUser(req.user.id,
+                                                                    'simulation_update',
+                                                                    {data:simulation});
+
                                         }
                                     });
                                 });
@@ -207,7 +217,13 @@ exports.create = function(req, res) {
                                         Simulation: simulation
                                     });
                                 }
+
+
                                 res.jsonp(simulation);
+                                sockets.getUserSockets().notifyUser(req.user.id,
+                                                        'simulation_create',
+                                                         {data:simulation});
+
                             }); // simulation.save (simulatorInstance)
                         }
                     });  // launchSimulator
@@ -216,7 +232,6 @@ exports.create = function(req, res) {
         }
     });  // User.load
 };
-
 
 /////////////////////////////////////////////////
 /// Update a simulation
@@ -260,7 +275,7 @@ exports.update = function(req, res) {
     // request body
     simulation = _.extend(simulation, req.body);
 
-    /* Save the updated simulation to the database */
+    // Save the updated simulation to the database
     simulation.save(function(err) {
         if (err) {
             return res.send('users/signup', {
@@ -269,6 +284,9 @@ exports.update = function(req, res) {
             });
         } else {
             res.jsonp(simulation);
+            sockets.getUserSockets().notifyUser(req.user.id,
+                                                'simulation_update',
+                                                 {data:simulation});
         }
     });
 };
@@ -294,6 +312,8 @@ exports.destroy = function(req, res) {
             });
         } else {
             res.jsonp(simulation);
+            // notify the user from the other browsers
+
         }
     });
 };
@@ -333,6 +353,9 @@ exports.terminate = function(req, res) {
                 } else {
                     console.log('Simulator terminated: ' + util.inspect(info) + ' key: ' + keyName);
                     res.jsonp(simulation);
+                    sockets.getUserSockets().notifyUser(req.user.id,
+                                                        'simulation_terminate',
+                                                        {data:simulation});
                 }
             });
         }

@@ -80,8 +80,19 @@ describe('<Unit Test>', function() {
             });
         });
 
+        describe('Next sim id', function() {
+            it('should be zero', function(done) {
+                User.find({username: user.username}, function(err, users) {
+                    users.should.have.length(1);
+                    var theUser = users[0];
+                    theUser.next_sim_id.should.be.exactly(0);
+                    done();
+                });
+            });
+        });
+
         describe('Check Create Simulation', function() {
-            it('should be possible to create a simulation', function(done) {
+            it('should be possible to create a first simulation', function(done) {
                 agent
                 .post('/simulations')
                 .set('Acccept', 'application/json')
@@ -100,7 +111,18 @@ describe('<Unit Test>', function() {
             });
         });
 
-       describe('Check One Simulation Created', function() {
+        describe('Next sim id', function() {
+            it('should have increased by one', function(done) {
+                User.find({username: user.username}, function(err, users) {
+                    users.should.have.length(1);
+                    var theUser = users[0];
+                    theUser.next_sim_id.should.be.exactly(1);
+                    done();
+                });
+            });
+        });
+
+        describe('Check One Simulation Created', function() {
             it('should be one running simulation', function(done) {
                 agent
                 .get('/simulations?state=Launching')
@@ -508,7 +530,7 @@ describe('<Unit Test>', function() {
         });
 
         describe('Check Second User Create Simulation', function() {
-            it('should be possible to create a simulation', function(done) {
+            it('should be possible to create a simulation for the second user', function(done) {
                 supertest(app)
                 .post('/simulations')
                 .set('Acccept', 'application/json')
