@@ -3,7 +3,9 @@
 /// Module dependencies.
 var mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/mean-dev');
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+var config = require('../../config/config');
+mongoose.connect(config.db);
 
 require('../models/user');
 require('../models/simulation');
