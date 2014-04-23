@@ -70,12 +70,13 @@ exports.launchSimulator = function (region, keyName, hardware, image, tags, scri
     // set AWS region
     AWS.config.region = region;
 
-    console.log('Launching simulator: ' + tags);
-    console.log('SSH key: ' +  keyName);
-    console.log('region:' + region);
-    console.log('hardware: ' +  hardware);
-    console.log('image: ' + image);
-    console.log('tags: ' + util.inspect(tags));
+    console.log('Launching simulator');
+    console.log('- SSH key: ' +  keyName);
+    console.log('- region:' + region);
+    console.log('- hardware: ' +  hardware);
+    console.log('- image: ' + image);
+    console.log('- tags: ' + util.inspect(tags));
+    console.log('');
 
     // AWS requires the script to be Base64-encoded MIME
     var userData = new Buffer(script).toString('base64');

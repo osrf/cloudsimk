@@ -8,9 +8,8 @@ var sshServices = require('../lib/ssh_services.js');
 // this controller handles the callback that each simulator server performs
 // to signal CloudSim that it is ready, or . 
 exports.simulatorCallback = function (req, res) {
-    //console.log('  query:' + require('util').inspect(req.body));
+    console.log('simulatorCallback data:' + require('util').inspect(req.body));
     var token = req.body.token;    
-    console.log('TOKEN: ' + token);
     Simulation.find({secret_token: token}).exec(function(err, simulations) {
         if(err) {
             var msg = 'simulator callback error: error looking for simulator token: ' + err;
@@ -25,11 +24,12 @@ exports.simulatorCallback = function (req, res) {
                         console.log(msg);
                         res.jsonp({result: 'Error', message: msg});
                     } else {
-                        console.log('SIM: ' + require('util').inspect(sim));
                         if(result.code !== 0) {
+                            // gztopic returned an error, sim is not running
                             sim.state = 'Error';
                             console.log('Error getting simulation status for sim ' + sim._id + ': ' + result.output );
                         } else {
+                            // gztopic success... set the new state
                             sim.state = 'Running';
                         }
                         // save simulation state
