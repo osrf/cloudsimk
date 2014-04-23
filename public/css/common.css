@@ -274,6 +274,10 @@ p {
 }
 /*-------------------------------------------------*/
 
+.cloudsim-alert {
+  margin-top: 10px;
+  margin-bottom: 0px;
+}
 
 /* Set the hover color for a table row */
 .table-hover>tbody>tr:hover>td {
