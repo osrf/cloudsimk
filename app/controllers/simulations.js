@@ -182,7 +182,11 @@ exports.create = function(req, res) {
 
                                 simulation.machine_ip = 'waiting';
                                 cloudServices.simulatorStatus(machineInfo, function(err, state) {
-                                    console.log('machine:' + util.inspect(machineInfo)  + ' status: ' + util.inspect(state));
+                                    var s = 'Getting ip from AWS: machine:';
+                                    s += util.inspect(machineInfo);
+                                    s +=  ' status: ';
+                                    s += util.inspect(state); 
+                                    console.log(s);
                                     simulation.machine_ip = state.ip;
                                     simulation.save(function(err) {
                                         if (err) {

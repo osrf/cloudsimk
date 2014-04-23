@@ -3,6 +3,7 @@
 var mongoose = require('mongoose'),
     Simulation = mongoose.model('Simulation');
 var sshServices = require('../lib/ssh_services.js');
+var sockets = require('../lib/sockets');
 
 //////////////////////////////////////////////////////////////////////////////
 // this controller handles the callback that each simulator server performs
@@ -27,7 +28,9 @@ exports.simulatorCallback = function (req, res) {
                         if(result.code !== 0) {
                             // gztopic returned an error, sim is not running
                             sim.state = 'Error';
-                            console.log('Error getting simulation status for sim ' + sim._id + ': ' + result.output );
+                            var s = 'Error getting simulation status for sim';
+                            s +=  ' ' + sim._id + ': ' + result.output;
+                            console.log(s);
                         } else {
                             // gztopic success... set the new state
                             sim.state = 'Running';
@@ -42,6 +45,11 @@ exports.simulatorCallback = function (req, res) {
                             } else {
                                 // success: simulator found, status updated
                                 res.jsonp({result: 'OK', message: 'Update successful' });
+                                // let all the other browser windows know
+                                sockets.getUserSockets().notifyUser(sim.user,
+                                                                    'simulation_update',
+                                                                    {data:sim});
+
                             }
                         });
                     }                  
