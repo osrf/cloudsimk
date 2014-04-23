@@ -44,6 +44,7 @@ User.find({email: email}).exec(function(err, users) {
                     fs.writeFile(keyF, key, function(err) {
                         if(err) console.log('Error saving key: ' + err);
                         else console.log(keyF + ' saved');
+                        console.log('ssh -i ' + keyF + ' ubuntu@' + sim.machine_ip);
                         process.exit();
                     });
                 }
