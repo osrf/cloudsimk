@@ -18,7 +18,7 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
 
     /// Get all simulations and update up time.
     $scope.simulations = Simulations.query(function() {
-        updateTime();
+        updateUpTime();
     });
 
     /// The current page of console simulations
@@ -41,7 +41,7 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
         history : 1
     };
 
-
+    // server time
     $scope.serverTime = window.server_time;
 
     /// A modal confirmation dialog displayed when the shutdown button
@@ -267,7 +267,8 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
       }
     });
 
-    var updateTime = function() {
+    // update the simulation up time for non-terminated simulations
+    var updateUpTime = function() {
         var notTerminated = $scope.simulations.filter(function(sim) {
             return !sim.date_term;
         });
@@ -287,7 +288,7 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
         $scope.serverTime = new Date(time);
 
         $scope.$apply(function() {
-            updateTime();
+            updateUpTime();
         });
     });
 
