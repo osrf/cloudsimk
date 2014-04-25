@@ -26,7 +26,7 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
     var simulationTerminateTopic = new Topic();
     simulationTerminateTopic.subscribe('simulation_terminate', function(message) {
       var termSim = message.data;
-      // this updates other clients
+      // find the terminated sim in the table
       var terminated = $scope.simulations.filter(function(sim) {
           return sim.sim_id === termSim.sim_id;
       });
@@ -36,10 +36,10 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
     });
 
     // Subscribe to simulation_update topic
-    var simulationTerminateTopic = new Topic();
-    simulationTerminateTopic.subscribe('simulation_update', function(message) {
+    var simulationUpdateTopic = new Topic();
+    simulationUpdateTopic.subscribe('simulation_update', function(message) {
       var updatedSim = message.data;
-      // this updates other clients
+      // find the updated sim in the table
       var updated = $scope.simulations.filter(function(sim) {
           return sim.sim_id === updatedSim.sim_id;
       });
@@ -103,7 +103,6 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
             world: launchWorld
         });
 
-        console.log(' create ' + JSON.stringify(sim));
         sim.$save(function() {},
             function(error) {
                 $scope.error = 'Error launching simulation: ' + error.data;
