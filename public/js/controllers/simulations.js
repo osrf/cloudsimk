@@ -1,5 +1,26 @@
 'use strict';
 
+// keep jslint happy: suppress the undefined io message
+/*globals io*/
+var socket = io.connect();
+
+socket.on('time', function (msg) {
+    console.log('server time: ' + msg.data);
+});
+
+socket.on('simulation_update', function (msg) {
+    console.log('Simulation update: ' + JSON.stringify(msg));
+});
+
+socket.on('simulation_create', function (msg) {
+    console.log('Simulation created: ' + JSON.stringify(msg));
+});
+
+socket.on('simulation_terminate', function (msg) {
+    console.log('Simulation terminated: ' + JSON.stringify(msg));
+});
+
+
 angular.module('cloudsim.simulations').controller('SimulationsController',
     ['$scope', '$stateParams', '$location', '$modal', 'Global', 'Simulations',
     function ($scope, $stateParams, $location, $modal, Global, Simulations) {
@@ -212,7 +233,7 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
 
     /// Select all simulations in the current page of the table
     $scope.selectPageSimulations = function(type) {
-        var selected = !$scope.getPageSimulationsSelected(type);
+        var selected = !$scope.getAllPageSimulationsSelected(type);
         var simulations = $scope.getPageSimulations(type);
         for (var i = 0; i < simulations.length; ++i) {
             simulations[i].selected = selected;
@@ -220,7 +241,7 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
     };
 
     /// Check if all simulations in the current page of the table are selected
-    $scope.getPageSimulationsSelected = function(type) {
+    $scope.getAllPageSimulationsSelected = function(type) {
         var simulations = $scope.getPageSimulations(type);
         if (simulations.length > 0) {
             var selectedSimulations = simulations.filter(function(sim) {
@@ -231,6 +252,18 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
             return false;
         }
         return false;
+    };
+
+    /// Get an array of selected simulations in the current page.
+    $scope.getPageSimulationsSelected = function(type) {
+        var simulations = $scope.getPageSimulations(type);
+        if (simulations.length > 0) {
+            var selectedSimulations = simulations.filter(function(sim) {
+                return sim.selected === true;
+            });
+            return selectedSimulations;
+        }
+        return simulations;
     };
 
     /// Get time as a string

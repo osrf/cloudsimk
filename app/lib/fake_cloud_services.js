@@ -5,14 +5,19 @@ console.log('*');
 console.log('* THIS IS THE FAKE CLOUD SERVICE....');
 console.log('*');
 
+// make traces silent by default. This is better for tests
+function log(s) {
+    var doit = false;
+    if(doit) console.log(s);
+}
 
 exports.generateKey = function (keyName, region, cb) {
-    console.log('FAKE generate Key ' + keyName + ' in region ' + region);
+    log('FAKE generate Key ' + keyName + ' in region ' + region);
     cb(null, 'START FAKE KEY\n=====346785893bjhdfgsd847edjhvcs\nEND FAKE KEY');
 };
 
 exports.deleteKey = function (keyName, region, cb) {
-    console.log('FAKE delete Key ' + keyName + ' in region ' + region);
+    log('FAKE delete Key ' + keyName + ' in region ' + region);
     cb(null, 'true');
 };
 

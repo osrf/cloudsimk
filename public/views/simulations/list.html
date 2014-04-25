@@ -6,7 +6,7 @@
         <thead>
           <tr>
             <th><input type="checkbox"
-              ng-checked="getPageSimulationsSelected(tableType.console)"
+              ng-checked="getAllPageSimulationsSelected(tableType.console)"
               ng-click="selectPageSimulations(tableType.console)"></th>
             <th>Id</th>
             <th>World</th>
@@ -19,7 +19,8 @@
         <tfoot>
           <td colspan="2">
             <div class='text-left' style="margin-top: 20px; margin-bottom: 20px">
-              <button class="btn btn-primary" ng-click="showShutdownDialog()">
+              <button class="btn btn-primary" ng-click="showShutdownDialog()"
+                ng-disabled="getPageSimulationsSelected(tableType.console).length === 0">
                 Shutdown
               </button>
             </div>
@@ -58,7 +59,7 @@
           <br>Your data will be lost.</br>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-primary" ng-click="confirmShutdown(true)">Yes</button>
+          <button class="btn btn-default" ng-click="confirmShutdown(true)">Yes</button>
           <button class="btn btn-primary" ng-click="confirmShutdown(false)">No</button>
         </div>
       </script>
@@ -70,7 +71,7 @@
         <thead>
           <tr>
             <th><input type="checkbox"
-              ng-checked="getPageSimulationsSelected(tableType.history)"
+              ng-checked="getAllPageSimulationsSelected(tableType.history)"
               ng-click="selectPageSimulations(tableType.history)"></th>
             <th>Date Launched</th>
             <th>Id</th>
@@ -83,7 +84,7 @@
         <tfoot>
           <td colspan="2">
             <div class='text-left' style="margin-top: 20px; margin-bottom: 20px">
-              <button class="btn btn-primary" ng-click="showDeleteForeverDialog()">
+              <button class="btn btn-default" ng-click="showDeleteForeverDialog()">
                 Delete Forever
               </button>
               <button class="btn btn-primary" ng-click="showRelaunchDialog()">
@@ -125,7 +126,7 @@
           <br>You will be charged $X.XX per hour once you click Yes.</br>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-primary" ng-click="confirmRelaunch(true)">Yes</button>
+          <button class="btn btn-default" ng-click="confirmRelaunch(true)">Yes</button>
           <button class="btn btn-primary" ng-click="confirmRelaunch(false)">Cancel</button>
         </div>
       </script>
@@ -137,7 +138,7 @@
           Are you sure you want to delete the terminated simulation(s) forever?
         </div>
         <div class="modal-footer">
-          <button class="btn btn-primary" ng-click="confirmDeleteForever(true)">Yes</button>
+          <button class="btn btn-default" ng-click="confirmDeleteForever(true)">Yes</button>
           <button class="btn btn-primary" ng-click="confirmDeleteForever(false)">Cancel</button>
         </div>
       </script>
