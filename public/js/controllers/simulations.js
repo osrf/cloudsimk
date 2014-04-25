@@ -1,29 +1,55 @@
 'use strict';
 
-// keep jslint happy: suppress the undefined io message
-/*globals io*/
-var socket = io.connect();
-
-socket.on('time', function (msg) {
-    console.log('server time: ' + msg.data);
-});
-
-socket.on('simulation_update', function (msg) {
-    console.log('Simulation update: ' + JSON.stringify(msg));
-});
-
-socket.on('simulation_create', function (msg) {
-    console.log('Simulation created: ' + JSON.stringify(msg));
-});
-
-socket.on('simulation_terminate', function (msg) {
-    console.log('Simulation terminated: ' + JSON.stringify(msg));
-});
-
-
 angular.module('cloudsim.simulations').controller('SimulationsController',
     ['$scope', '$stateParams', '$location', '$modal', 'Global', 'Simulations',
-    function ($scope, $stateParams, $location, $modal, Global, Simulations) {
+    'Topic',
+    function ($scope, $stateParams, $location, $modal, Global, Simulations,
+    Topic) {
+
+    // Subscribe to simulation_create topic
+    var simulationCreateTopic = new Topic();
+    simulationCreateTopic.subscribe('simulation_create', function(message) {
+      // don't add the simulation if it already exists
+      var newSim = message.data;
+      var sim = new Simulations({
+          sim_id: newSim.sim_id,
+          state: newSim.state,
+          region: newSim.region,
+          world: newSim.world
+      });
+      $scope.simulations.unshift(sim);
+      // this updates other clients
+      $scope.$apply();
+    });
+
+    // Subscribe to simulation_terminate topic
+    var simulationTerminateTopic = new Topic();
+    simulationTerminateTopic.subscribe('simulation_terminate', function(message) {
+      var termSim = message.data;
+      // this updates other clients
+      var terminated = $scope.simulations.filter(function(sim) {
+          return sim.sim_id === termSim.sim_id;
+      });
+      if (terminated.length === 1)
+        terminated[0].state = 'Terminated';
+      $scope.$apply();
+    });
+
+    // Subscribe to simulation_update topic
+    var simulationTerminateTopic = new Topic();
+    simulationTerminateTopic.subscribe('simulation_update', function(message) {
+      var updatedSim = message.data;
+      // this updates other clients
+      var updated = $scope.simulations.filter(function(sim) {
+          return sim.sim_id === updatedSim.sim_id;
+      });
+      if (updated.length === 1)
+      {
+        updated[0].state = updatedSim.state;
+        updated[0].machine_ip = updatedSim.machine_ip;
+      }
+      $scope.$apply();
+    });
 
     $scope.global = Global;
 
@@ -76,13 +102,14 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
             region: launchRegion,
             world: launchWorld
         });
+
+        console.log(' create ' + JSON.stringify(sim));
         sim.$save(function() {},
             function(error) {
                 $scope.error = 'Error launching simulation: ' + error.data;
                 sim.state = 'Error';
             });
         sim.selected = false;
-        $scope.simulations.unshift(sim);
     };
 
     /// Pop up a dialog to confirm shutting down a simulation
