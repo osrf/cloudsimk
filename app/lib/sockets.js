@@ -31,22 +31,26 @@ function findUserId(cookieData, cb) {
             console.log('Session error:' + err);
             cb(err);
         } else {
-            var s = JSON.parse(sessions[0].session);
-            var passportUser = s.passport.user;
-            User.find({open_id: passportUser}).exec(function (err, users) {
-                if(err) {
-                    console.log('Cannot find user for this session:' + err);
-                    cb(err);
-                } else {
-                    if(users.length === 1 ) {
-                        var userId = users[0]._id;                    
-                        cb(null, userId);
+            if(sessions.length != 1) {
+                console.log('Could not find session "' + sessionId +'" in the database: (' + sessions.length + ' results found)');
+            } else {
+                var s = JSON.parse(sessions[0].session);
+                var passportUser = s.passport.user;
+                User.find({open_id: passportUser}).exec(function (err, users) {
+                    if(err) {
+                        console.log('Cannot find user for this session:' + err);
+                        cb(err);
+                    } else {
+                        if(users.length === 1 ) {
+                            var userId = users[0]._id;                    
+                            cb(null, userId);
+                        }
+                        else {
+                            cb('can\'t find user for this session');
+                        }
                     }
-                    else {
-                        cb('can\'t find user for this session');
-                    }
-                }
-            });
+                });
+            }
         }        
     });
 }
