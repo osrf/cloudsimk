@@ -7,7 +7,7 @@ var sockets = require('../lib/sockets');
 
 //////////////////////////////////////////////////////////////////////////////
 // this controller handles the callback that each simulator server performs
-// to signal CloudSim that it is ready, or . 
+// to signal CloudSim that it is ready. 
 exports.simulatorCallback = function (req, res) {
     console.log('simulatorCallback data:' + require('util').inspect(req.body));
     var token = req.body.token;    
