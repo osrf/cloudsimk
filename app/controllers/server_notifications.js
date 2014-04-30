@@ -7,7 +7,7 @@ var sockets = require('../lib/sockets');
 
 //////////////////////////////////////////////////////////////////////////////
 // this controller handles the callback that each simulator server performs
-// to signal CloudSim that it is ready, or . 
+// to signal CloudSim that it is ready. 
 exports.simulatorCallback = function (req, res) {
     console.log('simulatorCallback data:' + require('util').inspect(req.body));
     var token = req.body.token;    
@@ -55,7 +55,7 @@ exports.simulatorCallback = function (req, res) {
                     }                  
                 });
             } else {
-                // token is not associated with a simualator. An attack? A callback to the wrong address?
+                // token is not associated with a simulator. An attack? A callback to the wrong address?
                 res.jsonp({result: 'Error', message: 'Can\'t find simulator for callback token: ' + token});
             }
         }

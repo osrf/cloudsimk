@@ -23,7 +23,7 @@ function executeSshCommand(hostIp, sshPrivateKeyStr, cmd, cb) {
                 // console.log('xx err:' + err);
                 throw err;
             }
-            // here we subscribe to various strem events, data
+            // here we subscribe to various stream events, data
             // and exit. Also available: end, close ...
             // note: data has an extra param (extended) for the stream
             // stderr...
