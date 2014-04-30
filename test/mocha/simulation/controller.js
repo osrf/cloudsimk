@@ -18,6 +18,7 @@ var user2;
 var agent;
 var user2Cookie;
 
+
 describe('<Unit Test>', function() {
     describe('Simulation Controller:', function() {
         before(function(done) {

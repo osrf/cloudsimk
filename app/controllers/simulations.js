@@ -4,6 +4,7 @@
 
 
 /// Module dependencies.
+var uuid = require('node-uuid');
 var mongoose = require('mongoose'),
     Simulation = mongoose.model('Simulation'),
     User = mongoose.model('User'),
@@ -28,10 +29,8 @@ var util = require('util');
 // The AWS server information
 //
 var awsData = { 'US West': {region: 'us-west-2',
-                            // image: 'ami-cc95f8fc', // cloudsim m1 small
-                            // hardware: 'm1.small',
-                            image: 'ami-b8d2b088',  // simulator-stable 2.0.3
-                            hardware: 'g2.2xlarge',
+                            image: 'ami-b8d2b088',
+                            hardware: 'g2.2xlarge', // 'm1.small',  'ami-cc95f8fc',
                             price: 0},
                  'US East': {region: 'us-east-1',
                              image: 'ami-4d8d8924',
@@ -90,6 +89,35 @@ function getKeyName(email, sim_id) {
     return 'cs-' + sim_id + '-' + email;
 }
 
+////////////////////////////////////////////////////////////////
+// Generates a script that will be executed when the simulation
+// server is booted for the first time.
+// @param[in] secret_token this token is used to call Cloudsim
+//            to let it know who is calling.
+// @param[in] the simulation world to load.
+function generate_callback_script(secret_token, world)
+{
+    var s = '';
+    s += '#!/usr/bin/env bash\n';
+    s += 'set -ex\n';
+    s += 'logfile=/home/ubuntu/cloudsimi_setup.log\n';
+    s += 'exec > $logfile 2>&1\n';
+    s += '\n';
+    s += 'cd /home/ubuntu\n';
+    s += 'hg clone https://bitbucket.org/osrf/cloudsimi\n\n';
+
+    // checkout a specific branch
+    s += 'cd  /home/ubuntu/cloudsimi\n';
+    s += 'hg co init\n';
+
+    s += '# cloudsim script to signal server ready\n';
+    s += '/home/ubuntu/cloudsimi/callback_to_cloudsim_io.bash ';
+    s += 'http://cloudsim.io ' + world + ' ' + secret_token + '\n';
+    s += '\n';
+    s += 'echo done!\n';
+
+    return s;
+}
 
 /////////////////////////////////////////////////
 /// Create a simulation
@@ -128,17 +156,26 @@ exports.create = function(req, res) {
                     console.log('Error generating key: ' + err);
                     res.jsonp(500, { error: err });
                 } else {
-                    cloudServices.launchSimulator(  req.user.username,
+                    var tags = {Name: 'simulator',
+                            user: req.user.username,
+                            id: simulation.sim_id};
+                    // create a callback script with a secret token. This script will be executed when the
+                    // server is booted for the first time. It can be found on the server at this path:
+                    //    /var/lib/cloud/instance/user-data.txt
+                    var token = uuid.v4();
+                    var script = generate_callback_script(token, simulation.world);
+                    cloudServices.launchSimulator(  serverDetails.region,
                                                     keyName,
-                                                    simulation.sim_id,
-                                                    serverDetails.region,
                                                     serverDetails.hardware,
                                                     serverDetails.image,
+                                                    tags,
+                                                    script,
                                                     function (err, machineInfo) {
                         if(err) {
                             res.jsonp(500, { error: err });
                         } else {
                             simulation.machine_id = machineInfo.id;
+                            simulation.secret_token = token;
                             simulation.server_price = serverDetails.price;
                             simulation.ssh_private_key = key;
                             simulation.machine_ip = 'N/A';
@@ -146,7 +183,11 @@ exports.create = function(req, res) {
 
                                 simulation.machine_ip = 'waiting';
                                 cloudServices.simulatorStatus(machineInfo, function(err, state) {
-                                    console.log('machine:' + util.inspect(machineInfo)  + ' status: ' + util.inspect(state));
+                                    var s = 'Getting ip from AWS: machine:';
+                                    s += util.inspect(machineInfo);
+                                    s +=  ' status: ';
+                                    s += util.inspect(state); 
+                                    console.log(s);
                                     simulation.machine_ip = state.ip;
                                     simulation.save(function(err) {
                                         if (err) {
@@ -344,7 +385,6 @@ exports.all = function(req, res) {
     if (req.query.state) {
         var queryStates = req.query.state.split(',');
         filter.state = {$in : queryStates};
-
     }
     // Get all simulation models, in creation order, for a user
     Simulation.find(filter).sort().populate('user', 'name username')
