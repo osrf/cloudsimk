@@ -93,21 +93,28 @@ function getKeyName(email, sim_id) {
 // server is booted for the first time.
 // @param[in] secret_token this token is used to call Cloudsim
 //            to let it know who is calling.
-// @param[in] the simulation world to load.
-function generate_callback_script(secret_token, world)
+// @param[in] world the simulation world to load.
+// @param[in] cloneRepo
+function generate_callback_script(secret_token, world, cloneRepo)
 {
+    // assume false if undefined
+    cloneRepo = cloneRepo || false;
+    
     var s = '';
     s += '#!/usr/bin/env bash\n';
+     // script is executed as root, but we want to be ubuntu
+    s += 'sudo su ubuntu\n';
     s += 'set -ex\n';
     s += 'logfile=/home/ubuntu/cloudsimi_setup.log\n';
     s += 'exec > $logfile 2>&1\n';
     s += '\n';
-    s += 'cd /home/ubuntu\n';
-    s += 'hg clone https://bitbucket.org/osrf/cloudsimi\n\n';
-
-    // checkout a specific branch
-    s += 'cd  /home/ubuntu/cloudsimi\n';
-    s += 'hg co init\n';
+    if(cloneRepo) {
+        s += 'cd /home/ubuntu\n';
+        s += 'hg clone https://bitbucket.org/osrf/cloudsimi\n\n';
+        // checkout a specific branch
+        s += 'cd  /home/ubuntu/cloudsimi\n';
+        s += 'hg co init\n';
+    }
 
     s += '# cloudsim script to signal server ready\n';
     s += '/home/ubuntu/cloudsimi/callback_to_cloudsim_io.bash ';
@@ -162,7 +169,7 @@ exports.create = function(req, res) {
                     // server is booted for the first time. It can be found on the server at this path:
                     //    /var/lib/cloud/instance/user-data.txt
                     var token = uuid.v4();
-                    var script = generate_callback_script(token, simulation.world);
+                    var script = generate_callback_script(token, simulation.world, true);
                     cloudServices.launchSimulator(  serverDetails.region,
                                                     keyName,
                                                     serverDetails.hardware,
