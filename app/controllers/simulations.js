@@ -7,6 +7,7 @@
 var mongoose = require('mongoose'),
     Simulation = mongoose.model('Simulation'),
     User = mongoose.model('User'),
+    fs = require('fs'),
     _ = require('lodash');
 
 var sockets = require('../lib/sockets');
@@ -354,6 +355,49 @@ exports.all = function(req, res) {
             });
         } else {
             res.jsonp(simulations);
+        }
+    });
+};
+
+
+function createSimulatorZipFile(ip, keyStr, path, cb) {
+
+    cb(null);
+}
+
+
+
+exports.keysDownload = function(req, res) {
+    console.log('Keys download!');  
+    
+    // get key
+    // write to tmp file
+    // serve file
+    var path = '/tmp/klog.zip';
+    fs.stat(path, function(err, stat) {
+        if(err) {
+            if('ENOENT' === err.code) {
+                res.statusCode = 404;
+                res.end('Not Found');
+            }
+            else {
+                res.statusCode = 500;
+                res.end('Internal Server Error');
+            }
+        } else {
+            res.setHeader('Content-Length', stat.size);
+            var stream = fs.createReadStream(path);
+            stream.pipe(res);
+            stream.on('error', function(err) {
+                res.statusCode = 500;
+                res.end('Internal Server Error');
+            }); 
+            stream.on('end', function() {
+                // delete tmp file
+                // done
+                res.end();
+            });
+        
         }
     });
 };

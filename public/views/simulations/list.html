@@ -14,6 +14,8 @@
             <th>Region</th>
             <th>Uptime</th>
             <th>Cost</th>
+            <th>Key</th>
+            <th>View</th>
           </tr>
         </thead>
         <tfoot>
@@ -47,6 +49,8 @@
             <td>{{simulation.region}}</td>
             <td>0</td>
             <td>{{simulation.server_price}}</td>
+            <td><a href="/simulations/{{simulation.sim_id}}/keys.zip">K</a></td>
+            <td><a href="{{simulation.machine_ip}}:8080">WebGL</a></td>
           </tr>
         </tbody>
       </table>
