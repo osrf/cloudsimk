@@ -29,6 +29,14 @@ var config = require('./config/config'),
 // Bootstrap db connection
 var db = mongoose.connect(config.db);
 
+// make shure the download directory exists
+try {
+    fs.statSync(config.downloadsDir);
+}
+catch(err) {
+    fs.mkdirSync(config.downloadsDir);
+}
+
 // Start the app by listening on <port>
 var port = process.env.PORT || config.port;
 server.listen(port);
