@@ -107,7 +107,7 @@ function generate_callback_script(secret_token, world, cloneRepo)
     var s = '';
     s += '#!/usr/bin/env bash\n';
      // script is executed as root, but we want to be ubuntu
-    s += 'sudo su ubuntu\n';
+    s += 'sudo su ubuntu << EOF\n';
     s += 'set -ex\n';
     s += 'logfile=/home/ubuntu/cloudsimi_setup.log\n';
     s += 'exec > $logfile 2>&1\n';
@@ -122,8 +122,8 @@ function generate_callback_script(secret_token, world, cloneRepo)
 
     s += '# cloudsim script to signal server ready\n';
     s += '/home/ubuntu/cloudsimi/callback_to_cloudsim_io.bash ';
-    s += 'http://cloudsim.io ' + world + ' ' + secret_token + '\n';
-    s += '\n';
+    s += 'http://cloudsim.io ' + world + ' ' + secret_token + '\n\n';
+    s += 'EOF\n';
     s += 'echo done!\n';
 
     return s;
