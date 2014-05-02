@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('cloudsim.users').controller('UsersController', ['$scope', '$stateParams', '$location', 'Global', 'Users', function ($scope, $stateParams, $location, Global, Users) {
+angular.module('cloudsim.users').controller('UsersController', ['$scope', '$stateParams', '$location', '$modal', 'Global', 'Users', function ($scope, $stateParams, $location, $modal, Global, Users) {
     $scope.global = Global;
 
     /// Get all the users on the server.
@@ -20,6 +20,8 @@ angular.module('cloudsim.users').controller('UsersController', ['$scope', '$stat
     $scope.reverse = false;
 
     $scope.error = '';
+
+    $scope.search = '';
 
     /////////////////////////////////////////////
     /// Callback that is used when an item in the user list is checked.
@@ -87,5 +89,75 @@ angular.module('cloudsim.users').controller('UsersController', ['$scope', '$stat
         // Clear the selected users.
         // todo: clear the checkboxes.
         $scope.selectedUsers = [];
+    };
+
+    /////////////////////////////////////////////
+    /// @brief A function that opens the add user modal.
+    $scope.openAddUserModal = function() {
+        var template = 'views/users/admin_add_user_modal.html';
+
+        // Make sure the person is authenticated.
+        if (this.global.authenticated) {
+            // Open the modal, and pass in (resolve) some values.
+            var modalInstance = $modal.open({
+                templateUrl: template,
+                controller: AddUserModalCtrl,
+                resolve: {
+                  users: function() {return $scope.users;}
+                }
+            });
+
+            // Wait for the modal to be closed/canceled.
+            modalInstance.result.then(function (email) {
+                  // Create a new user (just fill in the fields using email).
+                  var user = new Users({
+                    email: email,
+                      open_id: email,
+                      username: email,
+                      name: email
+                  });
+
+                  // Add the user to the local user list.
+                  $scope.users.push(user);
+
+                  // Save the user to the server.
+                  user.$save();
+        
+            }, function () {
+                // Do nothing when the modal is dismissed.
+            });
+        }
+        else {
+            console.log('Not authenticated');
+        }
+    };
+
+    /////////////////////////////////////////////
+    /// Controller for the add/edit ssh key modal
+    var AddUserModalCtrl = function($scope, $modalInstance, users) {
+        // The ok function is called when the modal form is
+        // submitted.
+        $scope.ok = function(form) {
+            var unique = true;
+
+            // Check that the email is uniqu
+            angular.forEach(users, function(usr) {
+                if (usr.email == form.email.$viewValue) {
+                    unique = false;
+                }
+            });
+
+            if (unique) {
+              $modalInstance.close(form.email.$viewValue);
+            } else {
+              $scope.error = "Email already exists";
+            }
+        };
+
+        // The cancel function is called when the modal form is 
+        // closed/canceld.
+        $scope.cancel = function() {
+            $modalInstance.dismiss();
+        };
     };
 }]);
