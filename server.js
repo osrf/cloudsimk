@@ -98,3 +98,8 @@ sockets.init(io);
 
 // Expose app
 exports = module.exports = app;
+
+process.on('uncaughtException', function (error) {
+   console.log('uncaughtException!!!\n'+  error.stack);
+});
+

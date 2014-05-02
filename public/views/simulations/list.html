@@ -15,7 +15,7 @@
             <th>Uptime</th>
             <th>Cost</th>
             <th>Key</th>
-            <th>View</th>
+            <th>3D</th>
           </tr>
         </thead>
         <tfoot>
@@ -45,11 +45,14 @@
             <td><input type="checkbox" ng-model="simulation.selected"></td>
             <td>{{simulation.sim_id}}</td>
             <td>{{simulation.world}}</td>
-            <td>{{simulation.state}}</td>
+            <td>{{simulation.state }} <img height="20px" src="/img/icons/error.gif"/> </td>
             <td>{{simulation.region}}</td>
             <td>0</td>
             <td>{{simulation.server_price}}</td>
-            <td><a href="/simulations/{{simulation.sim_id}}/keys.zip">K</a></td>
+            <td><a href="/simulations/{{simulation.sim_id}}/keys.zip">
+                    <img height="20px" src="/img/icons/download.svg"/>
+                </a>
+            </td>
             <td>
                 <a href="http://{{simulation.machine_ip}}:8080" target="_blank" >
                     <img height="20px"  src="/img/icons/eye.svg"/>
