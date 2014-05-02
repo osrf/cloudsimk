@@ -50,7 +50,12 @@
             <td>0</td>
             <td>{{simulation.server_price}}</td>
             <td><a href="/simulations/{{simulation.sim_id}}/keys.zip">K</a></td>
-            <td><a href="{{simulation.machine_ip}}:8080">WebGL</a></td>
+            <td>
+                <a href="http://{{simulation.machine_ip}}:8080" target="_blank" >
+                    <img height="20px"  src="/img/icons/eye.svg"/>
+                </a>
+            </td>
+
           </tr>
         </tbody>
       </table>
