@@ -430,8 +430,8 @@ function createSimulatorZipFile (simulation, cb) {
         if (err) {
             cb(err);
         }else {
-            var sshStr = '#!/bin/bash\n';
-            sshStr += 'DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )\n';
+            var sshStr = '#!/bin/bash\n\n';
+            sshStr += 'DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"\n\n';
             sshStr += 'ssh -i $DIR/key_sim_' + simId + '.pem ubuntu@' + ip + '\n';
             sshStr += '\n';
             // create the ssh log in script, make it executable
