@@ -45,7 +45,7 @@
             <td><input type="checkbox" ng-model="simulation.selected"></td>
             <td>{{simulation.sim_id}}</td>
             <td>{{simulation.world}}</td>
-            <td>{{simulation.state }} <img height="20px" src="/img/icons/error.gif"/> </td>
+            <td><img height="20px" ng-src="/img/icons/{{simulation.state}}.gif"/> {{simulation.state}} </td>
             <td>{{simulation.region}}</td>
             <td>0</td>
             <td>{{simulation.server_price}}</td>
