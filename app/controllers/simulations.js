@@ -110,7 +110,7 @@ function generate_callback_script(secret_token, world, cloneRepo)
     s += 'sudo su ubuntu << EOF\n';
     s += 'set -ex\n';
     s += 'logfile=/home/ubuntu/cloudsimi_setup.log\n';
-    s += 'exec > $logfile 2>&1\n';
+    s += 'exec > \\$logfile 2>&1\n';
     s += '\n';
     if(cloneRepo) {
         s += 'cd /home/ubuntu\n';
