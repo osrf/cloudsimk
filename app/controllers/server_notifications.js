@@ -29,7 +29,7 @@ exports.simulatorCallback = function (req, res) {
                             // gztopic returned an error, sim is not running
                             sim.state = 'Error';
                             var s = 'Error getting simulation status for sim';
-                            s +=  ' ' + sim._id + ': ' + result.output;
+                            s +=  ' ' + sim._id + 'code: '+ result.code +  ' output :"' + result.output + '";
                             console.log(s);
                         } else {
                             // gztopic success... set the new state
