@@ -90,3 +90,12 @@ sockets.init(io);
 
 // Expose app
 exports = module.exports = app;
+
+
+// monitoring the node process
+process.on('uncaughtException', function(err) {
+    console.log('uncaughtException handler');
+    console.log(err.stack);
+    throw err;
+});
+
