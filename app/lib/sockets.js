@@ -14,7 +14,6 @@ var mongoose = require('mongoose'),
 var sessionSchema = new Schema({ _id: String,  session: String, expires: String });
 var Session = mongoose.model('Session', sessionSchema);
 
-
 /////////////////////////////////////////////////////////////////////////////
 // Starting with the cookie data obtained  during the websocket authorization
 // this function performs a lookup in the session store to find the identity
@@ -118,7 +117,8 @@ function tick() {
 exports.init = function(io) {
     userSockets.io = io;
     // reduce log verbosity
-    io.set('log level', 1);
+    io.set('log level', config.socket_io_log_level);
+    console.log('Socket.io log level ' +  config.socket_io_log_level + ' [0 (error) to 3 (debug)]');
     // call tick periodically (30 sec)
     setInterval(tick, 30000);
 

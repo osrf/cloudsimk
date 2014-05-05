@@ -1,6 +1,7 @@
 'use strict';
 
 module.exports = {
+    socket_io_log_level: 3,
     db: 'mongodb://localhost/mean-production',
     app: {
         name: 'CloudSim - Cloud-hosted robot simulation'
