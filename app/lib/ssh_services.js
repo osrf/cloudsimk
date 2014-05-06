@@ -4,7 +4,7 @@ var ssh2 = require('ssh2');
 
 
 function executeSshCommand(hostIp, sshPrivateKeyStr, cmd, cb) {
-    // determine if we are performing the ssh calls for real or 
+    // determine if we are performing the ssh calls for real or
     // if we are simply executing local tests.
     var fake = typeof(process.env.AWS_ACCESS_KEY_ID) === 'undefined';
     if(fake){
@@ -52,13 +52,12 @@ function executeSshCommand(hostIp, sshPrivateKeyStr, cmd, cb) {
 }
 
 ////////////////////////////////////////////////////////////////////////////
-// 
 //  Start a simulation on a Gazebo server, stopping any running simulation
 //  beforehand.
 //  @param hostIp the ip address of the the server in xx.xx.xx.xx format
 //  @param sshPrivateKey the content of the private key for the ubuntu user
 //  @param world the world name to simulate (not a file path)
-//  @param cb the callback (err, result) where result is a dict that contains a 
+//  @param cb the callback (err, result) where result is a dict that contains a
 //  code (for the process return code) and and output (gztopic output).
 exports.startSimulation = function(hostIp, sshPrivateKeyStr, world, cb) {
     var cmd = 'cloudsimi/start_sim.bash ' + world;
@@ -66,25 +65,22 @@ exports.startSimulation = function(hostIp, sshPrivateKeyStr, world, cb) {
 };
 
 ////////////////////////////////////////////////////////////////////////////
-// 
-//  Stops a simulation on a Gazebo server. 
+//  Stops a simulation on a Gazebo server.
 //  @param hostIp the ip address of the the server in xx.xx.xx.xx format
 //  @param sshPrivateKey the content of the private key for the ubuntu user
-//  @param cb the callback (err, result) where result is a dict that contains a 
+//  @param cb the callback (err, result) where result is a dict that contains a
 //  code (for the process return code) and and output (gztopic output).
 exports.stopSimulation = function(hostIp, sshPrivateKeyStr, cb) {
     var cmd = 'cloudsimi/stop_sim.bash ';
     executeSshCommand(hostIp, sshPrivateKeyStr, cmd, cb);
 };
 
-
 ////////////////////////////////////////////////////////////////////////////
-//
-//  Gets the running state of a simulator by running gztopic list on the 
+//  Gets the running state of a simulator by running gztopic list on the
 //  server.
 //  @param hostIp the ip address of the the server in xx.xx.xx.xx format
 //  @param sshPrivateKey the content of the private key for the ubuntu user
-//  @param cb the callback (err, result) where result is a dict that contains a 
+//  @param cb the callback (err, result) where result is a dict that contains a
 //  code (for the process return code) and output (output of start_sim.bash).
 exports.getSimulatorStatus = function(hostIp, sshPrivateKeyStr, cb) {
     var cmd = 'cloudsimi/ping_gazebo.bash';
