@@ -84,10 +84,12 @@
         <tfoot>
           <td colspan="2">
             <div class='text-left' style="margin-top: 20px; margin-bottom: 20px">
-              <button class="btn btn-primary" ng-click="showRelaunchDialog()">
+              <button class="btn btn-primary" ng-click="showRelaunchDialog()"
+                ng-disabled="getPageSimulationsSelected(tableType.history).length === 0">
                 Relaunch
               </button>
-              <button class="btn btn-default" ng-click="showDeleteForeverDialog()">
+              <button class="btn btn-default" ng-click="showDeleteForeverDialog()"
+                ng-disabled="getPageSimulationsSelected(tableType.history).length === 0">
                 Delete Forever
               </button>
             </div>
