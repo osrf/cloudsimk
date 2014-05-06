@@ -83,6 +83,7 @@ exports.launchSimulator = function (username, keyName, simId, region, hardware, 
         InstanceType: hardware,
         MinCount:1,
         MaxCount: 1,
+        SecurityGroups: ['cloudsimk'],
         DryRun: dryRun
     };
 
