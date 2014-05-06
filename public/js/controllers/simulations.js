@@ -52,6 +52,10 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
     /// is pressed
     var relaunchDialog = null;
 
+    /// A modal confirmation dialog displayed when the delete forever button
+    /// is pressed
+    var deleteForeverDialog = null;
+
     /// Error messessage
     $scope.error = '';
 
@@ -140,6 +144,45 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
     var relaunchDialogCtrl = function ($scope, $modalInstance) {
         $scope.confirmRelaunch = function (relaunch) {
             if (relaunch) {
+                $modalInstance.close();
+            }
+            else {
+                $modalInstance.dismiss();
+            }
+        };
+    };
+
+    /// Pop up a dialog to confirm deleting a terminated simulation
+    /// from history forever
+    $scope.showDeleteForeverDialog = function () {
+        deleteForeverDialog = $modal.open({
+            templateUrl: 'deleteForever.html',
+            controller: deleteForeverDialogCtrl
+        });
+
+        // if the user confirms deleting the terminated simulation
+        deleteForeverDialog.result.then(function () {
+            var currentPageSims =
+                $scope.getPageSimulations($scope.tableType.history);
+            var selected = currentPageSims.filter(function(sim) {
+                return sim.selected === true;
+            });
+
+            // send a DELETE to remove the simulation from the database
+            for (var i = 0; i < selected.length; ++i) {
+                $scope.simulations.splice(
+                    $scope.simulations.indexOf(selected[i]), 1);
+                selected[i].$remove({simulationId:selected[i].sim_id});
+            }
+        },
+        // if the user cancels deleting terminated simulation
+        function () {});
+    };
+
+    /// A controller for closing / dimissing the delete forever dialog
+    var deleteForeverDialogCtrl = function ($scope, $modalInstance) {
+        $scope.confirmDeleteForever = function (del) {
+            if (del) {
                 $modalInstance.close();
             }
             else {
