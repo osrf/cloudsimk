@@ -59,8 +59,8 @@
           <br>Your data will be lost.</br>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-default" ng-click="confirmShutdown(true)">Yes</button>
-          <button class="btn btn-primary" ng-click="confirmShutdown(false)">No</button>
+          <button class="btn btn-primary" ng-click="confirmShutdown(true)">Yes</button>
+          <button class="btn btn-default" ng-click="confirmShutdown(false)">No</button>
         </div>
       </script>
     </tab>
@@ -84,11 +84,11 @@
         <tfoot>
           <td colspan="2">
             <div class='text-left' style="margin-top: 20px; margin-bottom: 20px">
-              <button class="btn btn-default" ng-click="showDeleteForeverDialog()">
-                Delete Forever
-              </button>
               <button class="btn btn-primary" ng-click="showRelaunchDialog()">
                 Relaunch
+              </button>
+              <button class="btn btn-default" ng-click="showDeleteForeverDialog()">
+                Delete Forever
               </button>
             </div>
           </td>
@@ -126,8 +126,8 @@
           <br>You will be charged $X.XX per hour once you click Yes.</br>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-default" ng-click="confirmRelaunch(true)">Yes</button>
-          <button class="btn btn-primary" ng-click="confirmRelaunch(false)">Cancel</button>
+          <button class="btn btn-primary" ng-click="confirmRelaunch(true)">Yes</button>
+          <button class="btn btn-default" ng-click="confirmRelaunch(false)">Cancel</button>
         </div>
       </script>
       <script type="text/ng-template" id="deleteForever.html">
@@ -138,8 +138,8 @@
           Are you sure you want to delete the terminated simulation(s) forever?
         </div>
         <div class="modal-footer">
-          <button class="btn btn-default" ng-click="confirmDeleteForever(true)">Yes</button>
-          <button class="btn btn-primary" ng-click="confirmDeleteForever(false)">Cancel</button>
+          <button class="btn btn-primary" ng-click="confirmDeleteForever(true)">Yes</button>
+          <button class="btn btn-default" ng-click="confirmDeleteForever(false)">Cancel</button>
         </div>
       </script>
     </tab>
