@@ -98,7 +98,6 @@ describe('<Unit Test>', function() {
 
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
-                    console.log('res:' + res.text);
                     var jres = JSON.parse(res.text);
                     jres.result.should.equal('Error');
 
@@ -114,15 +113,14 @@ describe('<Unit Test>', function() {
                 .set('Accept', 'application/json')
                 .send({world: 'empty.world', token: token})
                 .end(function(err, res){
-                     
+
                     if(err) should.fail(err);
 
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
-                    console.log('res:' + res.text);
                     var jres = JSON.parse(res.text);
                     jres.result.should.equal('OK');
-                    
+
                     done();
                 });
             });
@@ -135,5 +133,3 @@ describe('<Unit Test>', function() {
         });
     });
 });
-    
-

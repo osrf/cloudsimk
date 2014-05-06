@@ -103,7 +103,7 @@ function generate_callback_script(secret_token, world, cloneRepo)
 {
     // assume false if undefined
     cloneRepo = cloneRepo || false;
-    
+
     var s = '';
     s += '#!/usr/bin/env bash\n';
      // script is executed as root, but we want to be ubuntu
@@ -196,7 +196,7 @@ exports.create = function(req, res) {
                                     var s = 'Getting ip from AWS: machine:';
                                     s += util.inspect(machineInfo);
                                     s +=  ' status: ';
-                                    s += util.inspect(state); 
+                                    s += util.inspect(state);
                                     console.log(s);
                                     simulation.machine_ip = state.ip;
                                     simulation.save(function(err) {
