@@ -52,7 +52,3 @@ User.find({email: email}).exec(function(err, users) {
         });
     }
 });
-
-
-
-
