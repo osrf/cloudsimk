@@ -127,6 +127,8 @@ exports.create = function(req, res) {
                     console.log('Error generating key: ' + err);
                     res.jsonp(500, { error: err });
                 } else {
+                    // set date_launch just before we launch the simulation on the cloud
+                    simulation.date_launch = Date.now();
                     cloudServices.launchSimulator(  req.user.username,
                                                     keyName,
                                                     simulation.sim_id,
