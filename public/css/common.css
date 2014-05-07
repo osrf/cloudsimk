@@ -251,11 +251,8 @@ p {
 }
 /*-------------------------------------------------*/
 
-/* Set the hover color for a table row */
-.table-hover>tbody>tr:hover>td {
-  background-color: #e8f4ff;
-}
-
+/*************************************************/
+/* Fade functionality when switch pages in angular */
 .slide.ng-leave {
   position: relative;
 }
@@ -275,8 +272,29 @@ p {
 .slide, .slide.ng-enter.ng-enter-active {
   opacity: 1;
 }
+/*-------------------------------------------------*/
 
 .cloudsim-alert {
   margin-top: 10px;
   margin-bottom: 0px;
 }
+
+/* Set the hover color for a table row */
+.table-hover>tbody>tr:hover>td {
+  background-color: #e8f4ff;
+}
+
+/*************************************************/
+/* Styles for the SSH Key user preferences pane*/
+.sshkey_date {
+  width: 105px;
+}
+
+.sshkey_actions {
+  width: 80px;
+}
+
+.sshkey_edit {
+  margin-right: 10px;
+}
+/*-------------------------------------------------*/
