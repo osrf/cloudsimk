@@ -88,6 +88,10 @@
                 ng-disabled="getPageSimulationsSelected(tableType.history).length === 0">
                 Relaunch
               </button>
+              <button class="btn btn-default" ng-click="showDeleteForeverDialog()"
+                ng-disabled="getPageSimulationsSelected(tableType.history).length === 0">
+                Delete Forever
+              </button>
             </div>
           </td>
           <td colspan="6">
@@ -126,6 +130,18 @@
         <div class="modal-footer">
           <button class="btn btn-primary" ng-click="confirmRelaunch(true)">Yes</button>
           <button class="btn btn-default" ng-click="confirmRelaunch(false)">Cancel</button>
+        </div>
+      </script>
+      <script type="text/ng-template" id="deleteForever.html">
+        <div class="modal-header">
+          <h3>Delete Forever</h3>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete the terminated simulation(s) forever?
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" ng-click="confirmDeleteForever(true)">Yes</button>
+          <button class="btn btn-default" ng-click="confirmDeleteForever(false)">Cancel</button>
         </div>
       </script>
     </tab>
