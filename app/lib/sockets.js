@@ -32,7 +32,9 @@ function findUserId(cookieData, cb) {
             cb(err);
         } else {
             if(sessions.length != 1) {
-                console.log('Could not find session "' + sessionId +'" in the database: (' + sessions.length + ' results found)');
+                var msg = 'Could not find session "' + sessionId +'" in the database: (' + sessions.length + ' results found)');
+                console.log(msg);
+                cb(msg);
             } else {
                 var s = JSON.parse(sessions[0].session);
                 var passportUser = s.passport.user;
