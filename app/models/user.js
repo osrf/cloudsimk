@@ -28,7 +28,8 @@ var UserSchema = new Schema({
         unique: true
     },
 
-    /// The ID of the next simulation instance the user will run
+    // The ID of the next simulation instance the user will run
+    // DEPRECATED!! 
     next_sim_id: {
         type: Number,
         default: 0
@@ -146,7 +147,7 @@ UserSchema.methods = {
 UserSchema.statics.load = function(id, cb) {
     this.findOne({
         _id: id
-    }).exec(cb);
+    }).populate('cloudsim', 'next_sim_id').exec(cb);
 };
 
 mongoose.model('User', UserSchema);

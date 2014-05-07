@@ -34,7 +34,12 @@ describe('<Unit Test>', function() {
                     done();
                 });
             });
-
+            it('should have a next_sim_id', function(done) {
+                console.log(user);
+                var one = 1;
+                one.should.equal(2);
+                done();
+            });
             it('should be able to save without problems', function(done) {
                 user.save(done);
             });
