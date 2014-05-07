@@ -31,9 +31,10 @@ module.exports = function(config) {
             'public/js/services/global.js',
             'public/js/services/users.js',
             'public/js/services/simulations.js',
-            'public/js/controllers/users.js',
+            'public/js/controllers/admin.js',
             'public/js/controllers/index.js',
             'public/js/controllers/header.js',
+            'public/js/controllers/preferences.js',
             'public/js/init.js',
             'test/karma/unit/**/*.js'
         ],

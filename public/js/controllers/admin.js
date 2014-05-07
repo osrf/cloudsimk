@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('cloudsim.users').controller('UsersController', ['$scope', '$stateParams', '$location', '$modal', 'Global', 'Users', function ($scope, $stateParams, $location, $modal, Global, Users) {
+angular.module('cloudsim.admin').controller('AdminController', ['$scope', '$stateParams', '$location', '$modal', 'Global', 'Users', function ($scope, $stateParams, $location, $modal, Global, Users) {
     $scope.global = Global;
 
     /// Get all the users on the server.
