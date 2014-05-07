@@ -31,8 +31,9 @@ function findUserId(cookieData, cb) {
             console.log('Session error:' + err);
             cb(err);
         } else {
-            if(sessions.length != 1) {
-                var msg = 'Could not find session "' + sessionId +'" in the database: (' + sessions.length + ' results found)');
+            if(sessions.length !== 1) {
+                var msg = 'Could not find session "' + sessionId +'" in the database:';
+                msg += ' (' + sessions.length + ' results found)';
                 console.log(msg);
                 cb(msg);
             } else {
