@@ -110,6 +110,7 @@ exports.remove = function(req, res) {
 /// @param[out] res Nodejs response object.
 /// @return Function to create a user.
 exports.create = function(req, res) {
+    console.log('Create user');
     var message = null;
 
     // Make sure the requesting user is authenticated.
@@ -126,6 +127,7 @@ exports.create = function(req, res) {
     // Make sure the requesting user is in the database.
     // TODO: We need to implement user privaleges.
     User.findOne({open_id: req.user.open_id}, function(err) {
+
         if (!err) {
             // Create a new user based on the value in the request object
             var user = new User(req.body);
