@@ -26,6 +26,10 @@ angular.module('cloudsim').config(['$stateProvider', '$urlRouterProvider',
         url: '/admin',
         templateUrl: 'views/users/admin.html'
     })
+    .state('preferences', {
+        url: '/preferences',
+        templateUrl: 'views/users/preferences.html'
+    })
     .state('home', {
         url: '/',
         templateUrl: 'views/index.html'
