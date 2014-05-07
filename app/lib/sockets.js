@@ -19,7 +19,7 @@ var Session = mongoose.model('Session', sessionSchema);
 // Starting with the cookie data obtained  during the websocket authorization
 // this function performs a lookup in the session store to find the identity
 // of the logged in user. Then, the user is retrieved from the user
-// collection, and his id is returned. 
+// collection, and his id is returned.
 function findUserId(cookieData, cb) {
     var secret = config.sessionSecret;
     var p = cookie.parse(cookieData);
@@ -39,7 +39,7 @@ function findUserId(cookieData, cb) {
                     cb(err);
                 } else {
                     if(users.length === 1 ) {
-                        var userId = users[0]._id;                    
+                        var userId = users[0]._id;
                         cb(null, userId);
                     }
                     else {
@@ -47,14 +47,14 @@ function findUserId(cookieData, cb) {
                     }
                 }
             });
-        }        
+        }
     });
 }
 
 ///////////////////////////////////////////////
 // A type that maintains an association between
-// sockets and users. Fast lookup of socket 
-// list per user.  
+// sockets and users. Fast lookup of socket
+// list per user.
 function SocketDict() {
 
     this.sockets = {};
@@ -82,7 +82,7 @@ function SocketDict() {
     this.getSockets = function (user) {
         return user in this.sockets ? this.sockets[user] : [];
     };
-    
+
     this.notifyUser = function (user, channel, data) {
         var sockets = this.getSockets(user);
 
@@ -93,7 +93,7 @@ function SocketDict() {
     };
 
     this.notifyAll = function (channel, msg) {
-        this.io.sockets.emit(channel, msg);    
+        this.io.sockets.emit(channel, msg);
     };
 }
 
@@ -108,11 +108,11 @@ exports.getUserSockets = function () {
 // broadcasts the server time periodically
 function tick() {
     var now = new Date().toISOString();
-    userSockets.notifyAll('time', {data:now});
+    userSockets.notifyAll('clock', {data:now});
 }
 
 ////////////////////////////////////////////////////////////////////////////
-// Initialises the socket.io library, and sets up functions called each time 
+// Initialises the socket.io library, and sets up functions called each time
 // a new connection is established or destroyed
 //
 exports.init = function(io) {
@@ -143,6 +143,3 @@ exports.init = function(io) {
         });
     });
 };
-
-
-
