@@ -5,7 +5,8 @@
 
 /// Module dependencies.
 var mongoose = require('mongoose'),
-    User = mongoose.model('User');
+    User = mongoose.model('User'),
+    CloudsimUser = mongoose.model('CloudsimUser');
 
 /////////////////////////////////////////////////
 /// Authentication callback
@@ -80,13 +81,13 @@ exports.session = function(req, res) {
 };
 
 /////////////////////////////////////////////////
-/// Create user
+/// Remove user
 /// @param[in] req Nodejs request object.
 /// @param[out] res Nodejs response object.
 /// @return Function to create a user.
 exports.remove = function(req, res) {
     var user = req.profile;
-
+    console.log('removing user: ' + user.email);
     if (user.email === req.user.email) {
         res.send(500, 'Unable to delete yourself');
         return;
@@ -99,7 +100,19 @@ exports.remove = function(req, res) {
             }});
         }
         else {
-            res.jsonp(user);
+            CloudsimUser.findFromUserId(user._id, function(err, cloudsimUser) {
+                if(err) {
+                    res.jsonp({ error: {message: 'Unable to find CloudSim user info' }});
+                } else {
+                    cloudsimUser.remove(function(err) {
+                        if(err) {
+                            res.jsonp({ error: {message: 'Unable to erase CloudSim user info' }});    
+                        } else {
+                            res.jsonp(user);
+                        }
+                    });
+                }
+            });
         }
     });
 };
@@ -110,7 +123,7 @@ exports.remove = function(req, res) {
 /// @param[out] res Nodejs response object.
 /// @return Function to create a user.
 exports.create = function(req, res) {
-    console.log('Create user');
+    console.log('Create user ' + req.body.email);
     var message = null;
 
     // Make sure the requesting user is authenticated.
@@ -125,7 +138,7 @@ exports.create = function(req, res) {
     }
 
     // Make sure the requesting user is in the database.
-    // TODO: We need to implement user privaleges.
+    // TODO: We need to implement user privileges.
     User.findOne({open_id: req.user.open_id}, function(err) {
 
         if (!err) {
@@ -152,8 +165,19 @@ exports.create = function(req, res) {
                     });
                 }
                 else {
-                    // Send back the user (expected by angularjs on success).
-                    return res.jsonp(user);
+                    var cloudsimUser = new CloudsimUser({user: user._id});
+                    cloudsimUser.save(function(err) {
+                        if(err) {
+                            return res.jsonp({error: {
+                                message: 'Error creating CloudSim user data',
+                                user: user
+                                }
+                            });
+                        } else {
+                            // Send back the user (expected by angularjs on success).
+                            return res.jsonp(user);
+                        }
+                    });
                 }
             });
         }

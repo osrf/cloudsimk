@@ -44,10 +44,31 @@ CloudSimUserSchema.statics.incrementNextSimId = function(userId, cb) {
                                 if(err) {
                                     cb(err);
                                 } else {
-                                    cb(null, cloudsimUser.next_sim_id);
+                                    if(cloudsimUser) {
+                                        cb(null, cloudsimUser.next_sim_id);
+                                    } else {
+                                        cb('Can\'t find CloudSim information for the user');
+                                    }
                                 }
                            });
 };
+
+
+//
+//  Return the cloudsimUser that corresponds to a user
+//  @param userId the id of the user in the users collection
+//  @cb callback with 2 parameters (error, cloudsimUser)
+CloudSimUserSchema.statics.findFromUserId = function(userId, cb) {
+    this.findOne(   {user: userId},
+                    function(err, cloudsimUser) {
+                        if(err) {
+                            cb(err);
+                        } else {
+                            cb(null, cloudsimUser);
+                        } 
+                    });
+};
+
 
 mongoose.model('CloudsimUser', CloudSimUserSchema);
 

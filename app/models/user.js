@@ -28,13 +28,6 @@ var UserSchema = new Schema({
         unique: true
     },
 
-    // The ID of the next simulation instance the user will run
-    // DEPRECATED!! 
-    next_sim_id: {
-        type: Number,
-        default: 0
-    },
-
     /// The user's password
     hashed_password: String,
 
@@ -147,7 +140,7 @@ UserSchema.methods = {
 UserSchema.statics.load = function(id, cb) {
     this.findOne({
         _id: id
-    }).populate('cloudsim', 'next_sim_id').exec(cb);
+    }).exec(cb);
 };
 
 mongoose.model('User', UserSchema);
