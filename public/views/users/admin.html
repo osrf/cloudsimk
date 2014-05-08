@@ -43,7 +43,7 @@
             </th>
             <th>Invites</th>
             <th>Credit</th>
-            <th>Admin</th>
+            <th style="text-align:center">Admin</th>
             <th></th>
           </tr>
         </thead>
@@ -91,7 +91,7 @@
               ng-model="user.credit" min="0" ng-change="user.$update();">
               </div>
             </td>
-            <td><input type="checkbox" ng-click="setAdmin(user);"/></td>
+            <td style="text-align:center"><input type="checkbox" ng-click="setAdmin(user);"/></td>
             <td><button type="button" class="btn btn-default btn-sm">Simulations<button</td>
           </tr>
         </tbody>
