@@ -174,6 +174,8 @@ exports.create = function(req, res) {
                     //    /var/lib/cloud/instance/user-data.txt
                     var token = uuid.v4();
                     var script = generate_callback_script(token, simulation.world, true);
+                    // set date_launch just before we launch the simulation on the cloud
+                    simulation.date_launch = Date.now();
                     cloudServices.launchSimulator(  serverDetails.region,
                                                     keyName,
                                                     serverDetails.hardware,
@@ -232,8 +234,6 @@ exports.create = function(req, res) {
                                         Simulation: simulation
                                     });
                                 }
-
-
                                 res.jsonp(simulation);
                                 sockets.getUserSockets().notifyUser(req.user.id,
                                                         'simulation_create',
@@ -245,7 +245,7 @@ exports.create = function(req, res) {
                 }
             });  // gerenateKey
         }
-    });  // User.load
+    });  
 };
 
 /////////////////////////////////////////////////

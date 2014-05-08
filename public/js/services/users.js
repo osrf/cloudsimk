@@ -1,7 +1,7 @@
 'use strict';
 
 // Users service used for users REST endpoint
-angular.module('cloudsim.users').factory('Users', ['$resource', function($resource) {
+angular.module('cloudsim').factory('Users', ['$resource', function($resource) {
     return $resource('users/:userId', {}, {
         query:  {method: 'GET', params:{userId:''}, isArray: true},
         post:   {method: 'POST'},

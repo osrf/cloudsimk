@@ -1,12 +1,8 @@
 <!-- swig template -->
 {% extends 'layouts/default.html' %}
 {% block content %}
-  <div class="container">
-    <div data-ui-view class="slide"></div>
-  </div>
+  <div data-ui-view class="slide"></div>
   <script type="text/javascript">
     window.user = {{user|safe}};
-    // Get initial server time (at page load time)
-    window.server_time = {{Date.now()}};
   </script>
 {% endblock %}
