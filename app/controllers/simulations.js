@@ -144,27 +144,29 @@ exports.create = function(req, res) {
                             simulation.ssh_private_key = key;
                             simulation.machine_ip = 'N/A';
                             setTimeout(function () {
-
-                                simulation.machine_ip = 'waiting';
-                                cloudServices.simulatorStatus(machineInfo, function(err, state) {
-                                    console.log('machine:' + util.inspect(machineInfo)  + ' status: ' + util.inspect(state));
-                                    simulation.machine_ip = state.ip;
-                                    simulation.save(function(err) {
-                                        if (err) {
-                                            if(machineInfo.id) {
-                                                console.log('error saving simulation info to db: ' + err);
-                                                console.log('Terminating server ' + machineInfo.id);
-                                                cloudServices.terminateSimulator(machineInfo, function () {});
+                                // simulation data may have changed over the
+                                // 30 second period so retrieve it again
+                                Simulation.findOne({sim_id: simulation.sim_id}, function(err, sim) {
+                                    sim.machine_ip = 'waiting';
+                                    cloudServices.simulatorStatus(machineInfo, function(err, state) {
+                                        console.log('machine:' + util.inspect(machineInfo)  + ' status: ' + util.inspect(state));
+                                        sim.machine_ip = state.ip;
+                                        sim.save(function(err) {
+                                            if (err) {
+                                                if(machineInfo.id) {
+                                                    console.log('error saving simulation info to db: ' + err);
+                                                    console.log('Terminating server ' + machineInfo.id);
+                                                    cloudServices.terminateSimulator(machineInfo, function () {});
+                                                }
+                                                console.log('Error getting machine ip');
+                                                res.jsonp(500, { error: err });
+                                            } else {
+                                                // New IP: broadcast the news
+                                                sockets.getUserSockets().notifyUser(req.user.id,
+                                                                        'simulation_update',
+                                                                        {data:sim});
                                             }
-                                            console.log('Error getting machine ip');
-                                            res.jsonp(500, { error: err });
-                                        } else {
-                                            // New IP: broadcast the news
-                                            sockets.getUserSockets().notifyUser(req.user.id,
-                                                                    'simulation_update',
-                                                                    {data:simulation});
-
-                                        }
+                                        });
                                     });
                                 });
                             }, 30000);

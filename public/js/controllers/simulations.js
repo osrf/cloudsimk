@@ -289,6 +289,10 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
             $scope.$apply(function() {
                 terminated[0].state = 'Terminated';
                 terminated[0].date_term = termSim.date_term;
+                var uptime = new Date(terminated[0].date_term) -
+                    new Date(terminated[0].date_launch);
+                terminated[0].upTime = formatTimeElapsed(uptime*1e-3);
+                //updateUpTime(terminated[0]);
             });
         }
     });
@@ -310,17 +314,25 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
       }
     });
 
-    // update the simulation up time for non-terminated simulations
-    var updateUpTime = function() {
-        var notTerminated = $scope.simulations.filter(function(sim) {
-            return !sim.date_term;
+    // update the simulation up time
+    var updateUpTime = function(type) {
+        var filtered = $scope.simulations.filter(function(sim) {
+            if (type === $scope.tableType.console)
+              return !sim.date_term;
+            else if (type === $scope.tableType.history)
+              return sim.date_term;
+            else return true;
         });
 
         // calculate uptime
-        for (var i = 0; i < notTerminated.length; ++i) {
-            var serverLaunch = new Date(notTerminated[i].date_launch);
-            var uptime = $scope.serverTime - serverLaunch;
-            notTerminated[i].upTime = formatTimeElapsed(uptime*1e-3);
+        for (var i = 0; i < filtered.length; ++i) {
+            var serverLaunch = new Date(filtered[i].date_launch);
+            var uptime;
+            if (filtered[i].date_term)
+                uptime = new Date(filtered[i].date_term) - serverLaunch;
+            else
+                uptime = $scope.serverTime - serverLaunch;
+            filtered[i].upTime = formatTimeElapsed(uptime*1e-3);
         }
     };
 
@@ -331,7 +343,7 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
         $scope.serverTime = new Date(time);
 
         $scope.$apply(function() {
-            updateUpTime();
+            updateUpTime($scope.tableType.console);
         });
     });
 
