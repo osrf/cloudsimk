@@ -106,9 +106,9 @@
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="key in sshKeys">
+            <tr ng-repeat="key in user.ssh_keys">
               <td>{{key.label}}</td>
-              <td class='text-right sshkey_date' >{{key.date}}</td>
+              <td class='text-right sshkey_date' >{{key.date | date:'yyyy-MM-dd'}}</td>
               <td class='text-right sshkey-actions'>
                 <a href="" ng-click="openSSHKeyModal($index)"
                   class="sshkey_edit">Edit</a>

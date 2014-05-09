@@ -53,7 +53,23 @@ var UserSchema = new Schema({
     aol: {},
 
     /// AOL authentication
-    openid: {}
+    openid: {},
+
+    credit: {
+      type: Number,
+      default: 0
+    },
+
+    invites: {
+      type: Number,
+      default: 0
+    },
+
+    ssh_keys: [ {
+      label: String,
+      date: Date,
+      key: String,
+    }]
 });
 
 /// Virtuals

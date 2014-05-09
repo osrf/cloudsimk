@@ -80,6 +80,34 @@ exports.session = function(req, res) {
 };
 
 /////////////////////////////////////////////////
+/// Update a user
+/// @param[in] req Nodejs request object.
+/// @param[out] res Nodejs response object.
+/// @return Function to create a user.
+exports.update = function(req, res) {
+    var user = req.profile;
+
+    user.credit = req.body.credit;
+    user.invites = req.body.invites;
+    user.ssh_keys = req.body.ssh_keys;
+
+    // Save the user to the database
+    user.save(function(err) {
+        if (err) {
+            return res.jsonp({error: {
+                message: 'Unable to update user',
+                user: user
+               }
+            });
+        } else {
+            // Send back the user (expected by angularjs on success).
+            return res.jsonp(user);
+        }
+    });
+};
+
+
+/////////////////////////////////////////////////
 /// Create user
 /// @param[in] req Nodejs request object.
 /// @param[out] res Nodejs response object.
