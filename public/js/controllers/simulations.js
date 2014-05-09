@@ -291,7 +291,6 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
 
     // Subscribe to simulation_terminate topic
     var simulationTerminateTopic = new Topic();
-
     simulationTerminateTopic.subscribe('simulation_terminate',
     function(message) {
         var termSim = message.data;

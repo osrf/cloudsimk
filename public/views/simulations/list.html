@@ -46,7 +46,7 @@
             <td>{{simulation.state}}</td>
             <td>{{simulation.region}}</td>
             <td>{{formatTimeElapsed(simulation.upTime)}}</td>
-            <td>{{simulation.server_price}}</td>
+            <td>0</td>
           </tr>
         </tbody>
       </table>
@@ -107,7 +107,7 @@
         <tbody>
           <tr ng-repeat="simulation in ($parent.$parent.historySimulations =
             (simulations | filter:getHistorySimulations | orderBy: '-date_term')
-            | startFrom:(historyCurrentPage-1)*pageSize
+            | startFrom:($parent.$parent.historyCurrentPage-1)*pageSize
             | limitTo:pageSize)">
             <td><input type="checkbox" ng-model="simulation.selected"></td>
             <td>{{formatDateTime(simulation.date_launch)}}</td>
