@@ -16,6 +16,7 @@ module.exports = function(config) {
 
         // list of files / patterns to load in the browser
         files: [
+            '/node_modules/socket.io/node_modules/socket.io-client/dist/socket.io.js',
             'public/lib/angular/angular.js',
             'public/lib/angular-mocks/angular-mocks.js',
             'public/lib/angular-cookies/angular-cookies.js',
