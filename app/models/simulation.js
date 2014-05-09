@@ -99,7 +99,7 @@ SimulationSchema.path('region').validate(function(s) {
 }, 'Region cannot be blank');
 
 SimulationSchema.path('state').validate(function(s) {
-    return ['Launching', 'Terminated'].indexOf(s) > -1 ;
+    return ['Launching', 'Terminated', 'Initializing'].indexOf(s) > -1 ;
 }, 'State of the simulation instance must be Launching or Terminated');
 
 SimulationSchema.path('user').validate(function(s) {
