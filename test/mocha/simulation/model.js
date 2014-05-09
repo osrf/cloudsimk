@@ -27,6 +27,7 @@ describe('<Unit Test>', function() {
                 simulation = new Simulation({
                     world: 'brave new world',
                     region: 'region',
+                    date_launch: Date.now(),
                     user: user
                 });
 

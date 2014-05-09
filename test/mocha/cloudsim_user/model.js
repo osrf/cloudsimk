@@ -40,7 +40,7 @@ describe('<Unit Test>', function() {
 
             it('should have a next_sim_id', function(done) {
                 console.log(cloudsimUser);
-                cloudsimUser.next_sim_id.should.equal(0);
+                cloudsimUser.next_sim_id.should.equal(-1);
                 done();
             });
 
@@ -52,7 +52,7 @@ describe('<Unit Test>', function() {
 
                 CloudsimUser.incrementNextSimId(user._id, function(err, id) {
                     should.exist(id);
-                    id.should.equal(1);
+                    id.should.equal(0);
                     done();
                 });
 

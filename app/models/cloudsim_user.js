@@ -21,7 +21,7 @@ var CloudSimUserSchema = new Schema({
     // The ID of the next simulation instance the user will run
     next_sim_id: {
         type: Number,
-        default: 0
+        default: -1
     }
 
 });
@@ -30,7 +30,7 @@ var CloudSimUserSchema = new Schema({
 // Validations
 //
 CloudSimUserSchema.path('next_sim_id').validate(function(s) {
-    return s >= 0;
+    return s >= -1;
 }, 'next id must be positive');
 
 
