@@ -36,6 +36,17 @@ angular.module('cloudsim.admin').controller('AdminController', ['$scope', '$stat
       return false;
     };
 
+    /////////////////////////////
+    //
+    $scope.updateUser = function(user) {
+        console.log('updateUser');
+        user.$update(function() {},
+            function(error){
+                if(error)
+                   $scope.error = 'Error trying to update user data';
+            });
+    };
+
     /////////////////////////////////////////////
     /// @brief Select all users in the current page of the table
     $scope.selectPageUsers = function() {
@@ -197,7 +208,7 @@ angular.module('cloudsim.admin').controller('AdminController', ['$scope', '$stat
         };
 
         $scope.cancel = function() {$modalInstance.dismiss();};
-    }
+    };
 
     /////////////////////////////////////////////
     /// Controller for the add user modal
@@ -208,7 +219,7 @@ angular.module('cloudsim.admin').controller('AdminController', ['$scope', '$stat
 
             // Check that the email is uniqu
             angular.forEach(users, function(usr) {
-                if (usr.email == form.email.$viewValue) {
+                if (usr.email === form.email.$viewValue) {
                     unique = false;
                 }
             });
@@ -216,7 +227,7 @@ angular.module('cloudsim.admin').controller('AdminController', ['$scope', '$stat
             if (unique) {
               $modalInstance.close(form.email.$viewValue);
             } else {
-              $scope.error = "Email already exists";
+              $scope.error = 'Email already exists';
             }
         };
 
