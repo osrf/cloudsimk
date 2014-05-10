@@ -84,11 +84,11 @@
             <td>{{user.username}}</td>
             <td>{{user.email}}</td>
             <td class='col-sm-1'><input type="number" class="form-control"
-              ng-model="user.invites" min="0" ng-change="user.$update();"></td>
+              ng-model="user.invites" min="0" ng-change="updateUser(user);"></td>
             <td class='col-sm-2'><div class="input-group">
               <span class='input-group-addon'>$</span>
               <input type="number" class="form-control"
-              ng-model="user.credit" min="0" ng-change="user.$update();">
+              ng-model="user.credit" min="0" ng-change="updateUser(user);">
               </div>
             </td>
             <td style="text-align:center"><input type="checkbox" ng-click="setAdmin(user);"/></td>
