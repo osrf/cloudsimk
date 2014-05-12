@@ -21,6 +21,13 @@ var Session = mongoose.model('Session', sessionSchema);
 // of the logged in user. Then, the user is retrieved from the user
 // collection, and his id is returned.
 function findUserId(cookieData, cb) {
+
+    if(!cookieData) {
+        var msg = 'findUserId error: undefined cookieData';
+        cb(msg);
+        return;
+    }
+
     var secret = config.sessionSecret;
     var p = cookie.parse(cookieData);
     var sessionIdEncrypted = p['connect.sid'];
@@ -91,11 +98,17 @@ function SocketDict() {
     };
 
     this.notifyUser = function (user, channel, data) {
-        var sockets = this.getSockets(user);
 
-        for(var i=0; i<sockets.length; i++) {
-            var s = sockets[i];
-            s.emit(channel, data);
+        try {
+            var sockets = this.getSockets(user);
+            for(var i=0; i<sockets.length; i++) {
+                var s = sockets[i];
+                s.emit(channel, data);
+            }
+        }
+        catch(e) {
+            var msg = 'Error in notify user ' + user + ' :' + e;
+            console.log(msg);
         }
     };
 
@@ -114,8 +127,13 @@ exports.getUserSockets = function () {
 /////////////////////////////////////////////////////////////////////////////
 // broadcasts the server time periodically
 function tick() {
-    var now = new Date().toISOString();
-    userSockets.notifyAll('clock', {data:now});
+    try {
+        var now = new Date().toISOString();
+        userSockets.notifyAll('clock', {data:now});
+    }
+    catch(e) {
+        
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -143,10 +161,22 @@ exports.init = function(io) {
     });
 
     io.sockets.on('connection', function (socket) {
-        var user = socket.handshake.userId;
-        userSockets.addSocket(user, socket);
+        try {
+            var user = socket.handshake.userId;
+            userSockets.addSocket(user, socket);
+        } catch(e) {
+            var msg = 'socket connection error: ' + e;
+            console.log(msg);
+        }
+
         socket.on('disconnect', function() {
-            userSockets.removeSocket(user, socket);
+            try {
+                userSockets.removeSocket(user, socket);
+            }
+            catch(e) {
+                var msg = 'socket disconnect error: ' + e;
+                console.log(msg);
+            }
         });
     });
 };
