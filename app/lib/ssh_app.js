@@ -51,8 +51,9 @@ if (cmd === 'sendkey') {
     console.log('sending public key ');
     var publicKeyPath = process.argv[5];
 
-    var pubKey = fs.readFileSync(publicKeyPath);
-    console.log('public key: ' + pubKey);
+    var s = fs.readFileSync(publicKeyPath);
+    var pubKey = ('' + s).trim();
+    console.log('public key: [' + pubKey + ']');
     sshServices.uploadPublicKey(ip, key, pubKey, function(err, result) {
         if(err) console.log('Error sending public ssh key to ' + ip + ': ' + err);
         else console.log(result);

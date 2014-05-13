@@ -11,7 +11,7 @@ function executeSshCommand(hostIp, sshPrivateKeyStr, cmd, cb) {
     // if we are simply executing local tests.
     var fake = typeof(process.env.AWS_ACCESS_KEY_ID) === 'undefined';
     if(fake){
-        console.log('FAKE ssh');
+        console.log('FAKE ssh: ' + cmd);
         cb(null, {status:'Running'});
         return;
     }
@@ -91,13 +91,14 @@ exports.getSimulatorStatus = function(hostIp, sshPrivateKeyStr, cb) {
 };
 
 //////////////////////////////////////////////////////////////////////////////
-//
-//
+// Sends a public ssh key to a simulation server, by adding a line in the 
+// /home/ubuntu/.ssh/authorized_keys file
+// @param hostIp simulator ip
+// @param sshPrivateKey  the content of the private key for the ubuntu user
+// @param publicKeyStr  the content of the public key to upload
 exports.uploadPublicKey = function(hostIp, sshPrivateKeyStr, publicKeyStr, cb) {
-
     var cmd =  'echo ' + publicKeyStr + '  >> .ssh/authorized_keys && echo "Key copied"' ;
     executeSshCommand(hostIp, sshPrivateKeyStr, cmd, cb);
-
 };
 
 
