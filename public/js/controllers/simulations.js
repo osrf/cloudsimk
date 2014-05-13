@@ -72,8 +72,11 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
                 $scope.error = 'Error launching simulation: ' + error.data;
                 sim.state = 'Error';
             });
+        sim.upTime = 0;
         sim.selected = false;
-        sim.upTime = '00:00:00';
+
+        // add simulation to the table for immediate feedback.
+        $scope.simulations.unshift(sim);
     };
 
     /// Pop up a dialog to confirm shutting down a simulation
@@ -262,16 +265,27 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
     var simulationCreateTopic = new Topic();
     simulationCreateTopic.subscribe('simulation_create', function(message) {
         var newSim = message.data;
-        var sim = new Simulations({
-            sim_id: newSim.sim_id,
-            state: newSim.state,
-            region: newSim.region,
-            world: newSim.world,
-            date_launch: newSim.date_launch,
-            upTime: '00:00:00'
+        var created = $scope.simulations.filter(function(sim) {
+            return (sim.region === newSim.region) &&
+                (sim.world === newSim.world) &&
+                (sim.state === 'Launching') &&
+                (!sim.sim_id);
         });
+
         $scope.$apply(function() {
-            $scope.simulations.unshift(sim);
+            // insert simulation on other client browsers.
+            if (created.length === 0) {
+                var sim = new Simulations({
+                    sim_id: newSim.sim_id,
+                    state: newSim.state,
+                    region: newSim.region,
+                    world: newSim.world,
+                    date_launch: newSim.date_launch,
+                    upTime: 0,
+                    server_price: 100
+                });
+                $scope.simulations.unshift(sim);
+            }
         });
     });
 
@@ -289,6 +303,9 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
             $scope.$apply(function() {
                 terminated[0].state = 'Terminated';
                 terminated[0].date_term = termSim.date_term;
+                var uptime = new Date(terminated[0].date_term) -
+                    new Date(terminated[0].date_launch);
+                terminated[0].upTime = uptime*1e-3;
             });
         }
     });
@@ -310,17 +327,27 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
       }
     });
 
-    // update the simulation up time for non-terminated simulations
-    var updateUpTime = function() {
-        var notTerminated = $scope.simulations.filter(function(sim) {
-            return !sim.date_term;
+    // update the simulation up time
+    var updateUpTime = function(type) {
+        var filtered = $scope.simulations.filter(function(sim) {
+            if (type === $scope.tableType.console)
+              return !sim.date_term;
+            else if (type === $scope.tableType.history)
+              return sim.date_term;
+            else return true;
         });
 
         // calculate uptime
-        for (var i = 0; i < notTerminated.length; ++i) {
-            var serverLaunch = new Date(notTerminated[i].date_launch);
-            var uptime = $scope.serverTime - serverLaunch;
-            notTerminated[i].upTime = formatTimeElapsed(uptime*1e-3);
+        for (var i = 0; i < filtered.length; ++i) {
+            var serverLaunch = filtered[i].date_launch;
+            var uptime;
+            if (filtered[i].date_term) {
+                uptime = new Date(filtered[i].date_term) -
+                    new Date(serverLaunch);
+            }
+            else
+                uptime = $scope.serverTime - new Date(serverLaunch);
+            filtered[i].upTime = uptime*1e-3;
         }
     };
 
@@ -331,12 +358,12 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
         $scope.serverTime = new Date(time);
 
         $scope.$apply(function() {
-            updateUpTime();
+            updateUpTime($scope.tableType.console);
         });
     });
 
     // format elapsed time in seconds into a friendly string
-    var formatTimeElapsed = function(time)
+    $scope.formatTimeElapsed = function(time)
     {
         var sec = time;
 

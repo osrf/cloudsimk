@@ -188,32 +188,39 @@ exports.create = function(req, res) {
                             simulation.ssh_private_key = key;
                             simulation.machine_ip = 'N/A';
                             setTimeout(function () {
-
-                                simulation.machine_ip = 'waiting';
-                                cloudServices.simulatorStatus(machineInfo, function(err, state) {
-                                    var s = 'Getting ip from AWS: machine:';
-                                    s += util.inspect(machineInfo);
-                                    s +=  ' status: ';
-                                    s += util.inspect(state);
-                                    console.log(s);
-                                    simulation.machine_ip = state.ip;
-                                    simulation.save(function(err) {
-                                        if (err) {
-                                            if(machineInfo.id) {
-                                                console.log('error saving simulation info to db: ' + err);
-                                                console.log('Terminating server ' + machineInfo.id);
-                                                cloudServices.terminateSimulator(machineInfo, function () {});
-                                            }
-                                            console.log('Error getting machine ip');
-                                            res.jsonp(500, { error: err });
-                                        } else {
-                                            // New IP: broadcast the news
-                                            sockets.getUserSockets().notifyUser(req.user.id,
-                                                                    'simulation_update',
-                                                                    {data:simulation});
-
-                                        }
-                                    });
+                                // simulation data may have changed over the
+                                // 30 second period so retrieve it again
+                                Simulation.findOne({sim_id: simulation.sim_id}, function(err, sim) {
+                                    if (err) {
+                                      res.jsonp(500, { error: err });
+                                    }
+                                    else if (sim) {
+                                      sim.machine_ip = 'waiting';
+                                      cloudServices.simulatorStatus(machineInfo, function(err, state) {
+                                          var s = 'Getting ip from AWS: machine:';
+                                          s += util.inspect(machineInfo);
+                                          s +=  ' status: ';
+                                          s += util.inspect(state);
+                                          console.log(s);
+                                          sim.machine_ip = state.ip;
+                                          sim.save(function(err) {
+                                              if (err) {
+                                                  if(machineInfo.id) {
+                                                      console.log('error saving simulation info to db: ' + err);
+                                                      console.log('Terminating server ' + machineInfo.id);
+                                                      cloudServices.terminateSimulator(machineInfo, function () {});
+                                                  }
+                                                  console.log('Error getting machine ip');
+                                                  res.jsonp(500, { error: err });
+                                              } else {
+                                                  // New IP: broadcast the news
+                                                  sockets.getUserSockets().notifyUser(req.user.id,
+                                                                          'simulation_update',
+                                                                          {data:sim});
+                                              }
+                                          });
+                                      });
+                                    }
                                 });
                             }, 30000);
 
@@ -231,12 +238,16 @@ exports.create = function(req, res) {
                                     });
                                 }
 
+                                // send json response object to update the
+                                // caller with new simulation data.
+                                var simObj = simulation.toObject();
+                                simObj.upTime = 0;
+                                res.jsonp(simObj);
 
-                                res.jsonp(simulation);
+                                // notify all clients with the same user id.
                                 sockets.getUserSockets().notifyUser(req.user.id,
                                                         'simulation_create',
-                                                         {data:simulation});
-
+                                                         {data:simObj});
                             }); // simulation.save (simulatorInstance)
                         }
                     });  // launchSimulator
@@ -365,7 +376,16 @@ exports.terminate = function(req, res) {
                     });
                 } else {
                     console.log('Simulator terminated: ' + util.inspect(info) + ' key: ' + keyName);
-                    res.jsonp(simulation);
+
+                    // send json response object to update the
+                    // caller with new simulation data.
+                    // Convert to javascript object as mongoose documents
+                    // don't support adding new fields, in this case upTime.
+                    var simObj = simulation.toObject();
+                    simObj.upTime = (simulation.date_term -
+                        simulation.date_launch)*1e-3;
+                    res.jsonp(simObj);
+
                     sockets.getUserSockets().notifyUser(req.user.id,
                                                         'simulation_terminate',
                                                         {data:simulation});
