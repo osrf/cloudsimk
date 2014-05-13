@@ -178,5 +178,9 @@ exports.init = function(io) {
                 console.log(msg);
             }
         });
+
+        socket.on('error', function(reason) {
+            console.log('Socket communication error: ' +  reason);
+        });
     });
 };
