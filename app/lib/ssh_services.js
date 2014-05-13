@@ -93,13 +93,10 @@ exports.getSimulatorStatus = function(hostIp, sshPrivateKeyStr, cb) {
 //////////////////////////////////////////////////////////////////////////////
 //
 //
-exports.uploadPublicKey = function(hostIp, sshPrivateKeyStr, publicKeyPath, cb) {
+exports.uploadPublicKey = function(hostIp, sshPrivateKeyStr, publicKeyStr, cb) {
 
-    
-    var cmd = 'cat ' + publicKeyPath + ' | ' + ;
+    var cmd =  'echo ' + publicKeyStr + '  >> .ssh/authorized_keys && echo "Key copied"' ;
     executeSshCommand(hostIp, sshPrivateKeyStr, cmd, cb);
-
-    // cat cloudsimk.pub | ssh -i k.pem ubuntu@54.188.126.233  'cat >> .ssh/authorized_keys && echo "Key copied"'
 
 };
 
