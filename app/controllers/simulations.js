@@ -331,6 +331,8 @@ exports.terminate = function(req, res) {
 
                     // send json response object to update the
                     // caller with new simulation data.
+                    // Convert to javascript object as mongoose documents
+                    // don't support adding new fields, in this case upTime.
                     var simObj = simulation.toObject();
                     simObj.upTime = (simulation.date_term -
                         simulation.date_launch)*1e-3;
