@@ -7,6 +7,8 @@ console.log(process.argv);
 if (process.argv.length === 2) {
     console.log('node ssh_services keyfile ip stat');
     console.log('node ssh_services keyfile ip start worldfile');
+    console.log('node ssh_services keyfile ip stop');
+    console.log('node ssh_servides keyfile ip sendkey ');
     console.log('');
     process.exit(); 
 }
@@ -44,4 +46,14 @@ if (cmd === 'stop') {
         else console.log(result);
     });
 }
+
+if (cmd === 'sendkey') {
+    var publicKey = process.argv[5];
+    console.log('public key: ' + publicKey);
+    sshServices.sendPublicKey(ip, key, publicKey, function(err, result) {
+        if(err) console.log('Error sending public ssh key to ' + ip + ': ' + err);
+        else console.log(result);
+    });
+}
+
 

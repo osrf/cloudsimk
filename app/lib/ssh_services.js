@@ -2,7 +2,10 @@
 
 var ssh2 = require('ssh2');
 
-
+//////////////////////////////////////////////////////////////////
+// executes an ssh command on a server. This is used internally
+// by the 
+//
 function executeSshCommand(hostIp, sshPrivateKeyStr, cmd, cb) {
     // determine if we are performing the ssh calls for real or
     // if we are simply executing local tests.
@@ -86,3 +89,21 @@ exports.getSimulatorStatus = function(hostIp, sshPrivateKeyStr, cb) {
     var cmd = 'cloudsimi/ping_gazebo.bash';
     executeSshCommand(hostIp, sshPrivateKeyStr, cmd, cb);
 };
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//
+exports.uploadPublicKey = function(hostIp, sshPrivateKeyStr, publicKeyPath, cb) {
+
+    
+    var cmd = 'cat ' + publicKeyPath + ' | ' + ;
+    executeSshCommand(hostIp, sshPrivateKeyStr, cmd, cb);
+
+    // cat cloudsimk.pub | ssh -i k.pem ubuntu@54.188.126.233  'cat >> .ssh/authorized_keys && echo "Key copied"'
+
+};
+
+
+
+
+
