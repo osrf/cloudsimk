@@ -177,7 +177,7 @@ exports.create = function(req, res) {
                     // set date_launch just before we launch the simulation on the cloud
                     simulation.date_launch = Date.now();
                     cloudServices.launchSimulator(  serverDetails.region,
-                                                    keyName,
+                                                   keyName,
                                                     serverDetails.hardware,
                                                     serverDetails.image,
                                                     tags,
@@ -192,6 +192,39 @@ exports.create = function(req, res) {
                             simulation.ssh_private_key = key;
                             simulation.machine_ip = 'N/A';
                             setTimeout(function () {
+                                // simulation data may have changed over the
+                                // 30 second period so retrieve it again
+                                Simulation.findOne({sim_id: simulation.sim_id}, function(err, sim) {
+                                    if (err) {
+                                      res.jsonp(500, { error: err });
+                                    }
+                                    else if (sim) {
+                                      sim.machine_ip = 'waiting';
+                                      cloudServices.simulatorStatus(machineInfo, function(err, state) {
+                                          var s = 'Getting ip from AWS: machine:';
+                                          s += util.inspect(machineInfo);
+                                          s +=  ' status: ';
+                                          s += util.inspect(state);
+                                          console.log(s);
+                                          sim.machine_ip = state.ip;
+                                          sim.save(function(err) {
+                                              if (err) {
+                                                  if(machineInfo.id) {
+                                                      console.log('error saving simulation info to db: ' + err);
+                                                      console.log('Terminating server ' + machineInfo.id);
+                                                      cloudServices.terminateSimulator(machineInfo, function () {});
+                                                  }
+                                                  console.log('Error getting machine ip');
+                                                  res.jsonp(500, { error: err });
+                                              } else {
+                                                  // New IP: broadcast the news
+                                                  sockets.getUserSockets().notifyUser(req.user.id,
+                                                                          'simulation_update',
+                                                                          {data:sim});
+                                              }
+                                          });
+                                      });
+                                    }
                                 });
                             }, 30000);
 
@@ -225,7 +258,7 @@ exports.create = function(req, res) {
                 }
             });  // gerenateKey
         }
-    });  
+    });  // User.load
 };
 
 /////////////////////////////////////////////////
