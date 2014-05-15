@@ -89,6 +89,7 @@ exports.update = function(req, res) {
 
     user.credit = req.body.credit;
     user.invites = req.body.invites;
+    user.admin = req.body.admin;
 
     // Save the user to the database
     user.save(function(err) {

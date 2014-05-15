@@ -69,7 +69,7 @@
           <td colspan="5">
             <div class='text-right'>
               <pagination direction-links="true"
-              total-items="users.length" items-per-page="pageSize"
+              total-items="filteredUsers.length" items-per-page="pageSize"
               ng-click="clearSelected()"
               page="currentPage"></pagination>
              </div>
@@ -91,7 +91,8 @@
               ng-model="user.credit" min="0" ng-change="updateUser(user);">
               </div>
             </td>
-            <td style="text-align:center"><input type="checkbox" ng-click="setAdmin(user);"/></td>
+            <td style="text-align:center"><input type="checkbox"
+               ng-change="updateUser(user);" ng-model="user.admin"/></td>
             <td><button type="button" class="btn btn-default btn-sm">Simulations<button</td>
           </tr>
         </tbody>

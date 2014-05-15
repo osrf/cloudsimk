@@ -111,7 +111,6 @@ angular.module('cloudsim.admin').controller('AdminController', ['$scope', '$stat
                         $scope.users.splice(idx, 1);
                     },
                     function(err) {
-                        console.log(err.data);
                         $scope.error = err.data;
                     }
                 );
@@ -168,20 +167,12 @@ angular.module('cloudsim.admin').controller('AdminController', ['$scope', '$stat
             });
 
             // Wait for the modal to be closed/canceled.
-            modalInstance.result.then(function (email) {
-                  // Create a new user (just fill in the fields using email).
-                  var user = new Users({
-                    email: email,
-                      open_id: email,
-                      username: email,
-                      name: email
-                  });
+            modalInstance.result.then(function (user) {
+                // Add the user to the local user list.
+                $scope.users.push(user);
 
-                  // Add the user to the local user list.
-                  $scope.users.push(user);
-
-                  // Save the user to the server.
-                  user.$save();
+                // Save the user to the server.
+                user.$save();
             }, function () {
                 // Do nothing when the modal is dismissed.
             });
@@ -201,7 +192,12 @@ angular.module('cloudsim.admin').controller('AdminController', ['$scope', '$stat
             angular.forEach(users, function(usr) {
               usr.credit += credit;
               usr.invites += invites;
-              $scope.updateUser(usr);
+              usr.$update(function() {},
+                  function(error){
+                      if (error) {
+                        $scope.error = 'Error trying to update user data';
+                      }
+                  });
             });
 
             $modalInstance.close();
@@ -225,9 +221,18 @@ angular.module('cloudsim.admin').controller('AdminController', ['$scope', '$stat
             });
 
             if (unique) {
-              $modalInstance.close(form.email.$viewValue);
+                // Create a new user (just fill in the fields using email).
+                var user = new Users({
+                    email: form.email.$viewValue,
+                    open_id: form.email.$viewValue,
+                    username: form.email.$viewValue,
+                    name: form.email.$viewValue,
+                    admin: form.admin.$viewValue
+                });
+
+                $modalInstance.close(user);
             } else {
-              $scope.error = 'Email already exists';
+                $scope.error = 'Email already exists';
             }
         };
 
