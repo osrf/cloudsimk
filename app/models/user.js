@@ -69,7 +69,17 @@ var UserSchema = new Schema({
       label: String,
       date: Date,
       key: String,
-    }]
+    }],
+
+    spent_warning: {
+      type: Number,
+      default: 0
+    },
+
+    balance_warning: {
+      type: Number,
+      default: 0
+    }
 });
 
 /// Virtuals

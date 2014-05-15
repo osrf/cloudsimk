@@ -15,8 +15,8 @@ angular.module('cloudsim.admin').controller('AdminController', ['$scope', '$stat
     /// Number of users to diplay per page
     $scope.pageSize = 5;
 
-    // Sort users by their username in acending order
-    $scope.predicate = 'username';
+    // Sort users by their email in acending order
+    $scope.predicate = 'email';
     $scope.reverse = false;
 
     // An error message that will be displayed if set.
@@ -162,7 +162,6 @@ angular.module('cloudsim.admin').controller('AdminController', ['$scope', '$stat
                   var user = new Users({
                     email: email,
                       open_id: email,
-                      username: email,
                       name: email
                   });
 

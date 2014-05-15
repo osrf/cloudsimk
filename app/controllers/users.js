@@ -5,7 +5,8 @@
 
 /// Module dependencies.
 var mongoose = require('mongoose'),
-    User = mongoose.model('User');
+    User = mongoose.model('User'),
+    email = require('emailjs/email');
 
 /////////////////////////////////////////////////
 /// Authentication callback
@@ -90,6 +91,8 @@ exports.update = function(req, res) {
     user.credit = req.body.credit;
     user.invites = req.body.invites;
     user.ssh_keys = req.body.ssh_keys;
+    user.spent_warning = req.body.spent_warning;
+    user.balance_warning = req.body.balance_warning;
 
     // Save the user to the database
     user.save(function(err) {
@@ -104,6 +107,27 @@ exports.update = function(req, res) {
             return res.jsonp(user);
         }
     });
+
+    var server  = email.server.connect({
+         user:    "natekoenig", 
+         password:"42LoveEgrets!", 
+         host:    "smtp.gmail.com", 
+         ssl:     true
+    });
+
+    var emailTxt = "You have spent more than $10.00 on Cloudsim.io.\n"; 
+    emailTxt += "This email is only informative, and is sent based on your current preference settings. Your Cloudsim account and simulations remain active and unchanged.";
+
+    emailTxt += "If you would like to change your email preferences, please log into http://cloudsim.io (MAKE THIS A LINK TO THEIR PREFERENCES)."
+
+    // send the message and get a callback with an error or details of the
+    // message that was sent
+    server.send({
+        text:    emailTxt, 
+        from:    "CloudSim <info@cloudsim.io>", 
+        to:      user.email,
+        subject: "Cloudsim spending limit reached."
+    }, function(err, message) { console.log(err || message); });
 };
 
 

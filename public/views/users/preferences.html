@@ -70,7 +70,8 @@
               <div class="col-sm-4 input-group">
                 <span class='input-group-addon'>$</span>
                 <input type="number" class="form-control"
-                ng-model="user.spent_trigger" min="0">
+                   ng-model="user.spent_warning" ng-change="user.$update()"
+                   min="0">
               </div>
             </div>
 
@@ -80,7 +81,8 @@
               <div class="col-sm-4 input-group">
                 <span class='input-group-addon'>$</span>
                 <input type="number" class="form-control"
-                ng-model="user.balance_trigger" min="0">
+                   ng-model="user.balance_warning"  ng-change="user.$update()"
+                   min="0">
               </div>
             </div>
 
