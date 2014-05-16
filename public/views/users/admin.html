@@ -77,7 +77,7 @@
         </tfoot>
 
         <tbody ng-model="users" ui-sortable>
-        <tr ng-repeat="user in (filteredUsers = (users | filter:{email: search} | orderBy:predicate:reverse | startFrom:(currentPage-1)*pageSize*(search.length==0) | limitTo:pageSize))">
+        <tr ng-repeat="user in (filteredUsers = (users | filter:{email: search} | orderBy:predicate:reverse | startFrom:(currentPage-1)*pageSize*(search.length==0)) | limitTo:pageSize)">
             <td>
               <input type="checkbox" ng-model="user.selected" />
             </td>
