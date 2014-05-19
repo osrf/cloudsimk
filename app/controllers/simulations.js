@@ -585,3 +585,40 @@ exports.keysDownload = function(req, res) {
         }
     });
 };
+
+
+function getPublicKeys(email, cb) {
+    User.find({email: email}).exec(function(err, users) {
+        if (err) {
+            console.err('getPublicKeys error looking for user: ' + err);
+            cb(err);
+        } else {
+            if(users.length !=1) {
+                var m = 'Can\'t find user ' + email;
+                console.err(m);
+                cb(m);
+            } else {
+                var user = users[0];
+                // hardcoded for now
+                var publicKeys = [];
+                var k = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDd9kDR7TF5Xslh82TlC/7J45N42aHVMRWlWa5KFac5qgm9DAKyXeCxxIDF4ao2Ogj+7YSe0G2J5GBMEz0HM1ZysukbY4Z+G/nkADNuWi4BMASaplfvdB86B3e4ubkGUdhPoNPETBAt7EjJe5ZNlN1lcprOeoS0wlbeKnLNTHpojkr+y99jrQgldpyOUsuDc6H0/JTfYkStCr5iTJ3uDWRAVZ2UhddIts1ecDZpI6xMXnt4DtxTBmMGOcWl+YbfgftGhOKRvETeDP6Fi5VnlDgV4LnMZEDDxBv5Ap8O3v5LBiga4hvuoxUWlDMEE5c5UYluSrOMxNl2ATpygV5lal/H hugo@osrfoundation.org';
+                publicKeys.push(k);
+            }
+        }
+    }); // User.find
+}
+
+////////////////////////////////////////////////////
+//
+// Share a simulator with a user
+// @param req request
+// @param res response
+exports.shareSimulator = function(req, res) {
+    console.log('Sharing simulator: ' + req.user.username + ' :' + req.simulation.sim_id);
+    console.log('with user :' + req.body.newUser);
+
+    // gather ssh connection info
+    var hostIp = req.simulation.machine_ip; 
+    var sshPrivateKeyStr = req.simulation.ssh_private_key; 
+    var publicKeyStr = 
+};

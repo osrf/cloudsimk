@@ -95,10 +95,13 @@ exports.getSimulatorStatus = function(hostIp, sshPrivateKeyStr, cb) {
 // /home/ubuntu/.ssh/authorized_keys file
 // @param hostIp simulator ip
 // @param sshPrivateKey  the content of the private key for the ubuntu user
-// @param publicKeyStr  the content of the public key to upload
-exports.uploadPublicKey = function(hostIp, sshPrivateKeyStr, publicKeyStr, cb) {
-    var cmd =  'echo ' + publicKeyStr + '  >> .ssh/authorized_keys && echo "Key copied"' ;
-    executeSshCommand(hostIp, sshPrivateKeyStr, cmd, cb);
+// @param publicKeyStrArray  list of the public keys content to upload
+exports.uploadPublicKeys = function(hostIp, sshPrivateKeyStr, publicKeyStrArray, cb) {
+    for(var i=0; i < publicKeyStrArray.length; i++) {
+        var publicKeyStr = publicKeyStrArray[i];
+        var cmd =  'echo ' + publicKeyStr + '  >> .ssh/authorized_keys && echo "Key copied"' ;
+        executeSshCommand(hostIp, sshPrivateKeyStr, cmd, cb);
+    }
 };
 
 
