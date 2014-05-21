@@ -40,7 +40,7 @@
         <div class="panel-heading">Billing Information</div>
         <div class="panel-body">
 
-          <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+          <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" ng-hide="{{global.paypalSandbox}}">
             <input type="hidden" name="cmd" value="_s-xclick">
             <input type="hidden" name="hosted_button_id" value="39BUZ7J6AE4PU">
             <input type="hidden" name="custom" value="{{global.user._id}}">
@@ -68,14 +68,14 @@
           </form>
 
           <!-- sandbox test button -->
-          <form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post" target="_top">
+          <form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post" target="_top" ng-show="{{global.paypalSandbox}}">
             <input type="hidden" name="cmd" value="_s-xclick">
             <input type="hidden" name="hosted_button_id" value="B58V7X9ECC5T8">
             <input type="hidden" name="custom" value="{{global.user._id}}">
             <table>
               <tr>
                 <td>
-                  <input type="hidden" name="on0" value="CloudSim Credit Sandbox Test">CloudSim Credit Sandbox Test
+                  <input type="hidden" name="on0" value="CloudSim Credit Sandbox Test">CloudSim Credit Sandbox Test [see config/env/all.js]
                 </td>
               </tr>
               <tr>
