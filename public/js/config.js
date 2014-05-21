@@ -5,7 +5,6 @@ angular.module('cloudsim').config(['$stateProvider', '$urlRouterProvider',
   function($stateProvider, $urlRouterProvider) {
     // For unmatched routes:
     $urlRouterProvider.otherwise('/');
-
     // states for my app
     $stateProvider
 /*      .state('all simulations', {
@@ -33,6 +32,14 @@ angular.module('cloudsim').config(['$stateProvider', '$urlRouterProvider',
     .state('home', {
         url: '/',
         templateUrl: 'views/index.html'
+    })
+    .state('payment_success', {
+        url: '/payment/success',
+        templateUrl: 'views/billing/payment_success.html'
+    })
+    .state('payment_canceled', {
+        url: '/payment/canceled',
+        templateUrl: 'views/billing/payment_canceled.html'
     });
 }
 ]);

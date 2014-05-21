@@ -10,6 +10,8 @@
     _ = require('lodash');
 var sockets = require('../lib/sockets');*/
 
+var util  = require('util');
+
 /////////////////////////////////////////////////
 /// Process a Paypal Instant Payment Notification (IPN) message
 /// @param req Nodejs request object.
@@ -26,10 +28,11 @@ exports.paypal_ipn = function(req, res) {
       } else {
           console.log('paypal ipn msg ' + msg);
           //Do stuff with original params here
-
           if (req.body.payment_status === 'Completed') {
-            console.log ('completed');
-            //Payment has been confirmed as completed
+              console.log ('completed');
+              console.log('user ' + req.body.custom);
+              console.log('amount ' + req.body.mc_gross);
+              //Payment has been confirmed as completed
           }
       }
   });
