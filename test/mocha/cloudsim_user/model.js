@@ -48,7 +48,7 @@ describe('<Unit Test>', function() {
                 cloudsimUser.save(done);
             });
 
-            it('should fail to save an existing user again', function(done) {
+            it('should be possible to increment the sim id', function(done) {
 
                 CloudsimUser.incrementNextSimId(user._id, function(err, id) {
                     should.exist(id);
