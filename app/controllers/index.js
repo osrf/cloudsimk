@@ -9,8 +9,6 @@ exports.render = function(req, res) {
         });
     }
     else {
-        res.render('index_landing', {
-            user: req.user ? JSON.stringify(req.user) : 'null'
-        });
+        res.render('index_landing', {});
     }
 };

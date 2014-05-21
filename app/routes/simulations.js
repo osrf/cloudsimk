@@ -28,8 +28,13 @@ module.exports = function(app) {
     app.post('/simulations',
         authorization.requiresLogin, Simulations.create);
 
+    /// GET for ssh key download
     app.get('/simulations/:simulationId/keys.zip',
         authorization.requiresLogin, Simulations.keysDownload);
+
+    /// POST a username to share a simulator with that user
+    app.post('/simulations/:simulationId/share',
+        authorization.requiresLogin, Simulations.shareSimulator);
 
     /// GET /simulations/:simulationId
     /// Return properties for one simulation
