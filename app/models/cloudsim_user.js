@@ -22,8 +22,13 @@ var CloudSimUserSchema = new Schema({
     next_sim_id: {
         type: Number,
         default: -1
+    },
+    
+    // the money left in the user account, in cents
+    account_balance: {
+        type: Number,
+        default: 0
     }
-
 });
 
 //
@@ -69,6 +74,6 @@ CloudSimUserSchema.statics.findFromUserId = function(userId, cb) {
                     });
 };
 
-
 mongoose.model('CloudsimUser', CloudSimUserSchema);
+
 
