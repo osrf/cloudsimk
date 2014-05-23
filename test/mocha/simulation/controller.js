@@ -1,5 +1,8 @@
 'use strict';
 
+console.log('test/mocha/simulation/controller.js');
+
+
 /// Module dependencies.
 var mongoose = require('mongoose'),
     User = mongoose.model('User'),
@@ -68,7 +71,7 @@ describe('<Unit Test>', function() {
             });
         });
 
-        describe('Users should have CloudsimUser dosuments', function() {
+        describe('Users should have CloudsimUser documents', function() {
             it('should exist for user', function(done) {
               csUser = new CloudSimUser({user: user._id});
               csUser.save(done);
