@@ -25,6 +25,12 @@ var SimulationSchema = new Schema({
         default: null
     },
 
+    // The date until when the server is paid for
+    date_billed_until: {
+        type: Date,
+        default: null
+    },
+
     // Simulation id (starts at 0). The user is not allowed to modify
     // this value
     sim_id: {
@@ -73,7 +79,7 @@ var SimulationSchema = new Schema({
     },
 
     // cost per hr
-    server_price: {
+    server_price_in_cents: {
         type: Number
     }
 

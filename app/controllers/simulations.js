@@ -150,8 +150,6 @@ exports.create = function(req, res) {
     simulation.date_term = null;
     simulation.upTime = 0;
 
-    console.log('REZ0 ' + res);
-
     CloudsimUser.incrementNextSimId(req.user.id, function(err, cloudsimUser){
         if(err) {
             // an unlikely error, since user is in req.
