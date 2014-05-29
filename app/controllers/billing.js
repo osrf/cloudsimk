@@ -6,13 +6,10 @@
 /// Module dependencies.
 var Duration = require('duration');
 var mongoose = require('mongoose'),
-    Simulation = mongoose.model('Simulation'),
-    User = mongoose.model('User'),
     CloudsimUser = mongoose.model('CloudsimUser'),
     Billing = mongoose.model('Billing');
-var sockets = require('../lib/sockets');
 
-
+// var sockets = require('../lib/sockets');
 // var util  = require('util');
 
 //////////////////////////////////////////////////////////////////////////////
@@ -59,7 +56,7 @@ exports.accountWithdrawal = function(userId, amountInCents, note, cb) {
         else {
             // the balance is updated, let's write a billing document
             var billing = new Billing({ user: userId,
-                                        operation: "withdrawal",
+                                        operation: 'withdrawal',
                                         amount: amountInCents,
                                         balance: cloudsimUser.account_balance,
                                         date: new Date(),
@@ -98,7 +95,7 @@ exports.accountDeposit = function(userId, amountInCents, note, cb) {
         else {
             // the balance is updated, let's write a billing document
             var billing = new Billing({ user: userId,
-                                        operation: "deposit",
+                                        operation: 'deposit',
                                         amount: amountInCents,
                                         balance: cloudsimUser.account_balance,
                                         date: new Date(),
@@ -114,7 +111,7 @@ exports.accountDeposit = function(userId, amountInCents, note, cb) {
             });
         }
     }); 
-}
+};
 
 
 
@@ -155,7 +152,8 @@ exports.charge = function (dueDate, costPerHourInCents) {
     bill.chargeInCents = hoursToBill * costPerHourInCents;
     bill.validUntil = addSeconds(dueDate, 3600 * hoursToBill);
     return bill;
-}
+};
+
 
 
 

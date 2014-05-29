@@ -7,6 +7,7 @@
 var mongoose = require('mongoose'),
     Simulation = mongoose.model('Simulation'),
     CloudsimUser = mongoose.model('CloudsimUser'),
+    billing = require('./billing'),
     _ = require('lodash');
 
 var sockets = require('../lib/sockets');
@@ -31,15 +32,15 @@ var awsData = { 'US West': {region: 'us-west-2',
                             // hardware: 'm1.small',
                             image: 'ami-b8d2b088',  // simulator-stable 2.0.3
                             hardware: 'g2.2xlarge',
-                            price: 0},
+                            priceInCents: 75},
                  'US East': {region: 'us-east-1',
                              image: 'ami-4d8d8924',
                              hardware: 'g2.2xlarge',
-                             price: 0},
+                             priceInCents: 77},
                  'Ireland': {region: 'eu-west-1',
                              image: 'ami-b4e313c3',
                              hardware: 'g2.2xlarge',
-                             price: 0}
+                             priceInCents: 76}
 };
 
 /////////////////////////////////////////////////
@@ -90,6 +91,44 @@ function getKeyName(email, sim_id) {
 }
 
 
+////////////////////////////////////////////////////////////////////////////
+// Get the ip of a newly launched simulator server. This is performed 30sec
+// after launch, because the information is not available during launch.
+// @param machineInfo: contains the region and the AWS machine ID
+function getServerIp(machineInfo, userId,  simId) {
+
+    // retrieve simulation data
+    Simulation.findOne({sim_id: simId}, function(err, sim) {
+        if (err) {
+          console.error('Error retrieving simulation ' + simId + ': ' +  err );
+        }
+        else if (sim) {
+          sim.machine_ip = 'waiting';
+          cloudServices.simulatorStatus(machineInfo, function(err, state) {
+              var msg = 'machine:' + util.inspect(machineInfo);
+              msg += ' status: ' + util.inspect(state);
+              console.log(msg);
+              sim.machine_ip = state.ip;
+              sim.save(function(err) {
+                if (err) {
+                      console.log('error saving simulation info to db: ' + err);
+                      if(machineInfo.id) {
+                          console.log('Terminating server ' + machineInfo.id);
+                          cloudServices.terminateSimulator(machineInfo, function () {});
+                      }
+                  } else {
+                      // New IP: broadcast the news
+                      sockets.getUserSockets().notifyUser(userId,
+                                              'simulation_update',
+                                              {data:sim});
+                  }
+              });
+          });
+        }
+    });
+}
+
+
 /////////////////////////////////////////////////
 /// Create a simulation
 /// @param[in] req Nodejs request object.
@@ -99,109 +138,116 @@ exports.create = function(req, res) {
 
     // Create a new simulation instance based on the content of the
     // request
-    var simulation = new Simulation(req.body);
+
+    console.log(util.inspect(req.body));    
+    var simulation = {state: 'Launching'};
+    //new Simulation(req.body);
+    simulation.region = req.body.region;
+    simulation.world = req.body.world;
     // Set the simulation user
     simulation.user = req.user;
+    simulation.date_launch = new Date();
+    simulation.date_term = null;
+    simulation.upTime = 0;
 
-    //User.findByIdAndUpdate(req.user.id, {$inc:{next_sim_id: 1}}, function(err, user) {
-    // 
-    CloudsimUser.incrementNextSimId(req.user.id, function(err, next_sim_id){
+    console.log('REZ0 ' + res);
+
+    CloudsimUser.incrementNextSimId(req.user.id, function(err, cloudsimUser){
         if(err) {
             // an unlikely error, since user is in req.
             console.log('Create Simulation failed. Error updating user simulation sim id in database: ' + err);
             res.jsonp(500, { error: err });
         } else {
-            // set the new sim id from the CloudSim user data
-            simulation.sim_id = next_sim_id;
-            // we pick the appropriate machine based on the region specified
-            // by the user
-            var serverDetails = awsData[simulation.region];
-            var keyName = getKeyName(req.user.email,  simulation.sim_id);
-            cloudServices.generateKey(keyName, serverDetails.region, function(err, key) {
-                if(err) {
-                    console.log('Error generating key: ' + err);
-                    res.jsonp(500, { error: err });
-                } else {
-                    // set date_launch just before we launch the simulation on the cloud
-                    simulation.date_launch = Date.now();
-                    cloudServices.launchSimulator(  req.user.username,
-                                                    keyName,
-                                                    simulation.sim_id,
-                                                    serverDetails.region,
-                                                    serverDetails.hardware,
-                                                    serverDetails.image,
-                                                    function (err, machineInfo) {
-                        if(err) {
-                            res.jsonp(500, { error: err });
-                        } else {
-                            simulation.machine_id = machineInfo.id;
-                            simulation.server_price = serverDetails.price;
-                            simulation.ssh_private_key = key;
-                            simulation.machine_ip = 'N/A';
-                            setTimeout(function () {
-                                // simulation data may have changed over the
-                                // 30 second period so retrieve it again
-                                Simulation.findOne({sim_id: simulation.sim_id}, function(err, sim) {
-                                    if (err) {
-                                      res.jsonp(500, { error: err });
-                                    }
-                                    else if (sim) {
-                                      sim.machine_ip = 'waiting';
-                                      cloudServices.simulatorStatus(machineInfo, function(err, state) {
-                                          console.log('machine:' + util.inspect(machineInfo)  + ' status: ' + util.inspect(state));
-                                          sim.machine_ip = state.ip;
-                                          sim.save(function(err) {
-                                              if (err) {
-                                                  if(machineInfo.id) {
-                                                      console.log('error saving simulation info to db: ' + err);
-                                                      console.log('Terminating server ' + machineInfo.id);
-                                                      cloudServices.terminateSimulator(machineInfo, function () {});
-                                                  }
-                                                  console.log('Error getting machine ip');
-                                                  res.jsonp(500, { error: err });
-                                              } else {
-                                                  // New IP: broadcast the news
-                                                  sockets.getUserSockets().notifyUser(req.user.id,
-                                                                          'simulation_update',
-                                                                          {data:sim});
-                                              }
-                                          });
-                                      });
-                                    }
-                                });
-                            }, 30000);
+            var next_sim_id = cloudsimUser.next_sim_id;
+            // first, the money
+            var serverDetails = awsData[simulation.region]; 
+            // bill the first hour in advance
+            // console.log('The cost for this simulation is: ' + serverDetails.priceInCents);
+            if (cloudsimUser.account_balance <= serverDetails.priceInCents) {
+                var msg = 'Your account balance, $' + (0.01 * cloudsimUser.account_balance).toFixed(2);
+                msg += ' is insufficient to run this server for more than an hour (the server cost is ';
+                msg += ' ' + (0.01 * serverDetails.priceInCents).toFixed(2);
+                msg += ' $/hr)';
+                console.log(msg);
+                res.jsonp(500, { error: msg });
+            } else {
+                var bill = billing.charge(simulation.date_launch, serverDetails.priceInCents);
+                billing.accountWithdrawal(req.user._id,
+                                          serverDetails.priceInCents,
+                                          'Initial launch, sim' + next_sim_id,
+                                          function (err) {
+                    if(err){
+                        console.log('Error withdrawing money before launch: ' + err);
+                        res.jsonp(500, { error: err });
+                    } else {
+                        // set the new sim id from the CloudSim user data
+                        simulation.sim_id = next_sim_id;
+                        simulation.date_billed_until = bill.validUntil;
+                        simulation.server_price_in_cents = serverDetails.priceInCents;
+                        // we pick the appropriate machine based on the region specified
+                        // by the user
+                        var keyName = getKeyName(req.user.email,  simulation.sim_id);
+                        cloudServices.generateKey(keyName, serverDetails.region, function(err, key) {
+                            if(err) {
+                                console.log('Error generating key: ' + err);
+                                res.jsonp(500, { error: err });
+                            } else {
+                                // set date_launch just before we launch the simulation on the cloud
+                                simulation.date_launch = Date.now();
+                                cloudServices.launchSimulator(  req.user.username,
+                                                                keyName,
+                                                                simulation.sim_id,
+                                                                serverDetails.region,
+                                                                serverDetails.hardware,
+                                                                serverDetails.image,
+                                                                function (err, machineInfo) {
+                                    if(err) {
+                                        res.jsonp(500, { error: err });
+                                    } else {
+                                        // set simulation document values
+                                        simulation.machine_id = machineInfo.id;
+                                        simulation.ssh_private_key = key;
+                                        simulation.machine_ip = 'N/A';
+                                        // simulation.
 
-                            // Save the simulation instance to the database
-                            simulation.save(function(err) {
-                                if (err) {
-                                    if(machineInfo.id) {
-                                        console.log('error saving simulation info to db: ' + err);
-                                        console.log('Terminating server ' +  machineInfo.id);
-                                        cloudServices.terminateSimulator(machineInfo, function () {});
+                                        // trigger a callback to get the ip in 30 sec
+                                        setTimeout(
+                                            getServerIp(machineInfo, req.user.id, simulation.sim_id),
+                                            30000);
+                                        // Save the simulation instance to the database
+                                        var sim = new Simulation(simulation);
+                                        sim.save(function(err) {
+                                            if (err) {
+                                                console.log('error saving simulation info to db: ' + err);
+                                                if(machineInfo.id) {
+                                                    console.log('Terminating server ' +  machineInfo.id);
+                                                    cloudServices.terminateSimulator(machineInfo, function () {});
+                                                }
+                                                return res.send('users/signup', {
+                                                    errors: err.errors,
+                                                    Simulation: simulation
+                                                });
+                                            }
+
+                                            // send json response object to update the
+                                            // caller with new simulation data.
+                                            // var simObj = simulation.toObject();
+                                            res.jsonp(simulation);
+
+                                            // notify all clients with the same user id.
+                                            sockets.getUserSockets().notifyUser(req.user.id,
+                                                                    'simulation_create',
+                                                                     {data:simulation});
+                                        }); // simulation.save (simulatorInstance)
                                     }
-                                    return res.send('users/signup', {
-                                        errors: err.errors,
-                                        Simulation: simulation
-                                    });
-                                }
-
-                                // send json response object to update the
-                                // caller with new simulation data.
-                                var simObj = simulation.toObject();
-                                simObj.upTime = 0;
-                                res.jsonp(simObj);
-
-                                // notify all clients with the same user id.
-                                sockets.getUserSockets().notifyUser(req.user.id,
-                                                        'simulation_create',
-                                                         {data:simObj});
-                            }); // simulation.save (simulatorInstance)
-                        }
-                    });  // launchSimulator
-                }
-            });  // gerenateKey
-        }
-    });
+                                });  // launchSimulator
+                            }
+                        });  // gerenateKey
+                    } 
+                });
+            }
+        } 
+    }); // incrementNextSimId
 };
 
 /////////////////////////////////////////////////
@@ -210,10 +256,10 @@ exports.create = function(req, res) {
 /// @param[out] res Nodejs response object
 /// @return Simulation update function.
 exports.update = function(req, res) {
-
     // Get the simulation from the request
     var simulation = req.simulation;
-
+    console.log('body state ' + req.body.state + ' sim: ' + simulation.state);
+ 
     if (simulation.state === 'Terminated') {
         // don't rewrite history, just return.
         res.jsonp(simulation);
@@ -221,7 +267,7 @@ exports.update = function(req, res) {
     }
 
     // Check if the update operation is to terminate a simulation
-    if (req.body.state !== simulation.state &&
+   if (req.body.state !== simulation.state &&
         req.body.state === 'Terminated') {
         exports.terminate(req, res);
         return;
@@ -271,7 +317,6 @@ exports.destroy = function(req, res) {
 
     // Get the simulation model
     var simulation = req.simulation;
-
     // Remove the simulation model from the database
     // TODO: We need to check to make sure the simulation instance has been
     // terminated
@@ -295,6 +340,7 @@ exports.destroy = function(req, res) {
 /// @param[out] res Nodejs response object.
 /// @return Destroy function
 exports.terminate = function(req, res) {
+    console.log('simulation.terminate');
     // Get the simulation model
     var simulation = req.simulation;
     var user = req.user;

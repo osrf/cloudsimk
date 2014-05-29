@@ -50,7 +50,7 @@ CloudSimUserSchema.statics.incrementNextSimId = function(userId, cb) {
                                     cb(err);
                                 } else {
                                     if(cloudsimUser) {
-                                        cb(null, cloudsimUser.next_sim_id);
+                                        cb(null, cloudsimUser);
                                     } else {
                                         cb('Can\'t find CloudSim information for the user');
                                     }

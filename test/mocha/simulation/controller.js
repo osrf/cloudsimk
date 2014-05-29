@@ -118,6 +118,8 @@ describe('<Unit Test>', function() {
                 .send({ world: 'empty.world', region:'US East' })
                 .end(function(err,res){
                     util.log_res(res);
+                    should.not.exist(err);
+                    should.exist(res);
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     var text = JSON.parse(res.text);
