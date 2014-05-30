@@ -103,8 +103,7 @@ exports.create = function(req, res) {
     // Set the simulation user
     simulation.user = req.user;
 
-    //User.findByIdAndUpdate(req.user.id, {$inc:{next_sim_id: 1}}, function(err, user) {
-    // 
+    // Users keep track of their next simulation id 
     CloudsimUser.incrementNextSimId(req.user.id, function(err, next_sim_id){
         if(err) {
             // an unlikely error, since user is in req.
