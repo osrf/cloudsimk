@@ -12,6 +12,7 @@ angular.module('cloudsim.simulations').factory('Simulations', ['$resource', func
 
 /*globals io*/
 var socket = io.connect();
+
 angular.module('cloudsim.simulations').factory('Topic', function() {
   function Topic(options) {
     options = options || {};
