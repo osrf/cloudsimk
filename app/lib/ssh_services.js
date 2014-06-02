@@ -4,8 +4,7 @@ var ssh2 = require('ssh2');
 
 //////////////////////////////////////////////////////////////////
 // executes an ssh command on a server. This is used internally
-// by the 
-//
+// by the exported functions of this module 
 function executeSshCommand(hostIp, sshPrivateKeyStr, cmd, cb) {
     // determine if we are performing the ssh calls for real or
     // if we are simply executing local tests.
