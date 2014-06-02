@@ -2,18 +2,17 @@
 /// @module simulation_controller
 /// Server side simulation controller.
 
-
 /// Module dependencies.
 var uuid = require('node-uuid');
 var mongoose = require('mongoose'),
     Simulation = mongoose.model('Simulation'),
     User = mongoose.model('User'),
     fs = require('fs'),
+    CloudsimUser = mongoose.model('CloudsimUser'),
     _ = require('lodash');
 
 var sockets = require('../lib/sockets');
 var config = require('../../config/config');
-
 var child_process = require('child_process');
 
 // initialise cloudServices, depending on the environment
@@ -142,21 +141,15 @@ exports.create = function(req, res) {
     // Set the simulation user
     simulation.user = req.user;
 
-    // find user and also update the next_sim_id to ensure a unique id
-    // when we get multiple concurrent POSTS
-    User.findByIdAndUpdate(req.user.id, {$inc:{next_sim_id: 1}}, function(err, user) {
+    // Users keep track of their next simulation id 
+    CloudsimUser.incrementNextSimId(req.user.id, function(err, next_sim_id){
         if(err) {
             // an unlikely error, since user is in req.
             console.log('Create Simulation failed. Error updating user simulation sim id in database: ' + err);
             res.jsonp(500, { error: err });
         } else {
-            if (!user) {
-                console.log('Create Simulation failed. Error finding user in database: ' + err);
-                res.jsonp(500, { error: err });
-                return;
-            }
-            // decrement because we update it first in findByIdAndUpdate
-            simulation.sim_id = --user.next_sim_id;
+            // set the new sim id from the CloudSim user data
+            simulation.sim_id = next_sim_id;
             // we pick the appropriate machine based on the region specified
             // by the user
             var serverDetails = awsData[simulation.region];
@@ -258,7 +251,7 @@ exports.create = function(req, res) {
                 }
             });  // gerenateKey
         }
-    });  // User.load
+    });
 };
 
 /////////////////////////////////////////////////
