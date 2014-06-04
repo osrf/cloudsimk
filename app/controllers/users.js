@@ -6,8 +6,7 @@
 /// Module dependencies.
 var mongoose = require('mongoose'),
     User = mongoose.model('User'),
-    CloudsimUser = mongoose.model('CloudsimUser'),
-    async = require('async');
+    CloudsimUser = mongoose.model('CloudsimUser');
 
 /////////////////////////////////////////////////
 // Helper function that merges a user and cloudsimuser
