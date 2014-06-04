@@ -105,7 +105,7 @@ SimulationSchema.path('region').validate(function(s) {
 }, 'Region cannot be blank');
 
 SimulationSchema.path('state').validate(function(s) {
-    return ['Launching', 'Terminated'].indexOf(s) > -1 ;
+    return ['Launching', 'Running', 'Terminated'].indexOf(s) > -1 ;
 }, 'State of the simulation instance must be Launching or Terminated');
 
 SimulationSchema.path('user').validate(function(s) {
@@ -126,5 +126,14 @@ SimulationSchema.statics.loadBySimId = function(userId, simId, cb) {
         sim_id: simId
     }).populate('user', 'name username').exec(cb);
 };
+
+SimulationSchema.statics.getRunningSimulations = function(cb) {
+    this.find({
+        $where: 'this.state != "Terminated"'
+    }).populate('user', 'name username').exec(function (err, sims) {
+        cb(err, sims);
+    });
+};
+
 
 mongoose.model('Simulation', SimulationSchema);

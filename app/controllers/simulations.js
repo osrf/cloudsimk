@@ -11,6 +11,8 @@ var mongoose = require('mongoose'),
     _ = require('lodash');
 
 var sockets = require('../lib/sockets');
+var util = require('util');
+
 
 // initialise cloudServices, depending on the environment
 var cloudServices;
@@ -21,8 +23,6 @@ if(process.env.AWS_ACCESS_KEY_ID) {
     console.log('process.env.AWS_ACCESS_KEY_ID not defined: using the fake cloud services');
     cloudServices = require('../lib/fake_cloud_services.js');
 }
-
-var util = require('util');
 
 ////////////////////////////////////
 // The AWS server information
@@ -42,6 +42,73 @@ var awsData = { 'US West': {region: 'us-west-2',
                              hardware: 'g2.2xlarge',
                              priceInCents: 76}
 };
+
+/////////////////////////////////////////////////////////////////////////////////
+// When necessary, charges the user for simulator time, updating the 
+// account balance and the simulation's due date.
+// @param simulation the simulation to charge
+// @now the Date that represent the moment of billing
+function billSimulatorTime(simulation, now) {
+    // don't charge for Terminated sim
+    if (simulation.state === 'Terminated') {
+        return;
+    }
+
+    // check if billing is due
+    var bill = billing.charge(simulation.date_billed_until,
+                              simulation.server_price_in_cents,
+                              now);
+    // when there is a charge...
+    if (bill.chargeInCents) {
+        // time to bill
+        
+        Simulation.findOneAndUpdate({_id: simulation.id},
+                                    {date_billed_until: bill.validUntil},
+                                    function (err) {
+            if(err) {
+                var msg = 'Error updating sim time validity fot sim "';
+                msg += simulation.id + '" : ' + err;
+                console.log(msg);
+            } else {
+                billing.accountWithdrawal(simulation.user.id,
+                               bill.chargeInCents,
+                               'simulation time for sim: ' + simulation._id,
+                               function (err, new_balance) {
+                    if(err){
+                        console.log('Error withdrawing money before launch: ' + err);
+                    } else {
+                        var msg = 'User ' +  simulation.user.username;
+                        msg +=  ' balance: ' +  new_balance;
+                        console.log(msg);
+                        if(new_balance <= 0 ) {
+                            // Account is empty: kill the simulation
+                            simulation
+                        }
+                    }
+                });
+            }
+        });
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Collects all running simulations and updates the charges if necessary
+function billingCycle() {
+    var now = new Date();
+    Simulation.getRunningSimulations( function (err, sims) {
+        if(err) {
+            console.log('Error getting running sims for billing: ' + err);
+            return;
+        }
+        for (var i=0; i < sims.length; i++) {
+            var sim = sims[i];
+            billSimulatorTime(sim, now);
+        }
+    });
+}
+
+setInterval(billingCycle, 30000);
+
 
 /////////////////////////////////////////////////
 /// Find Simulation by id
@@ -89,6 +156,7 @@ exports.simulation = function(req, res, next, id) {
 function getKeyName(email, sim_id) {
     return 'cs-' + sim_id + '-' + email;
 }
+
 
 
 ////////////////////////////////////////////////////////////////////////////
@@ -327,35 +395,29 @@ exports.destroy = function(req, res) {
         } else {
             res.jsonp(simulation);
             // notify the user from the other browsers
-
         }
     });
 };
 
-/////////////////////////////////////////////////
-/// Terminate a running simulation
-/// @param[in] req Nodejs request object.
-/// @param[out] res Nodejs response object.
-/// @return Destroy function
-exports.terminate = function(req, res) {
-    console.log('simulation.terminate');
-    // Get the simulation model
-    var simulation = req.simulation;
-    var user = req.user;
-    var region = awsData[simulation.region].region;
-    var machineInfo = {region: region,
+///////////////////////////////////////////////////////////////////////////////////////
+//
+function terminateSimulator(user, simulation, cb) {
+    var awsRegion = awsData[simulation.region].region;
+    var machineInfo = {region: awsRegion,
                        id: simulation.machine_id};
     var keyName = getKeyName(user.email, simulation.sim_id);
+
     // delete the ssh key. If there is an error, report it
     // but try to shutdown the machine anyways
-    cloudServices.deleteKey(keyName, region, function(err) {
+    cloudServices.deleteKey(keyName, awsRegion, function(err) {
         if(err) {
             console.log('Error deleting key "' + keyName  +  '": ' + err);
         }
     });
+
     cloudServices.terminateSimulator(machineInfo, function(err, info) {
         if(err) {
-            res.jsonp(500, { error: err });
+            cb(err)
         } else {
             simulation.state = 'Terminated';
             simulation.date_term = Date.now();
@@ -366,28 +428,46 @@ exports.terminate = function(req, res) {
                         Simulation: simulation
                     });
                 } else {
-                    console.log('Simulator terminated: ' + util.inspect(info) + ' key: ' + keyName);
-
-                    // send json response object to update the
-                    // caller with new simulation data.
-                    // Convert to javascript object as mongoose documents
-                    // don't support adding new fields, in this case upTime.
-                    var simObj = simulation.toObject();
-                    simObj.upTime = (simulation.date_term -
-                        simulation.date_launch)*1e-3;
-                    res.jsonp(simObj);
-
-                    sockets.getUserSockets().notifyUser(req.user.id,
+                    var msg = 'Simulator terminated: ';
+                    msg += util.inspect(info) + ' key: ' + keyName;
+                    console.log(msg);
+                    // notify everyone
+                    sockets.getUserSockets().notifyUser(user.id,
                                                         'simulation_terminate',
                                                         {data:simulation});
+                    cb(null, simulation);
                 }
             });
+            
+        }
+    }); // terminate
+}
+
+/////////////////////////////////////////////////
+/// Terminate a running simulation
+/// @param[in] req Nodejs request object.
+/// @param[out] res Nodejs response object.
+/// @return Destroy function
+exports.terminate = function(req, res) {
+    var simulation = req.simulation;
+    var user = req.user;
+
+    terminateSimulator(user, simulation, function(err, sim) {
+        if(err) {
+            res.jsonp(500, { error: err });
+        } else {
+            var simObj = simulation.toObject();
+            simObj.upTime = (simulation.date_term -
+                    simulation.date_launch)*1e-3;
+                    res.jsonp(simObj);
+
         }
     });
 };
 
+
 /////////////////////////////////////////////////
-/// Show an simulation.
+/// Show a simulation.
 /// @param[in] req Nodejs request object.
 /// @param[out] res Nodejs response object.
 exports.show = function(req, res) {

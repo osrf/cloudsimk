@@ -38,6 +38,7 @@ describe('<Unit Test>', function() {
                     username: 'user',
                     password: 'pass',
                     provider: 'local'
+                    
                 });
                 user2 = new User({
                     open_id: 'myopenid2',
@@ -73,11 +74,17 @@ describe('<Unit Test>', function() {
 
         describe('Users should have CloudsimUser documents', function() {
             it('should exist for user', function(done) {
-              csUser = new CloudSimUser({user: user._id});
+              csUser = new CloudSimUser({
+                    user: user._id,
+                    account_balance: 1000
+                });
               csUser.save(done);
             });
             it('should exist for user2', function(done) {
-                csUser2 = new CloudSimUser({user: user2._id});
+                csUser2 = new CloudSimUser({
+                    user: user2._id,
+                    account_balance: 1000
+                });
                 csUser2.save(done);
             });
         });

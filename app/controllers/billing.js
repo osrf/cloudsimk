@@ -125,9 +125,11 @@ function addSeconds(date, seconds) {
 //////////////////////////////////////////////////////////////////
 // Helper function that compares a date d with the current date.
 // @param d the Date to compare things with.
-// returns a negative number if d is in the future
-function secondsSince(d) {
-    var now = new Date();
+// @param dateNow the reference date (or now if undefined)
+// returns a negative number if d is in the future (from now)
+function secondsSince(d, dateNow) {
+    var now = dateNow;
+    if(!now) now = new Date();
     var duration = new Duration(d, now);
     return duration.seconds;
 }
@@ -138,11 +140,15 @@ function secondsSince(d) {
 // the charge is 0.
 // @param dueDate the moment until the simulator is paid for
 // @param the cost per hour for the server in cents
+// @param dateNow the current time, or undefined (will use new Date())
 // @return the bill, with the amount to be charged (bill.chargeInCents)
 // and the moment until it will remain paid for (bill.validUntil)
-exports.charge = function (dueDate, costPerHourInCents) {
+exports.charge = function (dueDate, costPerHourInCents, dateNow) {
+
+    var now = dateNow;    
+    if(!now) now = new Date();
     var bill = {chargeInCents: 0, validUntil:dueDate};
-    var secondsLate = secondsSince(dueDate);
+    var secondsLate = secondsSince(dueDate, now);
     if (secondsLate < 0) {
         // not late yet
         return bill;
