@@ -28,12 +28,6 @@ var UserSchema = new Schema({
         unique: true
     },
 
-    /// The ID of the next simulation instance the user will run
-    next_sim_id: {
-        type: Number,
-        default: 0
-    },
-
     /// The user's password
     hashed_password: String,
 
@@ -53,23 +47,7 @@ var UserSchema = new Schema({
     aol: {},
 
     /// AOL authentication
-    openid: {},
-
-    credit: {
-      type: Number,
-      default: 0
-    },
-
-    invites: {
-      type: Number,
-      default: 0
-    },
-
-    admin: {
-      type: Boolean,
-      default: false
-    }
-
+    openid: {}
 });
 
 /// Virtuals

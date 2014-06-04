@@ -5,6 +5,7 @@ var mongoose = require('mongoose'),
     User = mongoose.model('User'),
     Simulation = mongoose.model('Simulation'),
     User = mongoose.model('User'),
+    CloudSimUser = mongoose.model('CloudsimUser'),
     app = require('../../../server'),
     util = require('../util');
 
@@ -17,6 +18,8 @@ var user;
 var user2;
 var agent;
 var user2Cookie;
+var csUser;  // cloudsimUser document for user 
+var csUser2; // cloudsimUser document for user2
 
 describe('<Unit Test>', function() {
     describe('Simulation Controller:', function() {
@@ -65,6 +68,17 @@ describe('<Unit Test>', function() {
             });
         });
 
+        describe('Users should have CloudsimUser dosuments', function() {
+            it('should exist for user', function(done) {
+              csUser = new CloudSimUser({user: user._id});
+              csUser.save(done);
+            });
+            it('should exist for user2', function(done) {
+                csUser2 = new CloudSimUser({user: user2._id});
+                csUser2.save(done);
+            });
+        });
+
         describe('Check Empty Running Simulation', function() {
             it('should be no running simulations at the beginning', function(done) {
                 agent
@@ -80,12 +94,15 @@ describe('<Unit Test>', function() {
         });
 
         describe('Next sim id', function() {
-            it('should be zero', function(done) {
+            it('should exist', function(done) {
                 User.find({username: user.username}, function(err, users) {
                     users.should.have.length(1);
                     var theUser = users[0];
-                    theUser.next_sim_id.should.be.exactly(0);
-                    done();
+                    CloudSimUser.findFromUserId(theUser._id, function(err, cloudsimUser) { 
+                        should.not.exist(err);
+                        cloudsimUser.next_sim_id.should.be.exactly(-1);
+                        done();
+                    });
                 });
             });
         });
@@ -115,8 +132,11 @@ describe('<Unit Test>', function() {
                 User.find({username: user.username}, function(err, users) {
                     users.should.have.length(1);
                     var theUser = users[0];
-                    theUser.next_sim_id.should.be.exactly(1);
-                    done();
+                    //  theUser.next_sim_id.should.be.exactly(1);
+                    CloudSimUser.findFromUserId(theUser._id, function(err, cloudsimUser) {
+                        cloudsimUser.next_sim_id.should.be.exactly(0);
+                        done();
+                    });
                 });
             });
         });

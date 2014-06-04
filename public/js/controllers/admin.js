@@ -226,9 +226,10 @@ angular.module('cloudsim.admin').controller('AdminController', ['$scope', '$stat
                     email: form.email.$viewValue,
                     open_id: form.email.$viewValue,
                     username: form.email.$viewValue,
-                    name: form.email.$viewValue,
-                    admin: form.admin.$viewValue
+                    name: form.email.$viewValue
                 });
+
+                user.admin = form.admin.$viewValue;
 
                 $modalInstance.close(user);
             } else {
