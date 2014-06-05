@@ -13,6 +13,14 @@ var mongoose = require('mongoose'),
 var sockets = require('../lib/sockets');
 var util = require('util');
 
+/////////////////////////////////////////////////////////////// 
+// Consttants that affect the billing. The Frequency at which
+// the billing is done (20 sec default) and the billing period
+// (default 1 hr). Changing these values during testing can
+// make payments occur faster.
+var billingCycleFrequencyInSecs = 2; // 10;
+var billingPeriodInSecs = 10; // 3600; 
+
 
 // initialise cloudServices, depending on the environment
 var cloudServices;
@@ -42,72 +50,6 @@ var awsData = { 'US West': {region: 'us-west-2',
                              hardware: 'g2.2xlarge',
                              priceInCents: 76}
 };
-
-/////////////////////////////////////////////////////////////////////////////////
-// When necessary, charges the user for simulator time, updating the 
-// account balance and the simulation's due date.
-// @param simulation the simulation to charge
-// @now the Date that represent the moment of billing
-function billSimulatorTime(simulation, now) {
-    // don't charge for Terminated sim
-    if (simulation.state === 'Terminated') {
-        return;
-    }
-
-    // check if billing is due
-    var bill = billing.charge(simulation.date_billed_until,
-                              simulation.server_price_in_cents,
-                              now);
-    // when there is a charge...
-    if (bill.chargeInCents) {
-        // time to bill
-        
-        Simulation.findOneAndUpdate({_id: simulation.id},
-                                    {date_billed_until: bill.validUntil},
-                                    function (err) {
-            if(err) {
-                var msg = 'Error updating sim time validity fot sim "';
-                msg += simulation.id + '" : ' + err;
-                console.log(msg);
-            } else {
-                billing.accountWithdrawal(simulation.user.id,
-                               bill.chargeInCents,
-                               'simulation time for sim: ' + simulation._id,
-                               function (err, new_balance) {
-                    if(err){
-                        console.log('Error withdrawing money before launch: ' + err);
-                    } else {
-                        var msg = 'User ' +  simulation.user.username;
-                        msg +=  ' balance: ' +  new_balance;
-                        console.log(msg);
-                        if(new_balance <= 0 ) {
-                            // Account is empty: kill the simulation
-                            simulation
-                        }
-                    }
-                });
-            }
-        });
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// Collects all running simulations and updates the charges if necessary
-function billingCycle() {
-    var now = new Date();
-    Simulation.getRunningSimulations( function (err, sims) {
-        if(err) {
-            console.log('Error getting running sims for billing: ' + err);
-            return;
-        }
-        for (var i=0; i < sims.length; i++) {
-            var sim = sims[i];
-            billSimulatorTime(sim, now);
-        }
-    });
-}
-
-setInterval(billingCycle, 30000);
 
 
 /////////////////////////////////////////////////
@@ -206,7 +148,6 @@ exports.create = function(req, res) {
 
     // Create a new simulation instance based on the content of the
     // request
-
     console.log(util.inspect(req.body));    
     var simulation = {state: 'Launching'};
     //new Simulation(req.body);
@@ -237,7 +178,10 @@ exports.create = function(req, res) {
                 console.log(msg);
                 res.jsonp(500, { error: msg });
             } else {
-                var bill = billing.charge(simulation.date_launch, serverDetails.priceInCents);
+                var bill = billing.charge(simulation.date_launch,
+                            serverDetails.priceInCents,
+                            simulation.date_launch,
+                            billingPeriodInSecs);
                 billing.accountWithdrawal(req.user._id,
                                           serverDetails.priceInCents,
                                           'Initial launch, sim' + next_sim_id,
@@ -400,12 +344,13 @@ exports.destroy = function(req, res) {
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////
-//
-function terminateSimulator(user, simulation, cb) {
+// Terminates a simulator. This operation can be triggered from a user request or
+// the billing cycle.
+function terminateSimulatorServer(simulation, cb) {
     var awsRegion = awsData[simulation.region].region;
     var machineInfo = {region: awsRegion,
                        id: simulation.machine_id};
-    var keyName = getKeyName(user.email, simulation.sim_id);
+    var keyName = getKeyName(simulation.user.email, simulation.sim_id);
 
     // delete the ssh key. If there is an error, report it
     // but try to shutdown the machine anyways
@@ -417,28 +362,25 @@ function terminateSimulator(user, simulation, cb) {
 
     cloudServices.terminateSimulator(machineInfo, function(err, info) {
         if(err) {
-            cb(err)
+            cb(err);
         } else {
             simulation.state = 'Terminated';
             simulation.date_term = Date.now();
             simulation.save(function(err) {
                 if (err) {
-                    return res.send('users/signup', {
-                        errors: err.errors,
-                        Simulation: simulation
-                    });
+                    console.log('Error saving sim state after shutdown: ' + err);
+                    cb(err);
                 } else {
                     var msg = 'Simulator terminated: ';
                     msg += util.inspect(info) + ' key: ' + keyName;
                     console.log(msg);
                     // notify everyone
-                    sockets.getUserSockets().notifyUser(user.id,
+                    sockets.getUserSockets().notifyUser(simulation.user.id,
                                                         'simulation_terminate',
                                                         {data:simulation});
                     cb(null, simulation);
                 }
             });
-            
         }
     }); // terminate
 }
@@ -450,13 +392,11 @@ function terminateSimulator(user, simulation, cb) {
 /// @return Destroy function
 exports.terminate = function(req, res) {
     var simulation = req.simulation;
-    var user = req.user;
-
-    terminateSimulator(user, simulation, function(err, sim) {
+    terminateSimulatorServer(simulation, function(err, sim) {
         if(err) {
             res.jsonp(500, { error: err });
         } else {
-            var simObj = simulation.toObject();
+            var simObj = sim.toObject(); // simulation.toObject();
             simObj.upTime = (simulation.date_term -
                     simulation.date_launch)*1e-3;
                     res.jsonp(simObj);
@@ -498,3 +438,88 @@ exports.all = function(req, res) {
         }
     });
 };
+
+
+/////////////////////////////////////////////////////////////////////////////////
+// When necessary, charges the user for simulator time, updating the 
+// account balance and the simulation's due date.
+// @param simulation the simulation to charge
+// @now the Date that represent the moment of billing
+function billSimulatorTime(simulation, now, periodInSec) {
+    // don't charge for Terminated sim
+    if (simulation.state === 'Terminated') {
+        return;
+    }
+
+    // check if billing is due
+    var bill = billing.charge(simulation.date_billed_until,
+                              simulation.server_price_in_cents,
+                              now,
+                              periodInSec);
+    // when there is a charge...
+    if (bill.chargeInCents) {
+        // time to bill
+        
+        Simulation.findOneAndUpdate({_id: simulation.id},
+                                    {date_billed_until: bill.validUntil},
+                                    function (err) {
+            if(err) {
+                var msg = 'Error updating sim time validity fot sim "';
+                msg += simulation.id + '" : ' + err;
+                console.log(msg);
+            } else {
+                billing.accountWithdrawal(simulation.user.id,
+                               bill.chargeInCents,
+                               'simulation time for sim: ' + simulation._id,
+                               function (err, new_balance) {
+                    if(err){
+                        console.log('Error withdrawing money before launch: ' + err);
+                    } else {
+                        var msg = 'User ' +  simulation.user.username;
+                        msg +=  ' balance: ' +  new_balance;
+                        msg += ' sim: ' + simulation.sim_id;
+                        console.log(msg);
+                        if(new_balance <= 0 ) {
+                            // Account is empty: kill the simulation
+                            msg = 'Insufficient funds: terminating simulation: ';
+                            msg += simulation._id;
+                            msg += ' (user ' + simulation.user.email;
+                            msg += ' sim ' + simulation.sim_id + ')'; 
+                            terminateSimulatorServer(simulation, function(err){
+                                if(err) {
+                                    var msg = 'Error shutting down simulation: ';
+                                    msg += simulation._id + ': ' + err;
+                                    console.error(msg);
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// Collects all running simulations and updates the charges if necessary
+function billingCycle() {
+    // console.log('.');
+    Simulation.getRunningSimulations( function (err, sims) {
+        if(err) {
+            console.log('Error getting running sims for billing: ' + err);
+            return;
+        }
+        var now  = new Date();
+        for (var i=0; i < sims.length; i++) {
+            var sim = sims[i];
+            billSimulatorTime(sim, now, billingPeriodInSecs);
+        }
+    });
+}
+
+
+console.log('\n\n# Starting the billing cycle every ' + billingCycleFrequencyInSecs + ' secs\n\n');
+setInterval(billingCycle, 1000 * billingCycleFrequencyInSecs);
+
+

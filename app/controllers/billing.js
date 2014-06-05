@@ -143,10 +143,14 @@ function secondsSince(d, dateNow) {
 // @param dateNow the current time, or undefined (will use new Date())
 // @return the bill, with the amount to be charged (bill.chargeInCents)
 // and the moment until it will remain paid for (bill.validUntil)
-exports.charge = function (dueDate, costPerHourInCents, dateNow) {
+exports.charge = function (dueDate, costPerPeriodInCents, dateNow, billPeriodInSecs) {
 
     var now = dateNow;    
     if(!now) now = new Date();
+
+    var period = billPeriodInSecs;
+    if(!period) period = 3600; // 1 hour
+
     var bill = {chargeInCents: 0, validUntil:dueDate};
     var secondsLate = secondsSince(dueDate, now);
     if (secondsLate < 0) {
@@ -154,9 +158,9 @@ exports.charge = function (dueDate, costPerHourInCents, dateNow) {
         return bill;
     }
     // calculate how many hours to bill
-    var hoursToBill = 1 + Math.round(secondsLate / 3600);
-    bill.chargeInCents = hoursToBill * costPerHourInCents;
-    bill.validUntil = addSeconds(dueDate, 3600 * hoursToBill);
+    var periodsToBill = 1 + Math.round(secondsLate / period);
+    bill.chargeInCents = periodsToBill * costPerPeriodInCents;
+    bill.validUntil = addSeconds(dueDate, period * periodsToBill);
     return bill;
 };
 

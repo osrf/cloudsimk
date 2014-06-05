@@ -61,6 +61,7 @@ describe('<Unit Test>', function() {
             it('should be able to save without problems', function(done) {
                 simulation.save(function(err, sim) {
                     should.not.exist(err);
+                    should.exist(sim);
                     // it should now be in the db
                     Simulation.getRunningSimulations(function(err, sims) {
                         should.not.exist(err);
