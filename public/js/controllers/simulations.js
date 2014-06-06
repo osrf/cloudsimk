@@ -1,29 +1,10 @@
 'use strict';
 
-// keep jslint happy: suppress the undefined io message
-/*globals io*/
-var socket = io.connect();
-
-socket.on('time', function (msg) {
-    console.log('server time: ' + msg.data);
-});
-
-socket.on('simulation_update', function (msg) {
-    console.log('Simulation update: ' + JSON.stringify(msg));
-});
-
-socket.on('simulation_create', function (msg) {
-    console.log('Simulation created: ' + JSON.stringify(msg));
-});
-
-socket.on('simulation_terminate', function (msg) {
-    console.log('Simulation terminated: ' + JSON.stringify(msg));
-});
-
-
 angular.module('cloudsim.simulations').controller('SimulationsController',
     ['$scope', '$stateParams', '$location', '$modal', 'Global', 'Simulations',
-    function ($scope, $stateParams, $location, $modal, Global, Simulations) {
+    'Topic',
+    function ($scope, $stateParams, $location, $modal, Global, Simulations,
+    Topic) {
 
     $scope.global = Global;
 
@@ -35,8 +16,10 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
     // TODO: Retrieve this list from the server.
     $scope.regions = ['US East', 'US West', 'Ireland'];
 
-    /// Get all the running simulations.
-    $scope.simulations = Simulations.query();
+    /// Get all simulations and update up time.
+    $scope.simulations = Simulations.query(function() {
+        updateUpTime();
+    });
 
     /// The current page of console simulations
     $scope.consoleCurrentPage = 1;
@@ -58,6 +41,9 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
         history : 1
     };
 
+    // server time
+    $scope.serverTime = window.server_time;
+
     /// A modal confirmation dialog displayed when the shutdown button
     /// is pressed
     var shutdownDialog = null;
@@ -65,6 +51,10 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
     /// A modal confirmation dialog displayed when the relaunch button
     /// is pressed
     var relaunchDialog = null;
+
+    /// A modal confirmation dialog displayed when the delete forever button
+    /// is pressed
+    var deleteForeverDialog = null;
 
     /// Error messessage
     $scope.error = '';
@@ -76,12 +66,16 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
             region: launchRegion,
             world: launchWorld
         });
+
         sim.$save(function() {},
             function(error) {
                 $scope.error = 'Error launching simulation: ' + error.data;
                 sim.state = 'Error';
             });
+        sim.upTime = 0;
         sim.selected = false;
+
+        // add simulation to the table for immediate feedback.
         $scope.simulations.unshift(sim);
     };
 
@@ -161,6 +155,45 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
         };
     };
 
+    /// Pop up a dialog to confirm deleting a terminated simulation
+    /// from history forever
+    $scope.showDeleteForeverDialog = function () {
+        deleteForeverDialog = $modal.open({
+            templateUrl: 'deleteForever.html',
+            controller: deleteForeverDialogCtrl
+        });
+
+        // if the user confirms deleting the terminated simulation
+        deleteForeverDialog.result.then(function () {
+            var currentPageSims =
+                $scope.getPageSimulations($scope.tableType.history);
+            var selected = currentPageSims.filter(function(sim) {
+                return sim.selected === true;
+            });
+
+            // send a DELETE to remove the simulation from the database
+            for (var i = 0; i < selected.length; ++i) {
+                $scope.simulations.splice(
+                    $scope.simulations.indexOf(selected[i]), 1);
+                selected[i].$remove({simulationId:selected[i].sim_id});
+            }
+        },
+        // if the user cancels deleting terminated simulation
+        function () {});
+    };
+
+    /// A controller for closing / dimissing the delete forever dialog
+    var deleteForeverDialogCtrl = function ($scope, $modalInstance) {
+        $scope.confirmDeleteForever = function (del) {
+            if (del) {
+                $modalInstance.close();
+            }
+            else {
+                $modalInstance.dismiss();
+            }
+        };
+    };
+
     /// Get simulations in the current page of the table
     $scope.getPageSimulations = function(type) {
         var currentPage;
@@ -226,5 +259,141 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
     /// Get time as a string
     $scope.formatDateTime = function(dateTime) {
         return new Date(dateTime).toString();
+    };
+
+    // Subscribe to simulation_create topic
+    var simulationCreateTopic = new Topic();
+    simulationCreateTopic.subscribe('simulation_create', function(message) {
+        var newSim = message.data;
+        var created = $scope.simulations.filter(function(sim) {
+            return (sim.region === newSim.region) &&
+                (sim.world === newSim.world) &&
+                (sim.state === 'Launching') &&
+                (!sim.sim_id);
+        });
+
+        $scope.$apply(function() {
+            // insert simulation on other client browsers.
+            if (created.length === 0) {
+                var sim = new Simulations({
+                    sim_id: newSim.sim_id,
+                    state: newSim.state,
+                    region: newSim.region,
+                    world: newSim.world,
+                    date_launch: newSim.date_launch,
+                    upTime: 0,
+                    server_price: 100
+                });
+                $scope.simulations.unshift(sim);
+            }
+        });
+    });
+
+    // Subscribe to simulation_terminate topic
+    var simulationTerminateTopic = new Topic();
+    simulationTerminateTopic.subscribe('simulation_terminate',
+    function(message) {
+        var termSim = message.data;
+        // find the terminated sim in the table
+        var terminated = $scope.simulations.filter(function(sim) {
+            return sim.sim_id === termSim.sim_id;
+        });
+        if (terminated.length === 1)
+        {
+            $scope.$apply(function() {
+                terminated[0].state = 'Terminated';
+                terminated[0].date_term = termSim.date_term;
+                var uptime = new Date(terminated[0].date_term) -
+                    new Date(terminated[0].date_launch);
+                terminated[0].upTime = uptime*1e-3;
+            });
+        }
+    });
+
+    // Subscribe to simulation_update topic
+    var simulationUpdateTopic = new Topic();
+    simulationUpdateTopic.subscribe('simulation_update', function(message) {
+      var updatedSim = message.data;
+      // find the updated sim in the table
+      var updated = $scope.simulations.filter(function(sim) {
+          return sim.sim_id === updatedSim.sim_id;
+      });
+      if (updated.length === 1)
+      {
+          $scope.$apply(function() {
+              updated[0].state = updatedSim.state;
+              updated[0].machine_ip = updatedSim.machine_ip;
+          });
+      }
+    });
+
+    // update the simulation up time
+    var updateUpTime = function(type) {
+        var filtered = $scope.simulations.filter(function(sim) {
+            if (type === $scope.tableType.console)
+              return !sim.date_term;
+            else if (type === $scope.tableType.history)
+              return sim.date_term;
+            else return true;
+        });
+
+        // calculate uptime
+        for (var i = 0; i < filtered.length; ++i) {
+            var serverLaunch = filtered[i].date_launch;
+            var uptime;
+            if (filtered[i].date_term) {
+                uptime = new Date(filtered[i].date_term) -
+                    new Date(serverLaunch);
+            }
+            else
+                uptime = $scope.serverTime - new Date(serverLaunch);
+            filtered[i].upTime = uptime*1e-3;
+        }
+    };
+
+    // Subscribe to clock topic
+    var simulationClockTopic = new Topic();
+    simulationClockTopic.subscribe('clock', function(message) {
+        var time = message.data;
+        $scope.serverTime = new Date(time);
+
+        $scope.$apply(function() {
+            updateUpTime($scope.tableType.console);
+        });
+    });
+
+    // format elapsed time in seconds into a friendly string
+    $scope.formatTimeElapsed = function(time)
+    {
+        var sec = time;
+
+        var day = Math.floor(sec / 86400);
+        sec -= day * 86400;
+
+        var hour = Math.floor(sec / 3600);
+        sec -= hour * 3600;
+
+        var minute = Math.floor(sec / 60);
+        sec -= minute * 60;
+
+        var timeValue = '';
+
+        if (hour < 10)
+        {
+          timeValue += '0';
+        }
+        timeValue += hour.toFixed(0) + ':';
+        if (minute < 10)
+        {
+          timeValue += '0';
+        }
+        timeValue += minute.toFixed(0) + ':';
+        if (sec < 10)
+        {
+          timeValue += '0';
+        }
+        timeValue += sec.toFixed(0);
+
+        return timeValue;
     };
 }]);

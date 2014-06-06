@@ -6,6 +6,7 @@
 /// Module dependencies.
 var mongoose = require('mongoose'),
     User = mongoose.model('User'),
+    CloudsimUser = mongoose.model('CloudsimUser'),
     email = require('emailjs/email');
 
 /////////////////////////////////////////////////
@@ -88,51 +89,61 @@ exports.session = function(req, res) {
 exports.update = function(req, res) {
     var user = req.profile;
 
-    user.credit = req.body.credit;
-    user.invites = req.body.invites;
-    user.ssh_keys = req.body.ssh_keys;
-    user.spent_warning = req.body.spent_warning;
-    user.balance_warning = req.body.balance_warning;
-
-    // Save the user to the database
-    user.save(function(err) {
+    // Find the user.
+    User.findOne({open_id: user.open_id}).exec(function(err, usr) { 
         if (err) {
-            return res.jsonp({error: {
-                message: 'Unable to update user',
-                user: user
-               }
-            });
+            res.jsonp({ error:
+                        {message: 'Unable to find CloudSim user info' }});
         } else {
-            // Send back the user (expected by angularjs on success).
-            return res.jsonp(user);
+            CloudsimUser.findFromUserId(user._id, function(err, cloudsimUser) {
+              if (err) {
+                  res.jsonp({ error:
+                              {message: 'Unable to find CloudSim user info' }});
+              } else {
+
+                  if (req.body.admin !== null) {
+                     cloudsimUser.admin = req.body.admin;
+                  }
+                  if (req.body.credit !== null) {
+                      cloudsimUser.credit = req.body.credit;
+                  }
+                  if (req.body.invites !== null) {
+                      cloudsimUser.invites = req.body.invites;
+                  }
+                  if (req.body.ssh_keys !== null) {
+                      cloudsimUser.ssh_keys = req.body.ssh_keys;
+                  }
+                  if (req.body.spent_warning !== null) {
+                      cloudsimUser.spent_warning = req.body.spent_warning;
+                  }
+                  if (req.body.balance_warning !== null) {
+                      cloudsimUser.balance_warning = req.body.balance_warning;
+                  }
+
+                  // Save the user to the database
+                  cloudsimUser.save(function(err) {
+                      if (err) {
+                          return res.jsonp({error: {
+                              message: 'Unable to update user',
+                              user: cloudsimUser
+                             }
+                          });
+                      } else {
+                          var result = merge(usr, cloudsimUser);
+                          // Send back the user
+                          // (expected by angularjs on success).
+                          return res.jsonp(result);
+                      }
+                  });
+              }
+            });
         }
     });
-
-    var server  = email.server.connect({
-         user:    "natekoenig", 
-         password:"42LoveEgrets!", 
-         host:    "smtp.gmail.com", 
-         ssl:     true
-    });
-
-    var emailTxt = "You have spent more than $10.00 on Cloudsim.io.\n"; 
-    emailTxt += "This email is only informative, and is sent based on your current preference settings. Your Cloudsim account and simulations remain active and unchanged.";
-
-    emailTxt += "If you would like to change your email preferences, please log into http://cloudsim.io (MAKE THIS A LINK TO THEIR PREFERENCES)."
-
-    // send the message and get a callback with an error or details of the
-    // message that was sent
-    server.send({
-        text:    emailTxt, 
-        from:    "CloudSim <info@cloudsim.io>", 
-        to:      user.email,
-        subject: "Cloudsim spending limit reached."
-    }, function(err, message) { console.log(err || message); });
-};
+}
 
 
 /////////////////////////////////////////////////
-/// Create user
+/// Remove user
 /// @param[in] req Nodejs request object.
 /// @param[out] res Nodejs response object.
 /// @return Function to create a user.
@@ -151,7 +162,19 @@ exports.remove = function(req, res) {
             }});
         }
         else {
-            res.jsonp(user);
+            CloudsimUser.findFromUserId(user._id, function(err, cloudsimUser) {
+                if(err) {
+                    res.jsonp({ error: {message: 'Unable to find CloudSim user info' }});
+                } else {
+                    cloudsimUser.remove(function(err) {
+                        if(err) {
+                            res.jsonp({ error: {message: 'Unable to erase CloudSim user info' }});    
+                        } else {
+                            res.jsonp(user);
+                        }
+                    });
+                }
+            });
         }
     });
 };
@@ -176,7 +199,7 @@ exports.create = function(req, res) {
     }
 
     // Make sure the requesting user is in the database.
-    // TODO: We need to implement user privaleges.
+    // TODO: We need to implement user privileges.
     User.findOne({open_id: req.user.open_id}, function(err) {
         if (!err) {
             // Create a new user based on the value in the request object
@@ -202,8 +225,19 @@ exports.create = function(req, res) {
                     });
                 }
                 else {
-                    // Send back the user (expected by angularjs on success).
-                    return res.jsonp(user);
+                    var cloudsimUser = new CloudsimUser({user: user._id});
+                    cloudsimUser.save(function(err) {
+                        if(err) {
+                            return res.jsonp({error: {
+                                message: 'Error creating CloudSim user data',
+                                user: user
+                                }
+                            });
+                        } else {
+                            // Send back the user (expected by angularjs on success).
+                            return res.jsonp(user);
+                        }
+                    });
                 }
             });
         }
