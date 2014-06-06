@@ -520,7 +520,6 @@ function downloadFile(path, res) {
                 res.end('Not Found');
             }   
         } else {
-            console.log('HEADERS!!');
             res.setHeader('Content-Length', stat.size);
             var stream = fs.createReadStream(path);
             stream.pipe(res);
