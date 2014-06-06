@@ -13,12 +13,17 @@ var mongoose = require('mongoose'),
 var sockets = require('../lib/sockets');
 var util = require('util');
 
-/////////////////////////////////////////////////////////////// 
-// Consttants that affect the billing. The Frequency at which
-// the billing is done (20 sec default) and the billing period
-// (default 1 hr). Changing these values during testing can
-// make payments occur faster.
-var billingCycleFrequencyInSecs = 2; // 10;
+
+//////////////////////////////////////////////////////////////////////// 
+// Consttants that affect the billing. 
+// billingCycleFrequencyInSecs controls the Frequency at which
+// the billing is done (20 sec default). billingCycleFrequencyInSecs
+// is actually the period in sec (as opposed to the rate, in sec -1)
+// The billing period, billingPeriodInSecs, is the duration for which 
+// simulation servers are charged (default 1 hr). 
+// Changing these values is useful during testing, and allows to 
+// observe payments faster.
+var billingCycleFrequencyInSecs = 10; 
 var billingPeriodInSecs = 10; // 3600; 
 
 

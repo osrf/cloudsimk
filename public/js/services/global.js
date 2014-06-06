@@ -7,7 +7,8 @@ angular.module('cloudsim.system').factory('Global', [
         _this._data = {
             user: window.user,
             authenticated: !! window.user,
-            paypalSandbox: window.paypalSandbox
+            paypalSandbox: window.paypalSandbox,
+            cloudsimUser : window.cloudsimUser
         };
 
         return _this._data;
