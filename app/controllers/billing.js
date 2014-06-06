@@ -2,15 +2,7 @@
 /// @module billing_controller
 /// Server side billing controller.
 
-
 /// Module dependencies.
-/*var mongoose = require('mongoose'),
-    Simulation = mongoose.model('Simulation'),
-    User = mongoose.model('User'),
-    _ = require('lodash');
-var sockets = require('../lib/sockets');*/
-
-var util  = require('util');
 
 /////////////////////////////////////////////////
 /// Process a Paypal Instant Payment Notification (IPN) message
