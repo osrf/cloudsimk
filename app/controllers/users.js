@@ -10,6 +10,37 @@ var mongoose = require('mongoose'),
     email = require('emailjs/email');
 
 /////////////////////////////////////////////////
+// Helper function that merges a user and cloudsimuser
+var merge = function(user, cloudsimUser)
+{
+    var result = {};
+    var userJson = {};
+    var cloudJson = {};
+  
+    if (user !== null) {
+        userJson = user.toJSON();
+    }
+  
+    if (cloudsimUser !== null) {
+        cloudJson = cloudsimUser.toJSON();
+    }
+  
+    for (var key in cloudJson) {
+      if (cloudJson.hasOwnProperty(key)) {
+        result[key] = cloudJson[key];
+      }
+    }
+  
+    for (var key in userJson) {
+      if (userJson.hasOwnProperty(key)) {
+        result[key] = userJson[key];
+      }
+    }
+
+    return result;
+}
+
+/////////////////////////////////////////////////
 /// Authentication callback
 /// @param[in] req Nodejs request object.
 /// @param[out] res Nodejs response object.
@@ -29,15 +60,30 @@ exports.all = function(req, res) {
         return;
     }
 
-    // Get all simulation models, in creation order, for a user
-    User.find().sort('-created') //.populate('user', 'name username')
-      .exec(function(err, users) {
+    // Get all the Users
+    User.find().exec(function(err, users) { 
         if (err) {
-            res.render('error', {
-                status: 500
-            });
+            res.render('error', {status: 500});
         } else {
-            res.jsonp(users);
+            // Get all the cloud sim users
+            CloudsimUser.find().exec(function(err, cloud) {
+                if (err) {
+                    res.render('error', {status: 500});
+                } else {
+                    var result = [];
+
+                    // Merge the two sets.
+                    users.forEach(function(user) {
+                        cloud.forEach(function(cloud) {
+                            if (String(cloud.user) === String(user._id)) {
+                                result.push(merge(user, cloud));
+                            }
+                        });
+                    });
+
+                    res.jsonp(result)
+                }
+            });
         }
     });
 };
@@ -235,7 +281,7 @@ exports.create = function(req, res) {
                             });
                         } else {
                             // Send back the user (expected by angularjs on success).
-                            return res.jsonp(user);
+                            return res.jsonp(merge(user, cloudsimUser));
                         }
                     });
                 }
@@ -255,7 +301,13 @@ exports.create = function(req, res) {
 /// @param[in] req Nodejs request object.
 /// @param[out] res Nodejs response object.
 exports.me = function(req, res) {
-    res.jsonp(req.user || null);
+  CloudsimUser.findFromUserId(req.user._id, function(err, cloudsimUser) {
+      if (err) {
+          res.jsonp({ error: {message: 'Unable to find CloudSim user info' }});
+      } else {
+        res.jsonp(merge(req.user, cloudsimUser) || null);
+      }
+  });
 };
 
 /////////////////////////////////////////////////
@@ -274,10 +326,17 @@ exports.user = function(req, res, next, id) {
         if (err) return next(err);
         if (!user) return next(new Error('Failed to load User ' + id));
 
-        // Store the user information in the request's profile
-        req.profile = user;
+        CloudsimUser.findFromUserId(user._id, function(err, cloudsimUser) {
+            if (err) {
+                res.jsonp({ error:
+                  {message: 'Unable to find CloudSim user info' }});
+            } else {
+                // Store the user information in the request's profile
+                req.profile = merge(user, cloudsimUser);
 
-        // Pass control to the next middleware
-        next();
+                // Pass control to the next middleware
+                next();
+            }
+        });
     });
 };

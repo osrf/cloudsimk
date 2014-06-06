@@ -22,7 +22,7 @@ var CloudSimUserSchema = new Schema({
     next_sim_id: {
         type: Number,
         default: -1
-    }
+    },
 
     credit: {
       type: Number,

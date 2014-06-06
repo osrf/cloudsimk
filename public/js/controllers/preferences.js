@@ -90,7 +90,7 @@ angular.module('cloudsim.preferences').controller('PreferencesController', ['$sc
         // without the key changed.
         if (index !== undefined) {
             $scope.label = user.ssh_keys[index].label;
-            $scope.key = user.ssh_keys[index].key;
+            $scope.key = btoa(user.ssh_keys[index].key).substring(0,20);
         } else {
             $scope.label = '';
             $scope.key = '';
