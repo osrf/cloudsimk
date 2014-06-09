@@ -53,7 +53,7 @@
 
               <div class="btn-group">
                 <button type="button" class="btn btn-default dropdown-toggle"
-                        data-toggle="dropdown"> More <span class="caret"></span>
+                        data-toggle="dropdown" ng-disabled="getPageUsersSelected().length === 0"> More <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" role="menu">
                   <li ng-class="userSelected() ? '' : 'disabled'">
@@ -69,7 +69,7 @@
           <td colspan="5">
             <div class='text-right'>
               <pagination direction-links="true"
-              total-items="filteredUsers.length - 1" items-per-page="pageSize"
+              total-items="filteredUsers.length" items-per-page="pageSize"
               ng-click="clearSelected()"
               page="currentPage"></pagination>
              </div>
