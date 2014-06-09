@@ -6,7 +6,6 @@
 var uuid = require('node-uuid');
 var mongoose = require('mongoose'),
     Simulation = mongoose.model('Simulation'),
-    User = mongoose.model('User'),
     fs = require('fs'),
     CloudsimUser = mongoose.model('CloudsimUser'),
     _ = require('lodash');
