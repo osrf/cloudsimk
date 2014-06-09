@@ -30,14 +30,14 @@ var merge = function(user, cloudsimUser)
       }
     }
   
-    for (var key in userJson) {
+    for (key in userJson) {
       if (userJson.hasOwnProperty(key)) {
         result[key] = userJson[key];
       }
     }
 
     return result;
-}
+};
 
 
 /////////////////////////////////////////////////
