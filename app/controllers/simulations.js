@@ -2,11 +2,11 @@
 /// @module simulation_controller
 /// Server side simulation controller.
 
-
 /// Module dependencies.
 var uuid = require('node-uuid');
 var mongoose = require('mongoose'),
     Simulation = mongoose.model('Simulation'),
+    fs = require('fs'),
     CloudsimUser = mongoose.model('CloudsimUser'),
     billing = require('./billing'),
     _ = require('lodash');
@@ -27,6 +27,8 @@ var util = require('util');
 var billingCycleFrequencyInSecs = 20; 
 var billingPeriodInSecs = 3600; 
 
+var config = require('../../config/config');
+var child_process = require('child_process');
 
 // initialise cloudServices, depending on the environment
 var cloudServices;
@@ -554,7 +556,7 @@ function billSimulatorTime(simulation, now, periodInSec) {
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // Collects all running simulations and updates the charges if necessary
 function billingCycle() {
     // console.log('.');
@@ -572,7 +574,158 @@ function billingCycle() {
 }
 
 
-console.log('\n\n# Starting the billing cycle every ' + billingCycleFrequencyInSecs + ' secs\n\n');
-setInterval(billingCycle, 1000 * billingCycleFrequencyInSecs);
+
+//////////////////////////////////////////
+// creates a zip file for the simulator
+// @param simulation the simulation data
+// @param cb the async callback (with possible err)
+//
+// first, create a directory, then save files inside
+// and call external zip tool (because node libraries
+// for creating zip file do not handle file modes
+// correctly [yet?]: adm-zip, archiver, zipper, zlib)
+function createSimulatorZipFile (simulation, cb) {
+    var simId = simulation.sim_id;
+    var keyStr = simulation.ssh_private_key;
+    var ip = simulation.machine_ip;
+
+    var dirPath = config.downloadsDir + '/' + simulation._id;
+    console.log('k: ' + keyStr);
+    console.log('ip: ' + ip);
+    fs.mkdir(dirPath, function(err) {
+        if (err) {
+            cb(err);
+        }else {
+            var sshStr = '#!/bin/bash\n\n';
+            sshStr += 'DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"\n\n';
+            sshStr += 'ssh -i $DIR/key_sim_' + simId + '.pem ubuntu@' + ip + '\n';
+            sshStr += '\n';
+            // create the ssh log in script, make it executable
+            var sshFile = 'ssh_sim_' + simId + '.bash';
+            fs.writeFile(dirPath + '/' + sshFile, sshStr, {mode: 509}, function(err) {
+                if(err) {
+                    cb('Error creating ssh script');
+                } else {
+                    // now create the key file, with 0600 permissions
+                    var keyFile = 'key_sim_' + simId + '.pem';
+                    fs.writeFile(dirPath + '/' + keyFile, keyStr, {mode: 384}, function(err) {
+                        if (err) {
+                            cb('Error creating key file');
+                        } else {
+                            // files are saved, now zip
+                            var cmd = 'zip ../' + simulation._id + '.zip ' + sshFile + ' ' + keyFile;
+                            child_process.exec(cmd, { cwd: dirPath}, function(error, stdout, stderr) {                        
+                                if(error){
+                                     console.log('Error zipping. stdout: ' + stdout + '\nstderr: ' + stderr);
+                                     cb(error);
+                                }
+                                // now... let'ss clean up after ourselves
+                                // directory must be empty to be removed (a POSIX rule)
+                                // so we delete each file first, starting with the key
+                                fs.unlink(dirPath + '/' + keyFile, function (err) {
+                                    if(err) {
+                                        console.log('Error deleting key file: ' + keyFile + ' :' + err);
+                                        cb(err);
+                                    } else {
+                                        // now delete the ssh script
+                                        fs.unlink(dirPath + '/' + sshFile, function (err) {
+                                            if(err) {
+                                                console.log('Error deleting ssh script file: ' + sshFile + ' :' + err);
+                                                cb(err);
+                                            } else {
+                                                // erase the directory
+                                                fs.rmdir(dirPath, function(err) {
+                                                    if(err) {
+                                                        console.log('Error deleting directory "' + dirPath + '": ' + err);
+                                                        cb(err); 
+                                                    } else {
+                                                        // success (files created, zip created, files and directory removed)
+                                                        cb();
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            });
+                        }
+                    });
+                }
+            });         
+        }
+    }); 
+}
 
 
+
+//////////////////////////////////////////////////////
+// local  utility function to download
+// a single file. Used for keys.zip
+// @param path the path of the local file to download
+// 
+function downloadFile(path, res) {
+
+    fs.stat(path, function(err, stat) {
+        if(err) {
+            if('ENOENT' === err.code) {
+                res.statusCode = 404;
+                res.end('Not Found');
+            }   
+        } else {
+            res.setHeader('Content-Length', stat.size);
+            var stream = fs.createReadStream(path);
+            stream.pipe(res);
+            stream.on('error', function() {
+                res.statusCode = 500;
+                res.end('Internal Server Error');
+            });
+            stream.on('end', function() {
+                res.end();
+            });
+        }
+    });
+}
+
+////////////////////////////////////////////////////
+// Downloads a zip file that contains the 
+// ssh key for the simulator and a bash script
+// to help you connect. The file is first created
+// if it doesn't already exist in the directory
+// (by default, /tmp/cloudsimk). The name of the zip
+// file on the server is the _id of the simulator, a
+// unique number that is generated by mongo
+// @param req request
+// @param res response
+exports.keysDownload = function(req, res) {
+    
+    console.log('Keys download for sim ' + req.simulation.sim_id);  
+    var path = config.downloadsDir + '/' + req.simulation._id + '.zip';
+    console.log(path);    
+     
+    // write to tmp file
+    // serve file
+    fs.stat(path, function(err) {
+        if(err) {
+            if('ENOENT' === err.code) {
+                // file does not exist
+                createSimulatorZipFile(req.simulation, function(err) {
+                    if(err) {
+                        res.statusCode = 500;
+                        res.end('Internal Server Error');
+                    } else {
+                        // fresh new file is created, download it
+                        console.log(path + ' created');
+                        downloadFile(path, res);
+                    }
+                });
+            }
+            else {
+                res.statusCode = 500;
+                res.end('Internal Server Error');
+            }
+        } else {
+            // file is there already, download it
+            downloadFile(path, res);
+        }
+    });
+};
