@@ -574,6 +574,11 @@ function billingCycle() {
 }
 
 
+// Perform billing cycle automatically, unless we are running tests
+console.log('\n\nBilling performed every ' + billingCycleFrequencyInSecs + ' secs\n');
+if(config.db.indexOf('test') !== -1)
+    setTimeout(billingCycle, billingCycleFrequencyInSecs);
+
 
 //////////////////////////////////////////
 // creates a zip file for the simulator
