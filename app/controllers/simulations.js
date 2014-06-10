@@ -13,20 +13,6 @@ var mongoose = require('mongoose'),
 
 var sockets = require('../lib/sockets');
 var util = require('util');
-
-
-//////////////////////////////////////////////////////////////////////// 
-// Consttants that affect the billing. 
-// billingCycleFrequencyInSecs controls the Frequency at which
-// the billing is done (20 sec default). billingCycleFrequencyInSecs
-// is actually the period in sec (as opposed to the rate, in sec -1)
-// The billing period, billingPeriodInSecs, is the duration for which 
-// simulation servers are charged (default 1 hr). 
-// Changing these values is useful during testing, and allows to 
-// observe payments faster.
-var billingCycleFrequencyInSecs = 20; 
-var billingPeriodInSecs = 3600; 
-
 var config = require('../../config/config');
 var child_process = require('child_process');
 
@@ -229,7 +215,7 @@ exports.create = function(req, res) {
                 var bill = billing.charge(simulation.date_launch,
                             serverDetails.priceInCents,
                             simulation.date_launch,
-                            billingPeriodInSecs);
+                            config.billingPeriodInSecs);
                 billing.accountWithdrawal(req.user._id,
                                           serverDetails.priceInCents,
                                           'Initial launch, sim' + next_sim_id,
@@ -568,16 +554,16 @@ function billingCycle() {
         var now  = new Date();
         for (var i=0; i < sims.length; i++) {
             var sim = sims[i];
-            billSimulatorTime(sim, now, billingPeriodInSecs);
+            billSimulatorTime(sim, now, config.billingPeriodInSecs);
         }
     });
 }
 
 
 // Perform billing cycle automatically, unless we are running tests
-console.log('\n\nBilling performed every ' + billingCycleFrequencyInSecs + ' secs\n');
+console.log('\n\nBilling performed every ' + config.billingCycleFrequencyInSecs + ' secs\n');
 if(config.db.indexOf('test') !== -1)
-    setTimeout(billingCycle, billingCycleFrequencyInSecs);
+    setTimeout(billingCycle, config.billingCycleFrequencyInSecs);
 
 
 //////////////////////////////////////////
