@@ -8,10 +8,7 @@ var uuid = require('node-uuid');
 var mongoose = require('mongoose'),
     Simulation = mongoose.model('Simulation'),
     CloudsimUser = mongoose.model('CloudsimUser'),
-<<<<<<< local
     billing = require('./billing'),
-=======
->>>>>>> other
     _ = require('lodash');
 
 var sockets = require('../lib/sockets');
@@ -27,8 +24,8 @@ var util = require('util');
 // simulation servers are charged (default 1 hr). 
 // Changing these values is useful during testing, and allows to 
 // observe payments faster.
-var billingCycleFrequencyInSecs = 10; 
-var billingPeriodInSecs = 10; // 3600; 
+var billingCycleFrequencyInSecs = 20; 
+var billingPeriodInSecs = 3600; 
 
 
 // initialise cloudServices, depending on the environment
@@ -251,6 +248,11 @@ exports.create = function(req, res) {
                                 console.log('Error generating key: ' + err);
                                 res.jsonp(500, { error: err });
                             } else {
+                                // tags are visible from the AWS console, and will help identify the
+                                // simulator (from its user and sim id).
+                                var tags = {Name: 'simulator',
+                                    user: req.user.username,
+                                    id: simulation.sim_id};
                                 // create a callback script with a secret token. This script will be executed when the
                                 // server is booted for the first time. It can be found on the server at this path:
                                 //    /var/lib/cloud/instance/user-data.txt
@@ -262,8 +264,6 @@ exports.create = function(req, res) {
                                 simulation.date_launch = Date.now();
                                 cloudServices.launchSimulator(  req.user.username,
                                                                 keyName,
-                                                                simulation.sim_id,
-                                                                serverDetails.region,
                                                                 serverDetails.hardware,
                                                                 serverDetails.image,
                                                                 tags,

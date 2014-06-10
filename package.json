@@ -60,12 +60,12 @@
     "mime": "~1.2.7",
     "aws-sdk": ">= 1.5.0",
     "paypal-ipn": "*",
-    "duration": ">=0.2.0"
+    "duration": ">=0.2.0",
     "node-uuid": ">=1.4.1",
     "ssh2": ">=0.2.22",
     "socket.io": ">=0.9.16"
   },
-  "devDependencies": {
+    "devDependencies": {
     "supertest": "0.8.2",
     "should": "2.1.1",
     "grunt-contrib-watch": "latest",
