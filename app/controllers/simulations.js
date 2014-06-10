@@ -4,10 +4,14 @@
 
 
 /// Module dependencies.
+var uuid = require('node-uuid');
 var mongoose = require('mongoose'),
     Simulation = mongoose.model('Simulation'),
     CloudsimUser = mongoose.model('CloudsimUser'),
+<<<<<<< local
     billing = require('./billing'),
+=======
+>>>>>>> other
     _ = require('lodash');
 
 var sockets = require('../lib/sockets');
@@ -104,6 +108,42 @@ function getKeyName(email, sim_id) {
     return 'cs-' + sim_id + '-' + email;
 }
 
+////////////////////////////////////////////////////////////////
+// Generates a script that will be executed when the simulation
+// server is booted for the first time.
+// @param[in] secret_token this token is used to call Cloudsim
+//            to let it know who is calling.
+// @param[in] world the simulation world to load.
+// @param[in] cloneRepo
+function generate_callback_script(secret_token, world, cloneRepo)
+{
+    // assume false if undefined
+    cloneRepo = cloneRepo || false;
+
+    var s = '';
+    s += '#!/usr/bin/env bash\n';
+     // script is executed as root, but we want to be ubuntu
+    s += 'sudo su ubuntu << EOF\n';
+    s += 'set -ex\n';
+    s += 'logfile=/home/ubuntu/cloudsimi_setup.log\n';
+    s += 'exec > \\$logfile 2>&1\n';
+    s += '\n';
+    if(cloneRepo) {
+        s += 'cd /home/ubuntu\n';
+        s += 'hg clone https://bitbucket.org/osrf/cloudsimi\n\n';
+        // checkout a specific branch
+        s += 'cd  /home/ubuntu/cloudsimi\n';
+        s += 'hg co init\n';
+    }
+
+    s += '# cloudsim script to signal server ready\n';
+    s += '/home/ubuntu/cloudsimi/callback_to_cloudsim_io.bash ';
+    s += 'http://cloudsim.io ' + world + ' ' + secret_token + '\n\n';
+    s += 'EOF\n';
+    s += 'echo done!\n';
+
+    return s;
+}
 
 
 ////////////////////////////////////////////////////////////////////////////
@@ -165,14 +205,18 @@ exports.create = function(req, res) {
     simulation.upTime = 0;
 
     CloudsimUser.incrementNextSimId(req.user.id, function(err, cloudsimUser){
+    // Users keep track of their next simulation id 
         if(err) {
             // an unlikely error, since user is in req.
             console.log('Create Simulation failed. Error updating user simulation sim id in database: ' + err);
             res.jsonp(500, { error: err });
         } else {
+            // set the new sim id from the CloudSim user data
             var next_sim_id = cloudsimUser.next_sim_id;
-            // first, the money
+            // we pick the appropriate machine based on the region specified
+            // by the user 
             var serverDetails = awsData[simulation.region]; 
+            // first, the money
             // bill the first hour in advance
             // console.log('The cost for this simulation is: ' + serverDetails.priceInCents);
             if (cloudsimUser.account_balance <= serverDetails.priceInCents) {
@@ -207,6 +251,13 @@ exports.create = function(req, res) {
                                 console.log('Error generating key: ' + err);
                                 res.jsonp(500, { error: err });
                             } else {
+                                // create a callback script with a secret token. This script will be executed when the
+                                // server is booted for the first time. It can be found on the server at this path:
+                                //    /var/lib/cloud/instance/user-data.txt
+                                var token = uuid.v4();
+                                var script = generate_callback_script(token, simulation.world, true);
+                                // set date_launch just before we launch the simulation on the cloud
+
                                 // set date_launch just before we launch the simulation on the cloud
                                 simulation.date_launch = Date.now();
                                 cloudServices.launchSimulator(  req.user.username,
@@ -215,6 +266,8 @@ exports.create = function(req, res) {
                                                                 serverDetails.region,
                                                                 serverDetails.hardware,
                                                                 serverDetails.image,
+                                                                tags,
+                                                                script,
                                                                 function (err, machineInfo) {
                                     if(err) {
                                         res.jsonp(500, { error: err });
@@ -222,10 +275,9 @@ exports.create = function(req, res) {
                                         // set simulation document values
                                         simulation.machine_id = machineInfo.id;
                                         simulation.ssh_private_key = key;
+                                        // the ip is not available upon launch...
                                         simulation.machine_ip = 'N/A';
-                                        // simulation.
-
-                                        // trigger a callback to get the ip in 30 sec
+                                        // so we trigger a callback to get the ip in 30 sec
                                         setTimeout(
                                             getServerIp(machineInfo, req.user.id, simulation.sim_id),
                                             30000);
@@ -243,12 +295,9 @@ exports.create = function(req, res) {
                                                     Simulation: simulation
                                                 });
                                             }
-
                                             // send json response object to update the
                                             // caller with new simulation data.
-                                            // var simObj = simulation.toObject();
                                             res.jsonp(simulation);
-
                                             // notify all clients with the same user id.
                                             sockets.getUserSockets().notifyUser(req.user.id,
                                                                     'simulation_create',
@@ -429,7 +478,6 @@ exports.all = function(req, res) {
     if (req.query.state) {
         var queryStates = req.query.state.split(',');
         filter.state = {$in : queryStates};
-
     }
     // Get all simulation models, in creation order, for a user
     Simulation.find(filter).sort().populate('user', 'name username')

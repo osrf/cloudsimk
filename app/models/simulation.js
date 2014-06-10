@@ -81,13 +81,20 @@ var SimulationSchema = new Schema({
     // cost per hr
     server_price_in_cents: {
         type: Number
-    }
+    },
 
+    // secret token to authenticate a server when
+    // it calls back cloudsim.io
+    // each call back has a unique token, to prevent
+    secret_token: {
+        type: String
+    }
 
 });
 
-
-// Validations
+//
+//  Validations
+//
 SimulationSchema.path('date_launch').validate(function(s) {
     return s !== null;
 }, 'Launch date must be set');
@@ -105,8 +112,8 @@ SimulationSchema.path('region').validate(function(s) {
 }, 'Region cannot be blank');
 
 SimulationSchema.path('state').validate(function(s) {
-    return ['Launching', 'Running', 'Terminated'].indexOf(s) > -1 ;
-}, 'State of the simulation instance must be Launching or Terminated');
+    return ['Launching', 'Running', 'Error', 'Terminated'].indexOf(s) > -1 ;
+}, 'State of the simulation instance must be valid');
 
 SimulationSchema.path('user').validate(function(s) {
     return s !== null;
