@@ -28,6 +28,9 @@ module.exports = function(app) {
     app.post('/simulations',
         authorization.requiresLogin, Simulations.create);
 
+    app.get('/simulations/:simulationId/keys.zip',
+        authorization.requiresLogin, Simulations.keysDownload);
+
     /// GET /simulations/:simulationId
     /// Return properties for one simulation
     app.get('/simulations/:simulationId',
