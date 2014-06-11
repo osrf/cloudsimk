@@ -14,6 +14,17 @@ var mongoose = require('mongoose'),
 var sessionSchema = new Schema({ _id: String,  session: String, expires: String });
 var Session = mongoose.model('Session', sessionSchema);
 
+// used to debug socket io problems (see below)
+var verbose = false;
+
+/////////////////////////////////////////////////////////////////////////////
+// prints debug messages to the console when verbose is true
+//
+function pr(str) {
+    if(verbose) {
+        console.log(str);
+    }
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // Starting with the cookie data obtained  during the websocket authorization
@@ -69,10 +80,13 @@ function SocketDict() {
     this.io = null;
 
     this.addSocket = function (user, socket) {
+        if(!user) {
+            console.trace('socket: ' + socket + ', user: ' + user);      
+        }
         if (!this.sockets[user]) {
             this.sockets[user] = [];
         }
-        this.sockets[user].push(socket);
+       this.sockets[user].push(socket);
     };
 
     this.removeSocket = function (socket) {
@@ -91,10 +105,12 @@ function SocketDict() {
     };
 
     this.notifyUser = function (user, channel, data) {
+        pr('notify user ' + user);
         var sockets = this.getSockets(user);
 
         for(var i=0; i<sockets.length; i++) {
             var s = sockets[i];
+            pr('emit on socket ' + s + ' channel: ' + channel + ', data: ' + data);
             s.emit(channel, data);
         }
     };
@@ -124,26 +140,32 @@ function tick() {
 //
 exports.init = function(io) {
     userSockets.io = io;
-    // reduce log verbosity
-    io.set('log level', 1);
+
     // call tick periodically (30 sec)
     setInterval(tick, 30000);
 
     console.log('Init websockets');
     io.set('authorization', function (data, accept) {
+        pr('socket authorization');
         var cookie = data.headers.cookie;
         findUserId(cookie, function(err, userId) {
             if(err) {
+                pr('socket authorization refused');
                 accept(null, false);
             } else {
-                data.userId = userId;
+                // put the user id where we can get it back during connection
+                // it works when put in the data.headers
+                data.headers.userId = userId;
+                pr('socket authorized for user ' + data.headers.userId);
                 accept(null, true);
             }
         });
     });
 
     io.sockets.on('connection', function (socket) {
-        var user = socket.handshake.userId;
+        // retrieve user id placed in data.headers during authorization
+        var user = socket.handshake.headers.userId;
+        pr('\n\nsocket connection for user id: ' + user);
         userSockets.addSocket(user, socket);
         socket.on('disconnect', function() {
             userSockets.removeSocket(user, socket);
