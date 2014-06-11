@@ -29,6 +29,21 @@ exports.paypal_ipn = function(req, res) {
           console.log('paypal ipn msg ' + msg);
           //Do stuff with original params here
           if (req.body.payment_status === 'Completed') {
+                // fetch the user id hidden in the custom field
+                var userId = req.body.custom;
+                var amountInCents = req.body.mc_gross * 100;
+                var note = 'Paypal payment';
+                exports.accountDeposit(userId, amountInCents, note, function(err) {
+                    if(err) {
+                        var msg = 'The Paypal payment of ' + amountInCents + ' cents ';
+                        msg += 'for user ' + userId + ' was not deposited. ';
+                        msg += 'Error: ' + err ;
+                        console.error(msg);
+                    }
+                    else {
+                        console.log('Paypal payement received');
+                    }
+                });
               console.log ('completed');
               console.log('user ' + req.body.custom);
               console.log('amount ' + req.body.mc_gross);
