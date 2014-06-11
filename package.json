@@ -63,7 +63,7 @@
     "duration": ">=0.2.0",
     "node-uuid": ">=1.4.1",
     "ssh2": ">=0.2.22",
-    "socket.io": ">=0.9.16"
+    "socket.io": ">=1.0.4"
   },
     "devDependencies": {
     "supertest": "0.8.2",

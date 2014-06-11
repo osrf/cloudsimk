@@ -160,6 +160,7 @@ function getServerIp(machineInfo, userId,  simId) {
                                   cloudServices.terminateSimulator(machineInfo, function () {});
                               }
                         } else {
+                              console.log('broadcasting changes: ' + util.inspect(sim) );
                               // New IP: broadcast the news
                               sockets.getUserSockets().notifyUser(userId,
                                                       'simulation_update',
@@ -286,14 +287,15 @@ exports.create = function(req, res) {
                                                     errors: err.errors,
                                                     Simulation: simulation
                                                 });
-                                            }
-                                            // send json response object to update the
-                                            // caller with new simulation data.
-                                            res.jsonp(simulation);
-                                            // notify all clients with the same user id.
-                                            sockets.getUserSockets().notifyUser(req.user.id,
+                                            } else {
+                                                // send json response object to update the
+                                                // caller with new simulation data.
+                                                res.jsonp(simulation);
+                                                // notify all clients with the same user id.
+                                                sockets.getUserSockets().notifyUser(req.user.id,
                                                                     'simulation_create',
                                                                      {data:simulation});
+                                            }
                                         }); // simulation.save (simulatorInstance)
                                     }
                                 });  // launchSimulator
