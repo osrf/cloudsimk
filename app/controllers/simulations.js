@@ -276,7 +276,7 @@ exports.create = function(req, res) {
                                         // so we trigger a callback to get the ip in 30 sec
                                         setTimeout(
                                             getServerIp(machineInfo, req.user.id, simulation.sim_id),
-                                            30000);
+                                            60000);
                                         // Save the simulation instance to the database
                                         var sim = new Simulation(simulation);
                                         sim.save(function(err) {
@@ -401,9 +401,7 @@ function terminateSimulatorServer(simulation, cb) {
     var machineInfo = {region: awsRegion,
                        id: simulation.machine_id};
 
-    console.log('terminateSimulatiorServer ' + util.inspect(simulation) + '\n');
-
-    var keyName = getKeyName(simulation.user.email, simulation.sim_id);
+    var keyName = getKeyName(simulation.user.username, simulation.sim_id);
 
     // delete the ssh key. If there is an error, report it
     // but try to shutdown the machine anyways
