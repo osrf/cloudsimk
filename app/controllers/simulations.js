@@ -146,28 +146,32 @@ function getServerIp(machineInfo, userId,  simId) {
           console.error('Error retrieving simulation ' + simId + ': ' +  err );
         }
         else if (sim) {
-          sim.machine_ip = 'waiting';
-          cloudServices.simulatorStatus(machineInfo, function(err, state) {
-              var msg = 'getServerIp ';
-              msg += 'machine:' + util.inspect(machineInfo);
-              msg += ' status: ' + util.inspect(state);
-              console.log(msg);
-              sim.machine_ip = state.ip;
-              sim.save(function(err) {
-                if (err) {
-                      console.log('error saving simulation info to db: ' + err);
-                      if(machineInfo.id) {
-                          console.log('Terminating server ' + machineInfo.id);
-                          cloudServices.terminateSimulator(machineInfo, function () {});
-                      }
-                  } else {
-                      // New IP: broadcast the news
-                      sockets.getUserSockets().notifyUser(userId,
-                                              'simulation_update',
-                                              {data:sim});
-                  }
-              });
-          });
+            sim.machine_ip = 'waiting';
+            cloudServices.simulatorStatus(machineInfo, function(err, state) {
+                if(err) {
+                    console.error('Error getting simulation status: ' + err);
+                } else {        
+                    var msg = 'getServerIp ';
+                    msg += 'machine:' + util.inspect(machineInfo);
+                    msg += ' status: ' + util.inspect(state);
+                    console.log(msg);
+                    sim.machine_ip = state.ip;
+                    sim.save(function(err) {
+                        if (err) {
+                              console.log('error saving simulation info to db: ' + err);
+                              if(machineInfo.id) {
+                                  console.log('Terminating server ' + machineInfo.id);
+                                  cloudServices.terminateSimulator(machineInfo, function () {});
+                              }
+                        } else {
+                              // New IP: broadcast the news
+                              sockets.getUserSockets().notifyUser(userId,
+                                                      'simulation_update',
+                                                      {data:sim});
+                        }
+                    });
+                }
+            });
         }
     });
 }
