@@ -27,6 +27,7 @@ var config = require('./config/config'),
     mongoose = require('mongoose');
 
 // Bootstrap db connection
+console.log('Using database: ' + config.db);
 var db = mongoose.connect(config.db);
 
 // make sure the download directory exists
