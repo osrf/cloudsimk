@@ -400,6 +400,9 @@ function terminateSimulatorServer(simulation, cb) {
     var awsRegion = awsData[simulation.region].region;
     var machineInfo = {region: awsRegion,
                        id: simulation.machine_id};
+
+    console.log('terminateSimulatiorServer ' + util.inspect(simulation) + '\n');
+
     var keyName = getKeyName(simulation.user.email, simulation.sim_id);
 
     // delete the ssh key. If there is an error, report it
