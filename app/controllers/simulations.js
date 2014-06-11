@@ -137,6 +137,9 @@ function generate_callback_script(secret_token, world, cloneRepo)
 // @param machineInfo: contains the region and the AWS machine ID
 function getServerIp(machineInfo, userId,  simId) {
 
+    var msg = 'getServerIp ' +  util.inspect(machineInfo);
+    console.log(msg);
+
     // retrieve simulation data
     Simulation.findOne({sim_id: simId}, function(err, sim) {
         if (err) {
@@ -145,7 +148,8 @@ function getServerIp(machineInfo, userId,  simId) {
         else if (sim) {
           sim.machine_ip = 'waiting';
           cloudServices.simulatorStatus(machineInfo, function(err, state) {
-              var msg = 'machine:' + util.inspect(machineInfo);
+              var msg = 'getServerIp ';
+              msg += 'machine:' + util.inspect(machineInfo);
               msg += ' status: ' + util.inspect(state);
               console.log(msg);
               sim.machine_ip = state.ip;
