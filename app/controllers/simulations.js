@@ -136,10 +136,6 @@ function generate_callback_script(secret_token, world, cloneRepo)
 // after launch, because the information is not available during launch.
 // @param machineInfo: contains the region and the AWS machine ID
 function getServerIp(machineInfo, userId,  simId) {
-
-    var msg = 'getServerIp ' +  util.inspect(machineInfo);
-    console.log(msg);
-
     // retrieve simulation data
     Simulation.findOne({sim_id: simId}, function(err, sim) {
         if (err) {
@@ -274,9 +270,9 @@ exports.create = function(req, res) {
                                         // the ip is not available upon launch...
                                         simulation.machine_ip = 'N/A';
                                         // so we trigger a callback to get the ip in 30 sec
-                                        setTimeout(
-                                            getServerIp(machineInfo, req.user.id, simulation.sim_id),
-                                            60000);
+                                        setTimeout(function() {
+                                            getServerIp(machineInfo, req.user.id, simulation.sim_id);
+                                        }, 30000);
                                         // Save the simulation instance to the database
                                         var sim = new Simulation(simulation);
                                         sim.save(function(err) {
