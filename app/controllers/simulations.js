@@ -250,7 +250,7 @@ exports.create = function(req, res) {
 
                                 // set date_launch just before we launch the simulation on the cloud
                                 simulation.date_launch = Date.now();
-                                cloudServices.launchSimulator(  req.user.username,
+                                cloudServices.launchSimulator(  serverDetails.region,
                                                                 keyName,
                                                                 serverDetails.hardware,
                                                                 serverDetails.image,
