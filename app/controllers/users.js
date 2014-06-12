@@ -15,21 +15,21 @@ var merge = function(user, cloudsimUser)
     var result = {};
     var userJson = {};
     var cloudJson = {};
-  
+
     if (user !== null) {
         userJson = user.toJSON();
     }
-  
+
     if (cloudsimUser !== null) {
         cloudJson = cloudsimUser.toJSON();
     }
-  
+
     for (var key in cloudJson) {
       if (cloudJson.hasOwnProperty(key)) {
         result[key] = cloudJson[key];
       }
     }
-  
+
     for (key in userJson) {
       if (userJson.hasOwnProperty(key)) {
         result[key] = userJson[key];
@@ -61,7 +61,7 @@ exports.all = function(req, res) {
     }
 
     // Get all the Users
-    User.find().exec(function(err, users) { 
+    User.find().exec(function(err, users) {
         if (err) {
             res.render('error', {status: 500});
         } else {
@@ -80,8 +80,7 @@ exports.all = function(req, res) {
                             }
                         });
                     });
-
-                    res.jsonp(result)
+                    res.jsonp(result);
                 }
             });
         }
@@ -136,7 +135,7 @@ exports.update = function(req, res) {
     var user = req.profile;
 
     // Find the user.
-    User.findOne({open_id: user.open_id}).exec(function(err, usr) { 
+    User.findOne({open_id: user.open_id}).exec(function(err, usr) {
         if (err) {
             res.jsonp({ error:
                         {message: 'Unable to find CloudSim user info' }});
@@ -186,7 +185,7 @@ exports.remove = function(req, res) {
 
     // Find the user.
     var usr = User.findOne({open_id: user.open_id});
-   
+
     usr.remove(function(err) {
         if (err) {
             res.jsonp({ error: {
@@ -200,7 +199,7 @@ exports.remove = function(req, res) {
                 } else {
                     cloudsimUser.remove(function(err) {
                         if(err) {
-                            res.jsonp({ error: {message: 'Unable to erase CloudSim user info' }});    
+                            res.jsonp({ error: {message: 'Unable to erase CloudSim user info' }});
                         } else {
                             res.jsonp(user);
                         }
@@ -250,7 +249,7 @@ exports.create = function(req, res) {
                         default:
                             message = 'Please fill all the required fields';
                     }
-    
+
                     return res.jsonp({error: {
                         message: message,
                         user: user
