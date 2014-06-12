@@ -21,10 +21,9 @@ exports.paypal_ipn = function(req, res) {
           console.log('paypal ipn msg ' + msg);
           //Do stuff with original params here
           if (req.body.payment_status === 'Completed') {
-              console.log ('completed');
-              console.log('user ' + req.body.custom);
-              console.log('amount ' + req.body.mc_gross);
-              //Payment has been confirmed as completed
+              // Payment has been confirmed as completed
+              // req.body.mc_gross: transaction amount
+              // req.body.custom: user id.
           }
       }
   });
