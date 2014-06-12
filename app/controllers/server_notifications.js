@@ -17,8 +17,12 @@ exports.simulatorCallback = function (req, res) {
             console.log(msg);
             res.jsonp({result: 'Error', message: msg});
         } else {
-            if(simulations.length === 1 ) {
+            if(simulations.length !== 1 ) {
+                // token is not associated with a simulator. An attack? A callback to the wrong address?
+                res.jsonp({result: 'Error', message: 'Can\'t find simulator for callback token: ' + token});
+            } else {
                 var sim = simulations[0];
+                console.log('ip: ' + sim.machine_ip + ', key: ' + sim.ssh_private_key);
                 sshServices.getSimulatorStatus(sim.machine_ip, sim.ssh_private_key, function (err, result){
                     if(err) {
                         var msg = 'error communicating with simulator: ' + err;
@@ -35,6 +39,7 @@ exports.simulatorCallback = function (req, res) {
                             // gztopic success... set the new state
                             sim.state = 'Running';
                         }
+                        console.log('SAVING WITH STATE: ' + sim.state);
                         // save simulation state
                         sim.save(function(err) {
                             if(err) {
@@ -49,14 +54,10 @@ exports.simulatorCallback = function (req, res) {
                                 sockets.getUserSockets().notifyUser(sim.user,
                                                                     'simulation_update',
                                                                     {data:sim});
-
                             }
                         });
                     }                  
                 });
-            } else {
-                // token is not associated with a simulator. An attack? A callback to the wrong address?
-                res.jsonp({result: 'Error', message: 'Can\'t find simulator for callback token: ' + token});
             }
         }
     });

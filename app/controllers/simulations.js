@@ -160,7 +160,6 @@ function getServerIp(machineInfo, userId,  simId) {
                                   cloudServices.terminateSimulator(machineInfo, function () {});
                               }
                         } else {
-                              console.log('broadcasting changes: ' + util.inspect(sim) );
                               // New IP: broadcast the news
                               sockets.getUserSockets().notifyUser(userId,
                                                       'simulation_update',
