@@ -29,6 +29,14 @@ var config = require('./config/config'),
 // Bootstrap db connection
 var db = mongoose.connect(config.db);
 
+// make sure the download directory exists
+try {
+    fs.statSync(config.downloadsDir);
+}
+catch(err) {
+    fs.mkdirSync(config.downloadsDir);
+}
+
 // Start the app by listening on <port>
 var port = process.env.PORT || config.port;
 server.listen(port);
@@ -90,3 +98,8 @@ sockets.init(io);
 
 // Expose app
 exports = module.exports = app;
+
+process.on('uncaughtException', function (error) {
+   console.log('uncaughtException!!!\n'+  error.stack);
+});
+
