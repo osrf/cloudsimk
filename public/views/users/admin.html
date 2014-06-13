@@ -5,72 +5,95 @@
   </div>
 
   <div class="row">
-    <div class="col-md-6">
-      <form class="form-inline form-horizontal" ng-submit="addUser()">
-          <!-- Add a user -->
-          <div class="form-group">
-            <label for="email" class="col-sm-2 control-label">Email</label>
-            <div class="col-sm-10">
-            <input type="email" class="form-control"
-                   ng-model="email" required="required">
-            </div>
-          </div>
-  
-          <button type="submit" class="btn btn-primary">Add User</button>
-      </form>
+    <div class="col-md-1">
+      <button type="button" class="btn btn-default"
+              ng-click="openAddUserModal()">
+        <span class="glyphicon glyphicon-user"</span><span
+          class="glyphicon glyphicon-plus" style="font-size:80%"></span>
+      </button>
     </div>
-  
-    <div class="col-md-6">
+    <div class="col-md-4">
+      <input type="text"class="form-control"
+             ng-model="search" placeholder="Search">
+    </div>
+  </div>
 
+  <br/>
+
+  <div class="row">
+    <div class="col-md-12">
       <form>
         <table class="table table-striped table-condensed table-hover">
         <thead>
           <tr>
-            <th><input type="checkbox"></th>
-            <th>Username 
+            <th><input type="checkbox"
+              ng-checked="getAllPageUsersSelected()"
+              ng-click="selectPageUsers()"></th>
+            <th>Username
               <a href="" ng-click="predicate ='username'; reverse=!reverse">
                 <span class="glyphicon "
                   ng-class="predicate == 'username' ? reverse ? 'glyphicon-arrow-down' : 'glyphicon-arrow-up' : 'glyphicon-sort'"></span>
               </a>
             </th>
-            <th>Email 
+            <th>Email
               <a href="" ng-click="predicate ='email'; reverse=!reverse">
                 <span class="glyphicon "
                   ng-class="predicate == 'email' ? reverse ? 'glyphicon-arrow-down' : 'glyphicon-arrow-up' : 'glyphicon-sort'"></span>
               </a>
             </th>
-            <th>Admin</th>
+            <th>Invites</th>
+            <th>Credit</th>
+            <th style="text-align:center">Admin</th>
+            <th></th>
           </tr>
         </thead>
         <tfoot>
           <td colspan="2">
             <div class="text-left">
-              <button type="button" class="btn btn-primary inline-block"
-                style="margin-top: 20px; margin-bottom: 20px;"
-                ng-click="deleteUser();">Delete</button>
+
+              <div class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle"
+                        data-toggle="dropdown" ng-disabled="getPageUsersSelected().length === 0"> More <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                  <li ng-class="userSelected() ? '' : 'disabled'">
+                    <a href="" ng-click="openEditUsersModal()">Edit User(s)</a>
+                  </li>
+                  <li class="divider"></li>
+                  <li ng-class="userSelected() ? '' : 'disabled'">
+                    <a href="" ng-click="deleteUsers()">Delete User(s)</a></li>
+                </ul>
+              </div>
             </div>
           </td>
-          <td colspan="2">
+          <td colspan="5">
             <div class='text-right'>
               <pagination direction-links="true"
-              total-items="users.length" items-per-page="pageSize"
-              page="currentPage" ng-model="currentPage" on-select-page="selectedUsers = []"></pagination>
+              total-items="filteredUsers.length" items-per-page="pageSize"
+              ng-click="clearSelected()"
+              page="currentPage"></pagination>
              </div>
           </td>
         </tfoot>
 
         <tbody ng-model="users" ui-sortable>
-          <tr ng-repeat="user in users | orderBy:predicate:reverse | startFrom:(currentPage-1)*pageSize | limitTo:pageSize">
+        <tr ng-repeat="user in (filteredUsers = (users | filter:{email: search} | orderBy:predicate:reverse) | startFrom:(currentPage-1)*pageSize*(search.length==0) | limitTo:pageSize)">
             <td>
-              <input type="checkbox"
-              ng-click="setSelected(user);" ng-model="user.selected"/>
+              <input type="checkbox" ng-model="user.selected" />
             </td>
             <td>{{user.username}}</td>
             <td>{{user.email}}</td>
-            <td>
-              <input type="checkbox"
-              ng-click="setAdmin(user);"/>
+            <td class='col-sm-1'><input type="number" class="form-control"
+              ng-model="user.invites" min="0" ng-change="updateUser(user);"></td>
+            <td class='col-sm-2'><div class="input-group">
+              <span class='input-group-addon'>$</span>
+              <input type="number" class="form-control"
+              ng-model="user.credit" min="0" ng-change="updateUser(user);">
+              </div>
             </td>
+            <td style="text-align:center"><input type="checkbox"
+               ng-change="updateUser(user);" ng-model="user.admin"/></td>
+            <td><button type="button" class="btn btn-default btn-sm">Simulations<button</td>
           </tr>
         </tbody>
       </table>
@@ -83,4 +106,5 @@
       </div>
     </div>
   </div>
+
 </div>
