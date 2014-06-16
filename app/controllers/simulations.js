@@ -250,8 +250,8 @@ exports.create = function(req, res) {
                                 //    /var/lib/cloud/instance/user-data.txt
                                 var token = uuid.v4();
                                 var script = generate_callback_script(token, simulation.world, true);
-                                // set date_launch just before we launch the simulation on the cloud
-
+				// remember token for later, during callback 
+				simulation.secret_token = token;
                                 // set date_launch just before we launch the simulation on the cloud
                                 simulation.date_launch = Date.now();
                                 cloudServices.launchSimulator(  serverDetails.region,
@@ -587,8 +587,6 @@ function createSimulatorZipFile (simulation, cb) {
     var ip = simulation.machine_ip;
 
     var dirPath = config.downloadsDir + '/' + simulation._id;
-    console.log('k: ' + keyStr);
-    console.log('ip: ' + ip);
     fs.mkdir(dirPath, function(err) {
         if (err) {
             cb(err);

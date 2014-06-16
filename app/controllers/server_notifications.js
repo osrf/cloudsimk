@@ -12,16 +12,17 @@ exports.simulatorCallback = function (req, res) {
     console.log('simulatorCallback data:' + require('util').inspect(req.body));
     var token = req.body.token;    
     Simulation.find({secret_token: token}).exec(function(err, simulations) {
-        if(err) {
+      if(err) {
             var msg = 'simulator callback error: error looking for simulator token: ' + err;
             console.log(msg);
             res.jsonp({result: 'Error', message: msg});
         } else {
-            if(simulations.length !== 1 ) {
+           if(simulations.length !== 1 ) {
+		msg = 'Can\'t find simulator for callback token: ' + token;
                 // token is not associated with a simulator. An attack? A callback to the wrong address?
-                res.jsonp({result: 'Error', message: 'Can\'t find simulator for callback token: ' + token});
+                res.jsonp({result: 'Error', message: msg });
             } else {
-                var sim = simulations[0];
+               var sim = simulations[0];
                 console.log('ip: ' + sim.machine_ip + ', key: ' + sim.ssh_private_key);
                 sshServices.getSimulatorStatus(sim.machine_ip, sim.ssh_private_key, function (err, result){
                     if(err) {
@@ -29,29 +30,29 @@ exports.simulatorCallback = function (req, res) {
                         console.log(msg);
                         res.jsonp({result: 'Error', message: msg});
                     } else {
-                        if(result.code !== 0) {
+                       if(result.code !== 0) {
                             // gztopic returned an error, sim is not running
                             sim.state = 'Error';
                             var s = 'Error getting simulation status for sim';
                             s +=  ' ' + sim._id + 'code: '+ result.code +  ', output :"' + result.output + '"';
                             console.log(s);
                         } else {
-                            // gztopic success... set the new state
+                           // gztopic success... set the new state
                             sim.state = 'Running';
                         }
                         console.log('SAVING WITH STATE: ' + sim.state);
                         // save simulation state
                         sim.save(function(err) {
-                            if(err) {
+                           if(err) {
                                 var msg = 'Error saving sim: ' + err;
                                 console.log(msg);
                                 // db error? possible, but unlikely
                                 res.jsonp({result: 'Error', message: msg});
                             } else {
-                                // success: simulator found, status updated
+                               // success: simulator found, status updated
                                 res.jsonp({result: 'OK', message: 'Update successful' });
                                 // let all the other browser windows know
-                                sockets.getUserSockets().notifyUser(sim.user,
+                               sockets.getUserSockets().notifyUser(sim.user,
                                                                     'simulation_update',
                                                                     {data:sim});
                             }
