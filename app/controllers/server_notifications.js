@@ -17,10 +17,10 @@ exports.simulatorCallback = function (req, res) {
             console.log(msg);
             res.jsonp({result: 'Error', message: msg});
         } else {
-           if(simulations.length !== 1 ) {
-		msg = 'Can\'t find simulator for callback token: ' + token;
+            if(simulations.length !== 1 ) {
+		        var m = 'Can\'t find simulator for callback token: ' + token;
                 // token is not associated with a simulator. An attack? A callback to the wrong address?
-                res.jsonp({result: 'Error', message: msg });
+                res.jsonp({result: 'Error', message: m });
             } else {
                var sim = simulations[0];
                 console.log('ip: ' + sim.machine_ip + ', key: ' + sim.ssh_private_key);
