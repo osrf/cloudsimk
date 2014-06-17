@@ -53,6 +53,7 @@ describe('<Unit Test>', function() {
             user.save(done);
         });
 
+
         describe('Bad login', function() {
             it('should be impossible to login as a random user', function(done) {
                 agent = supertest.agent(app);
@@ -120,6 +121,7 @@ describe('<Unit Test>', function() {
         });
 
         after(function(done) {
+            console.log('removing user: ' + user.email);
             user.remove();
             done();
         });

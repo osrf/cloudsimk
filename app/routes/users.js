@@ -18,6 +18,10 @@ module.exports = function(app, passport) {
     /// Delete a user
     app.del('/users/:userId', users.remove);
 
+    /// PUT /users
+    /// Update a user
+    app.put('/users/:userId', users.update);
+
     /// Get all the users
     /// This route should only return data if the user is logged in, and 
     /// is and administrator.

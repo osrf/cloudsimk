@@ -29,7 +29,7 @@ var config = require('./config/config'),
 // Bootstrap db connection
 var db = mongoose.connect(config.db);
 
-// make shure the download directory exists
+// make sure the download directory exists
 try {
     fs.statSync(config.downloadsDir);
 }
