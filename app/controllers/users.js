@@ -9,6 +9,38 @@ var mongoose = require('mongoose'),
     CloudsimUser = mongoose.model('CloudsimUser');
 
 /////////////////////////////////////////////////
+// Helper function that merges a user and cloudsimuser
+var merge = function(user, cloudsimUser)
+{
+    var result = {};
+    var userJson = {};
+    var cloudJson = {};
+
+    if (user !== null) {
+        userJson = user.toJSON();
+    }
+
+    if (cloudsimUser !== null) {
+        cloudJson = cloudsimUser.toJSON();
+    }
+
+    for (var key in cloudJson) {
+      if (cloudJson.hasOwnProperty(key)) {
+        result[key] = cloudJson[key];
+      }
+    }
+
+    for (key in userJson) {
+      if (userJson.hasOwnProperty(key)) {
+        result[key] = userJson[key];
+      }
+    }
+
+    return result;
+};
+
+
+/////////////////////////////////////////////////
 /// Authentication callback
 /// @param[in] req Nodejs request object.
 /// @param[out] res Nodejs response object.
@@ -28,15 +60,29 @@ exports.all = function(req, res) {
         return;
     }
 
-    // Get all simulation models, in creation order, for a user
-    User.find().sort('-created') //.populate('user', 'name username')
-      .exec(function(err, users) {
+    // Get all the Users
+    User.find().exec(function(err, users) {
         if (err) {
-            res.render('error', {
-                status: 500
-            });
+            res.render('error', {status: 500});
         } else {
-            res.jsonp(users);
+            // Get all the cloud sim users
+            CloudsimUser.find().exec(function(err, cloud) {
+                if (err) {
+                    res.render('error', {status: 500});
+                } else {
+                    var result = [];
+
+                    // Merge the two sets.
+                    users.forEach(function(user) {
+                        cloud.forEach(function(cloud) {
+                            if (String(cloud.user) === String(user._id)) {
+                                result.push(merge(user, cloud));
+                            }
+                        });
+                    });
+                    res.jsonp(result);
+                }
+            });
         }
     });
 };
@@ -81,19 +127,66 @@ exports.session = function(req, res) {
 };
 
 /////////////////////////////////////////////////
+/// Update a user
+/// @param[in] req Nodejs request object.
+/// @param[out] res Nodejs response object.
+/// @return Function to create a user.
+exports.update = function(req, res) {
+    var user = req.profile;
+
+    // Find the user.
+    User.findOne({open_id: user.open_id}).exec(function(err, usr) {
+        if (err) {
+            res.jsonp({ error:
+                        {message: 'Unable to find CloudSim user info' }});
+        } else {
+            CloudsimUser.findFromUserId(user._id, function(err, cloudsimUser) {
+              if (err) {
+                  res.jsonp({ error:
+                              {message: 'Unable to find CloudSim user info' }});
+              } else {
+                  cloudsimUser.credit = req.body.credit;
+                  cloudsimUser.invites = req.body.invites;
+                  cloudsimUser.admin = req.body.admin;
+
+                  // Save the user to the database
+                  cloudsimUser.save(function(err) {
+                      if (err) {
+                          return res.jsonp({error: {
+                              message: 'Unable to update user',
+                              user: cloudsimUser
+                             }
+                          });
+                      } else {
+                          var result = merge(usr, cloudsimUser);
+                          // Send back the user
+                          // (expected by angularjs on success).
+                          return res.jsonp(result);
+                      }
+                  });
+              }
+            });
+        }
+    });
+};
+
+
+/////////////////////////////////////////////////
 /// Remove user
 /// @param[in] req Nodejs request object.
 /// @param[out] res Nodejs response object.
 /// @return Function to create a user.
 exports.remove = function(req, res) {
     var user = req.profile;
-    console.log('removing user: ' + user.email);
     if (user.email === req.user.email) {
         res.send(500, 'Unable to delete yourself');
         return;
     }
-   
-    user.remove(function(err) {
+
+    // Find the user.
+    var usr = User.findOne({open_id: user.open_id});
+
+    usr.remove(function(err) {
         if (err) {
             res.jsonp({ error: {
                 message: 'Unable to delete user'
@@ -106,7 +199,7 @@ exports.remove = function(req, res) {
                 } else {
                     cloudsimUser.remove(function(err) {
                         if(err) {
-                            res.jsonp({ error: {message: 'Unable to erase CloudSim user info' }});    
+                            res.jsonp({ error: {message: 'Unable to erase CloudSim user info' }});
                         } else {
                             res.jsonp(user);
                         }
@@ -123,7 +216,6 @@ exports.remove = function(req, res) {
 /// @param[out] res Nodejs response object.
 /// @return Function to create a user.
 exports.create = function(req, res) {
-    console.log('Create user ' + req.body.email);
     var message = null;
 
     // Make sure the requesting user is authenticated.
@@ -157,7 +249,7 @@ exports.create = function(req, res) {
                         default:
                             message = 'Please fill all the required fields';
                     }
-    
+
                     return res.jsonp({error: {
                         message: message,
                         user: user
@@ -166,6 +258,7 @@ exports.create = function(req, res) {
                 }
                 else {
                     var cloudsimUser = new CloudsimUser({user: user._id});
+                    cloudsimUser.admin = req.body.admin;
                     cloudsimUser.save(function(err) {
                         if(err) {
                             return res.jsonp({error: {
@@ -174,8 +267,9 @@ exports.create = function(req, res) {
                                 }
                             });
                         } else {
-                            // Send back the user (expected by angularjs on success).
-                            return res.jsonp(user);
+                            // Send back the user
+                            // (expected by angularjs on success).
+                            return res.jsonp(merge(user, cloudsimUser));
                         }
                     });
                 }
@@ -214,10 +308,17 @@ exports.user = function(req, res, next, id) {
         if (err) return next(err);
         if (!user) return next(new Error('Failed to load User ' + id));
 
-        // Store the user information in the request's profile
-        req.profile = user;
+        CloudsimUser.findFromUserId(user._id, function(err, cloudsimUser) {
+            if (err) {
+                res.jsonp({ error:
+                  {message: 'Unable to find CloudSim user info' }});
+            } else {
+                // Store the user information in the request's profile
+                req.profile = merge(user, cloudsimUser);
 
-        // Pass control to the next middleware
-        next();
+                // Pass control to the next middleware
+                next();
+            }
+        });
     });
 };

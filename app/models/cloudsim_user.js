@@ -28,6 +28,21 @@ var CloudSimUserSchema = new Schema({
     account_balance: {
         type: Number,
         default: 0
+    },
+
+    credit: {
+      type: Number,
+      default: 0
+    },
+
+    invites: {
+      type: Number,
+      default: 0
+    },
+
+    admin: {
+      type: Boolean,
+      default: false
     }
 });
 
