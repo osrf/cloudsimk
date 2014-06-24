@@ -2,15 +2,12 @@
 /// @module billing_controller
 /// Server side billing controller.
 
-
 /// Module dependencies.
 var Duration = require('duration');
 var mongoose = require('mongoose'),
     CloudsimUser = mongoose.model('CloudsimUser'),
     Billing = mongoose.model('Billing');
 
-// var sockets = require('../lib/sockets');
-// var util  = require('util');
 
 //////////////////////////////////////////////////////////////////////////////
 /// Process a Paypal Instant Payment Notification (IPN) message
@@ -26,6 +23,9 @@ exports.paypal_ipn = function(req, res) {
       if (err) {
           console.error(msg);
       } else {
+          // Payment has been confirmed as completed
+          // req.body.mc_gross: transaction amount
+          // req.body.custom: user id.
           console.log('paypal ipn msg ' + msg);
           //Do stuff with original params here
           if (req.body.payment_status === 'Completed') {
@@ -47,7 +47,6 @@ exports.paypal_ipn = function(req, res) {
               console.log ('completed');
               console.log('user ' + req.body.custom);
               console.log('amount ' + req.body.mc_gross);
-              //Payment has been confirmed as completed
           }
       }
   });
