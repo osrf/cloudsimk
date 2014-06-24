@@ -23,6 +23,12 @@ var CloudSimUserSchema = new Schema({
         type: Number,
         default: -1
     },
+    
+    // the money left in the user account, in cents
+    account_balance: {
+        type: Number,
+        default: 0
+    },
 
     credit: {
       type: Number,
@@ -70,7 +76,7 @@ CloudSimUserSchema.statics.incrementNextSimId = function(userId, cb) {
                                     cb(err);
                                 } else {
                                     if(cloudsimUser) {
-                                        cb(null, cloudsimUser.next_sim_id);
+                                        cb(null, cloudsimUser);
                                     } else {
                                         cb('Can\'t find CloudSim information for the user');
                                     }
@@ -94,6 +100,6 @@ CloudSimUserSchema.statics.findFromUserId = function(userId, cb) {
                     });
 };
 
-
 mongoose.model('CloudsimUser', CloudSimUserSchema);
+
 

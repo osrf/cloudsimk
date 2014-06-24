@@ -73,7 +73,7 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
 
         sim.$save(function() {},
             function(error) {
-                $scope.error = 'Error launching simulation: ' + error.data;
+                $scope.error = 'Error launching simulation: ' + error.data.error;
                 sim.state = 'Error';
             });
         sim.upTime = 0;

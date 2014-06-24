@@ -1,10 +1,12 @@
 'use strict';
 
+
 /// Module dependencies.
 var mongoose = require('mongoose'),
     User = mongoose.model('User'),
     Simulation = mongoose.model('Simulation'),
     User = mongoose.model('User'),
+    CloudsimUser = mongoose.model('CloudsimUser'),
     util = require('../util'),
     should = require('should'),
     app = require('../../../server'),
@@ -13,6 +15,7 @@ var mongoose = require('mongoose'),
 var user;
 var token;
 var agent;
+var csUser;
 
 describe('<Unit Test>', function() {
     describe('Server_notification Controller:', function() {
@@ -48,6 +51,16 @@ describe('<Unit Test>', function() {
                         });
                     });
                 });
+            });
+        });
+
+        describe('CloudsimUser doc for the User', function() {
+            it('Should be created', function(done) {
+                csUser = new CloudsimUser({
+                    user: user._id,
+                    account_balance: 1000
+                    });
+                csUser.save(done);
             });
         });
 
