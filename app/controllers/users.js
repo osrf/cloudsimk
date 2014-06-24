@@ -148,8 +148,8 @@ exports.update = function(req, res) {
                   cloudsimUser.credit = req.body.credit;
                   cloudsimUser.invites = req.body.invites;
                   cloudsimUser.admin = req.body.admin;
-console.log('USER UPDATE... ' + require('util').inspect(req.body) );
-                  cloudsimUser.public_ssh_keys = req.body.public_ssh_keys
+console.log('(DELETE ME) USER UPDATE... ' + require('util').inspect(req.body) );
+                  cloudsimUser.public_ssh_keys = req.body.public_ssh_keys;
                   // Save the user to the database
                   cloudsimUser.save(function(err) {
                       if (err) {
