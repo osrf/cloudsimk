@@ -138,7 +138,7 @@ exports.update = function(req, res) {
     User.findOne({open_id: user.open_id}).exec(function(err, usr) {
         if (err) {
             res.jsonp({ error:
-                        {message: 'Unable to find CloudSim user info' }});
+                        {message: 'Unable to find user info' }});
         } else {
             CloudsimUser.findFromUserId(user._id, function(err, cloudsimUser) {
               if (err) {
@@ -148,7 +148,8 @@ exports.update = function(req, res) {
                   cloudsimUser.credit = req.body.credit;
                   cloudsimUser.invites = req.body.invites;
                   cloudsimUser.admin = req.body.admin;
-
+console.log('USER UPDATE... ' + require('util').inspect(req.body) );
+                  cloudsimUser.public_ssh_keys = req.body.public_ssh_keys
                   // Save the user to the database
                   cloudsimUser.save(function(err) {
                       if (err) {

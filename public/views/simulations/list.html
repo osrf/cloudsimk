@@ -14,8 +14,8 @@
             <th>Region</th>
             <th>Uptime</th>
             <th>Cost</th>
-            <th>Key</th>
-            <th>3D</th>
+            <th></th>
+            <th></th>
           </tr>
         </thead>
         <tfoot>
@@ -49,19 +49,20 @@
             <td>{{simulation.region}}</td>
             <td>{{formatTimeElapsed(simulation.upTime)}}</td>
             <td>{{simulation.server_price}}</td>
-            <td><a href="/simulations/{{simulation.sim_id}}/keys.zip">
-                    <img height="20px" src="/img/icons/download.svg"/>
-                </a>
-            </td>
+
             <td>
                 <a href="http://{{simulation.machine_ip}}:8080" target="_blank" >
                     <img height="20px"  src="/img/icons/eye.svg"/>
                 </a>
             </td>
+
+            <td><img height="20px" ng-src="/img/icons/share.svg"  ng-click="shareSimulator( simulation._id );"/>
+
           </tr>
         </tbody>
       </table>
-      <script type="text/ng-template" id="shutdown.html">
+
+       <script type="text/ng-template" id="shutdown.html">
         <div class="modal-header">
           <h3>Shutdown</h3>
         </div>
@@ -74,7 +75,31 @@
           <button class="btn btn-default" ng-click="confirmShutdown(false)">No</button>
         </div>
       </script>
-    </tab>
+
+    <script type="text/ng-template" id="share.html">
+        <div class="modal-header">
+            <h3>Sharing this simulator</h3>
+        </div>
+        <div class="modal-body">Invite people
+            <textarea  ng-model="inviteStr" rows="4" cols="45"></textarea>
+        </div>
+        <div class="modal-body">
+            Invited people can: SSH into teh simulator and access gzweb.
+            <br>They cannot: modify or shut down the simulator from CloudSim.</br>
+        </div>
+        <div align="right" class="modal-body">
+            <button class="btn btn-default" ng-click="invite(inviteStr)">Invite</button>
+        </div>
+
+        <div class="modal-footer">
+            <div align="left">
+                <h3>Who has access</h3>
+            </div>
+            <button class="btn btn-default" ng-click="closeDlg()">Close</button>
+        </div>
+    </script>
+
+   </tab>
 
     <!-- History: Terminated Simulations -->
     <tab heading='History'>
@@ -156,5 +181,10 @@
         </div>
       </script>
     </tab>
+
+    <tab heading='Shared with me'>
+        
+    </tab>
+
   </tabset>
 </div>

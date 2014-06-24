@@ -14,6 +14,9 @@ var sockets = require('../lib/sockets');
 var config = require('../../config/config');
 var child_process = require('child_process');
 
+// to send ssh keys
+var sshServices = require('../lib/ssh_services.js');
+
 // initialise cloudServices, depending on the environment
 var cloudServices;
 if(process.env.AWS_ACCESS_KEY_ID) {
@@ -578,13 +581,31 @@ exports.keysDownload = function(req, res) {
 };
 
 
-function getPublicKeys(email, cb) {
+function getPublicKeys(userId, cb) {
+
+    CloudsimUser.findFromUserId(userId, function(err, cloudsimUser) {
+        if(err) {
+            console.log('Error looking for cloudsimuser in getPlicKeys : ' + err);
+            cb(err);
+        } else {
+            for(var i=0; i < cloudsimUser.public_ssh_keys.length; i++) {
+                var keyName =  cloudsimUser.public_ssh_keys[i].name;
+                var keyStr =  cloudsimUser.public_ssh_keys[i].name;
+                console.log('PUBKEY ' + i + ' ' + keyName + ': ' + keyStr);
+            }
+            cb(null, cloudsimUser.public_ssh_keys); 
+        }
+    });
+}
+
+
+/*
     User.find({email: email}).exec(function(err, users) {
         if (err) {
             console.err('getPublicKeys error looking for user: ' + err);
             cb(err);
         } else {
-            if(users.length !=1) {
+            if(users.length !== 1) {
                 var m = 'Can\'t find user ' + email;
                 console.err(m);
                 cb(m);
@@ -599,6 +620,8 @@ function getPublicKeys(email, cb) {
         }
     }); // User.find
 }
+*/
+
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -612,14 +635,21 @@ exports.shareSimulator = function(req, res) {
 
     // gather ssh connection info
     var hostIp = req.simulation.machine_ip; 
-    var sshPrivateKeyStr = req.simulation.ssh_private_key; 
-    getPublicKeys(newUser, function(err, publicKeys) {
+    var privKey = req.simulation.ssh_private_key; 
+    getPublicKeys(newUser._id, function(err, publicKeys) {
         if(err) {
-            console.log('shareSimulator error: ' + err);
-            
+            console.log('shareSimulator error getting public keys: ' + err);
+            res.jsonp(500, {error: err});
         } else {
-            var r = {};
-            res.jsonp(simObj);        
+            // upload all the keys from this user
+            sshServices.uploadPublicKeys(hostIp, privKey, publicKeys, function(err, results) {  
+                if(err) {
+                    console.log('error sending public keys to simulator: ' + err);
+                    res.jsonp(500, {error: err});
+                } else {
+                    res.jsonp(results);
+                }
+            });
         }
     });
 };

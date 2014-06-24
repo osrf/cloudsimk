@@ -56,6 +56,10 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
     /// is pressed
     var deleteForeverDialog = null;
 
+    /// A modal dialog that shows a list of users. The ssh keys of these users
+    /// are uploaded to the simulation machine's /home/ubuntu/.ssh/id_rsa 
+    var shareDialog = null;
+
     /// Error messessage
     $scope.error = '';
 
@@ -396,4 +400,30 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
 
         return timeValue;
     };
+
+    $scope.shareSimulator = function(simId)
+    {
+        console.log('Share simulator ' + simId);
+        
+        shareDialog = $modal.open({
+            templateUrl: 'share.html',
+            controller: shareDialogCtrl
+        });
+    };
+
+    // a controller for the share dialog
+    var shareDialogCtrl = function ($scope, $modalInstance) {
+        $scope.closeDlg = function () {
+            $modalInstance.close();
+        };
+        $scope.invite = function(inviteStr) {
+            // remove delimiters
+            var s = inviteStr.replace(/(,|;)/gm, ' ');
+            // remove double spaces and split
+            var invites = s.replace(/\s+/g, ' ').split(' ');
+            console.log('shareDialog  inviting: ' + invites);
+               
+        };
+    };
+
 }]);

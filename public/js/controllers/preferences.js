@@ -1,11 +1,15 @@
 'use strict';
 
-angular.module('cloudsim.preferences').controller('PreferencesController', ['$scope', '$stateParams', '$location', '$modal', 'Global', function ($scope, $stateParams, $location, $modal, Global) {
+angular.module('cloudsim.preferences').controller('PreferencesController', 
+                ['$scope', '$stateParams', '$location', '$modal', 'Global', 'Users', 
+                function ($scope, $stateParams, $location, $modal, Global, Users) {
 
     $scope.global = Global;
 
-    $scope.sshKeys = [];
-
+//    $scope.sshKeys = [];
+    $scope.users = Users.query(); // window.user._id);
+    $scope.user = null;
+    
     /////////////////////////////////////////////
     /// @brief Open a modal to confirm the deletion of an ssh key.
     /// @param[in] index Index of the key to delete.
@@ -47,6 +51,14 @@ angular.module('cloudsim.preferences').controller('PreferencesController', ['$sc
     /// Addition and modifications to keys will be sent to the sever when
     /// the form in the modal window is submitted.
     $scope.openSSHKeyModal = function(index) {
+        if(!$scope.user) {
+            for(var i=0; i < $scope.users.length; i++) {
+                var user = $scope.global.users[i];
+                if(user._id == $scope.global.user._id) {
+                    $scope.user = user;
+                }
+            }
+        }
 
         var template = 'views/users/ssh_key_add_modal.html';
         if (index !== undefined) {

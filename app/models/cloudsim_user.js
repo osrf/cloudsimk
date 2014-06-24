@@ -37,7 +37,18 @@ var CloudSimUserSchema = new Schema({
     admin: {
       type: Boolean,
       default: false
-    }
+    },
+
+    public_ssh_keys: [
+        {
+            // a name to identify the key
+            label: String,
+            // the key data
+            key: String,
+            // the date when the key was added
+            date: Date
+        }
+    ]
 });
 
 //
