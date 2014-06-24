@@ -61,7 +61,8 @@
     "aws-sdk": ">= 1.5.0",
     "node-uuid": ">=1.4.1",
     "ssh2": ">=0.2.22",
-    "socket.io": ">=0.9.16"
+    "socket.io": ">=0.9.16",
+    "paypal-ipn": ">=1.0.1"
   },
   "devDependencies": {
     "supertest": "0.8.2",

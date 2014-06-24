@@ -5,7 +5,6 @@ angular.module('cloudsim').config(['$stateProvider', '$urlRouterProvider',
   function($stateProvider, $urlRouterProvider) {
     // For unmatched routes:
     $urlRouterProvider.otherwise('/');
-
     // states for my app
     $stateProvider
 /*      .state('all simulations', {
