@@ -53,7 +53,7 @@ angular.module('cloudsim.preferences').controller('PreferencesController',
     $scope.openSSHKeyModal = function(index) {
         if(!$scope.user) {
             for(var i=0; i < $scope.users.length; i++) {
-                var user = $scope.global.users[i];
+                var user = $scope.users[i];
                 if(user._id == $scope.global.user._id) {
                     $scope.user = user;
                 }
