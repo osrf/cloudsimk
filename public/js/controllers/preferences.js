@@ -6,22 +6,21 @@ angular.module('cloudsim.preferences').controller('PreferencesController',
 
     $scope.global = Global;
 
-    $scope.users = Users.query();
-    // we store the current logged in user here
-    $scope.user = null;
+    // we store the current logged in user here. It is leaoded with the pref page
+    $scope.user = Users.me();
    
     /////////////////////////////////////////////
     /// @brief Open a modal to confirm the deletion of an ssh key.
     /// @param[in] index Index of the key to delete.
     $scope.removeSSHKey = function(index) {
-        if (index >= 0 && index < $scope.user.ssh_public_keys.length) {
+        if (index >= 0 && index < $scope.user.public_ssh_keys.length) {
             // Open the modal, and pass in (resolve) the ssh key label.
             var modalInstance = $modal.open({
                 templateUrl: 'views/users/ssh_key_remove_modal.html',
                 resolve: {
                     // The ssh key label 
                     label: function() {
-                        return $scope.user.ssh_public_keys[index].label;
+                        return $scope.user.public_ssh_keys[index].label;
                     }
                 },
                 controller: function($scope, $modalInstance, label) {
@@ -39,7 +38,8 @@ angular.module('cloudsim.preferences').controller('PreferencesController',
             // Wait for the modal to be closed/canceled.
             modalInstance.result.then(function () {
                 // Delete the key if confirmed.
-                $scope.user.ssh_public_keys.splice(index, 1);
+                $scope.user.public_ssh_keys.splice(index, 1);
+                $scope.user.$update();
             }, function () {
                 // Do nothing when the modal is dismissed.
             });
@@ -51,14 +51,6 @@ angular.module('cloudsim.preferences').controller('PreferencesController',
     /// Addition and modifications to keys will be sent to the sever when
     /// the form in the modal window is submitted.
     $scope.openSSHKeyModal = function(index) {
-        if(!$scope.user) {
-            for(var i=0; i < $scope.users.length; i++) {
-                var user = $scope.users[i];
-                if(user._id === $scope.global.user._id) {
-                    $scope.user = user;
-                }
-            }
-        }
 
         var template = 'views/users/ssh_key_add_modal.html';
         if (index !== undefined) {
@@ -75,9 +67,8 @@ angular.module('cloudsim.preferences').controller('PreferencesController',
                 index: function() {
                     return index;
                 },
-                // The array of ssh keys.
-                sshKeys: function() {
-                    return $scope.user.ssh_public_keys;
+                user: function() {
+                    return $scope.user;
                 }
             }
         });
@@ -85,6 +76,7 @@ angular.module('cloudsim.preferences').controller('PreferencesController',
         // Wait for the modal to be closed/canceled.
         modalInstance.result.then(function () {
             // Send the keys to the server.
+            $scope.user.$update();
         }, function () {
             // Do nothing when the modal is dismissed.
         });
@@ -95,14 +87,19 @@ angular.module('cloudsim.preferences').controller('PreferencesController',
     /// @param[in] index Index into the sshKeys array of the key to edit.
     ///                  Undefined if adding a new key.
     /// @param[in] sshKeys The array of ssh keys.
-    var SSHKeyModelCtrl = function($scope, $modalInstance, index, sshKeys) {
+    var SSHKeyModelCtrl = function($scope, $modalInstance, index, user) {
         // Grab the label and key, if editing a key. We do this so that
         // editing the values in the form does not directly change the
         // key properties. The user can modify a value, and hit cancel
         // without the key changed.
         if (index !== undefined) {
-            $scope.label = $scope.user.ssh_public_keyss[index].label;
-            $scope.key = $scope.user.ssh_public_keys[index].key;
+            // Grab the label and key, if editing a key. We do this so that
+            // editing the values in the form does not directly change the
+            // key properties. The user can modify a value, and hit cancel
+            // without the key changed.
+
+            $scope.label = user.public_ssh_keys[index].label;
+            $scope.key = btoa(user.public_ssh_keys[index].key).substring(0,20);
         } else {
             $scope.label = '';
             $scope.key = '';
@@ -119,17 +116,22 @@ angular.module('cloudsim.preferences').controller('PreferencesController',
             m = m < 10 ? '0' + m : m;
             d = d < 10 ? '0' + d : d;
 
-            // Add a new key if the index was not defined.
-            // Otherwise, update an existing key
-            if (index === undefined) {
+            var key = form.key.$viewValue;
 
-                $scope.user.ssh_public_keys.push({'label':form.label.$viewValue,
+            // add a new key if the index was nmt defined.
+            // otherwise, update an existing key
+            if (index === undefined) {
+                if (user.ssh_keys === undefined) {
+                    user.ssh_keys = [];
+                }
+                user.public_ssh_keys.push({
+                              'label':form.label.$viewValue,
                               'key':form.key.$viewValue,
                               'date':y + '-' + m  + '-' + d});
             } else {
-                $scope.user.ssh_public_keys[index].label = form.label.$viewValue;
-                $scope.user.ssh_public_keys[index].key = form.key.$viewValue;
-                $scope.user.ssh_public_keys[index].date = new Date(); //y + '-' + m + '-' + d;
+                user.public_ssh_keys[index].label = form.label.$viewValue;
+                user.public_ssh_keys[index].key = form.key.$viewValue;
+                user.public_ssh_keys[index].date = y + '-' + m + '-' + d;
             }
             $modalInstance.close();
         };
