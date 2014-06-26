@@ -95,6 +95,9 @@ CloudSimUserSchema.statics.findFromUserId = function(userId, cb) {
                         if(err) {
                             cb(err);
                         } else {
+
+console.log('findfromuserid: ' + userId + ' found cloudsimUser: ' + cloudsimUser);
+
                             cb(null, cloudsimUser);
                         } 
                     });
