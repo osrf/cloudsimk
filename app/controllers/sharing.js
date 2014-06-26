@@ -17,14 +17,19 @@ exports.uploadAllUserKeysToSimulator = function(sim, userId, cb) {
     var sshPrivateKeyStr = sim.ssh_private_key;
 
     CloudsimUser.findFromUserId (userId, function(err, csUser) {
-        var publicKeyStrArray = csUser.public_ssh_keys;
-        sshServices.uploadPublicKeys(hostIp, sshPrivateKeyStr, publicKeyStrArray, function(err, result) {
-            if(err) {
-                console.log('uploadAllUserKeysToSimulator error:' + err);
-                cb(err);
-            } else {
-                cb(null, publicKeyStrArray);
-            }
-        });
+        if(err) {
+            console.error('uploadUserKeys: error looking up user data: ' + err);
+            cb(err);
+        } else {
+            var publicKeyStrArray = csUser.public_ssh_keys;
+            sshServices.uploadPublicKeys(hostIp, sshPrivateKeyStr, publicKeyStrArray, function(err, result) {
+                if(err) {
+                    console.log('uploadAllUserKeysToSimulator error:' + err);
+                    cb(err);
+                } else {
+                    cb(null, publicKeyStrArray);
+                }
+            });
+        }
     });
 };
