@@ -154,8 +154,11 @@ function getServerIp(machineInfo, userId,  simId) {
                     msg += 'machine:' + util.inspect(machineInfo);
                     msg += ' status: ' + util.inspect(state);
                     console.log(msg);
-                    sim.machine_ip = state.ip;
-                    sim.save(function(err) {
+//                    sim.machine_ip = state.ip;
+//                    sim.save(function(err) {
+                    Simulation.findOneAndUpdate({_id: simulation.id},
+                                                {date_billed_until: bill.validUntil},
+                                                function(err) {
                         if (err) {
                               console.log('error saving simulation info to db: ' + err);
                               if(machineInfo.id) {
@@ -167,7 +170,7 @@ function getServerIp(machineInfo, userId,  simId) {
                               sockets.getUserSockets().notifyUser(userId,
                                                       'simulation_update',
                                                       {data:sim});
-                              console.log('Sim ip ' + sim.machine_ip+ '  saved');
+                              console.log('Sim ip ' + state.ip+ '  saved');
                         }
                     });
                 }
