@@ -156,7 +156,7 @@ function getServerIp(machineInfo, userId,  simId) {
                     console.log(msg);
 //                    sim.machine_ip = state.ip;
 //                    sim.save(function(err) {
-                    Simulation.findOneAndUpdate({_id: simulation.id},
+                    Simulation.findOneAndUpdate({_id: sim.id},
                                                 {machine_ip: state.ip},
                                                 function(err) {
                         if (err) {
