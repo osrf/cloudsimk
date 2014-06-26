@@ -167,6 +167,7 @@ function getServerIp(machineInfo, userId,  simId) {
                               sockets.getUserSockets().notifyUser(userId,
                                                       'simulation_update',
                                                       {data:sim});
+                              console.log('Sim ip ' + sim.machine_ip+ '  saved');
                         }
                     });
                 }
