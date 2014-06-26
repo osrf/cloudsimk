@@ -157,7 +157,7 @@ function getServerIp(machineInfo, userId,  simId) {
 //                    sim.machine_ip = state.ip;
 //                    sim.save(function(err) {
                     Simulation.findOneAndUpdate({_id: simulation.id},
-                                                {date_billed_until: bill.validUntil},
+                                                {machine_ip: state.ip},
                                                 function(err) {
                         if (err) {
                               console.log('error saving simulation info to db: ' + err);
