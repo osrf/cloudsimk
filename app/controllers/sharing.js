@@ -17,7 +17,7 @@ exports.uploadAllUserKeysToSimulator = function(simulator, userId, cb) {
     var sshPrivateKeyStr = sim.ssh_private_key;
 
     CloudsimUser.findFromUserId (userId, function(err, csUser) {
-        var publicKeyStrArray = csUser.public_ssh_keys:
+        var publicKeyStrArray = csUser.public_ssh_keys;
         sshServices.uploadPublicKeys(hostIp, sshPrivateKeyStr, publicKeyStrArray, function(err, result) {
             if(err) {
                 console.log('uploadAllUserKeysToSimulator error:' + err);
