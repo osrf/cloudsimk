@@ -9,10 +9,10 @@ var sshServices = require('../lib/ssh_services.js');
 //////////////////////////////////////////////////////////////////////////////
 /// Uses ssh to connect to a simulation and upload all the ssh keys from a
 /// user to the ubuntu user.
-/// @param simulator the simulator document in the db simulations collection
+/// @param sim the simulator document in the db simulations collection
 /// @userId the _id of the user in the users collection
 /// @cb a callback function with an err (error) and the uploaded keys
-exports.uploadAllUserKeysToSimulator = function(simulator, userId, cb) {
+exports.uploadAllUserKeysToSimulator = function(sim, userId, cb) {
     var hostIp = sim.machine_ip;
     var sshPrivateKeyStr = sim.ssh_private_key;
 
