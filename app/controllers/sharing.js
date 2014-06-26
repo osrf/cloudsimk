@@ -26,5 +26,5 @@ exports.uploadAllUserKeysToSimulator = function(simulator, userId, cb) {
                 cb(null, publicKeyStrArray);
             }
         });
-    }
-}
+    });
+};
