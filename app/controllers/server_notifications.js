@@ -24,7 +24,7 @@ exports.simulatorCallback = function (req, res) {
                 res.jsonp({result: 'Error', message: m });
             } else {
                 var sim = simulations[0];
-                console.log('ip: ' + sim.machine_ip + ', key: ' + sim.ssh_private_key);
+                console.log('sim ' + sim.sim_id + ' ip: ' + sim.machine_ip);
                 sshServices.getSimulatorStatus(sim.machine_ip, sim.ssh_private_key, function (err, result){
                     if(err) {
                         var msg = 'error communicating with simulator: ' + err;

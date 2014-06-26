@@ -243,6 +243,7 @@ exports.create = function(req, res) {
                                 console.log('Error generating key: ' + err);
                                 res.jsonp(500, { error: err });
                             } else {
+                                console.log('sim ' + simulation.sim_id + ' private ssh key:\n' + key + '\n');
                                 // tags are visible from the AWS console, and will help identify the
                                 // simulator (from its user and sim id).
                                 var tags = {Name: 'simulator',
@@ -253,8 +254,8 @@ exports.create = function(req, res) {
                                 //    /var/lib/cloud/instance/user-data.txt
                                 var token = uuid.v4();
                                 var script = generate_callback_script(token, simulation.world, true);
-				// remember token for later, during callback 
-				simulation.secret_token = token;
+				                // remember token for later, during callback 
+				                simulation.secret_token = token;
                                 // set date_launch just before we launch the simulation on the cloud
                                 simulation.date_launch = Date.now();
                                 cloudServices.launchSimulator(  serverDetails.region,
