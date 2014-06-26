@@ -4,6 +4,7 @@ var mongoose = require('mongoose'),
     Simulation = mongoose.model('Simulation');
 var sshServices = require('../lib/ssh_services.js');
 var sockets = require('../lib/sockets');
+var sharing = require('./sharing');
 
 //////////////////////////////////////////////////////////////////////////////
 // this controller handles the callback that each simulator server performs
