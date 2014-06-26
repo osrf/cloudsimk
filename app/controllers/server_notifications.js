@@ -42,7 +42,8 @@ exports.simulatorCallback = function (req, res) {
                             // gztopic success... set the new state
                             sim.state = 'Running';
                             // send the owner's ssh public keys to the machine to unlock the ubuntu user
-                            sharing.uploadAllUserKeysToSimulator(sim, sim.user._id, function(err, keys) {
+                            // note: sim.user is the _id of the user, because there is no 'populate' done
+                            sharing.uploadAllUserKeysToSimulator(sim, sim.user, function(err, keys) {
                                 if(err) {
                                     var msg = "Error loading user keys to simulator: " + err;
                                     console.log(msg);
