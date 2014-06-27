@@ -93,11 +93,9 @@ CloudSimUserSchema.statics.findFromUserId = function(userId, cb) {
     this.findOne(   {user: userId},
                     function(err, cloudsimUser) {
                         if(err) {
+                            console.log('findFromUserId error: ' + err);
                             cb(err);
                         } else {
-
-console.log('findfromuserid: ' + userId + ' found cloudsimUser: ' + cloudsimUser);
-
                             cb(null, cloudsimUser);
                         } 
                     });

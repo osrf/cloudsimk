@@ -48,7 +48,6 @@ exports.simulatorCallback = function (req, res) {
                                     var msg = "Error loading user keys to simulator: " + err;
                                     console.log(msg);
                                 } else { 
-                                    console.log('SAVING WITH STATE: ' + sim.state);
                                     // save simulation state
                                     sim.save(function(err) {
                                        if(err) {

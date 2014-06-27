@@ -27,6 +27,8 @@ exports.uploadAllUserKeysToSimulator = function(sim, userId, cb) {
                     console.log('uploadAllUserKeysToSimulator error:' + err);
                     cb(err);
                 } else {
+                    console.log('keys ' + publicKeyStrArray + ' uploaded!');
+                    console.log('result ' + result);
                     cb(null, publicKeyStrArray);
                 }
             });
