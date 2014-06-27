@@ -21,7 +21,11 @@ exports.uploadAllUserKeysToSimulator = function(sim, userId, cb) {
             console.error('uploadUserKeys: error looking up user data: ' + err);
             cb(err);
         } else {
-            var publicKeyStrArray = csUser.public_ssh_keys;
+            var publicKeyStrArray = [];
+            for(var i=0; i < csUser.public_ssh_keys.length; i++) {
+                var k = csUser.public_ssh_keys[i]['key'];
+                publicKeyStrArray.push(k);
+            }
             sshServices.uploadPublicKeys(hostIp, sshPrivateKeyStr, publicKeyStrArray, function(err, result) {
                 if(err) {
                     console.log('uploadAllUserKeysToSimulator error:' + err);
