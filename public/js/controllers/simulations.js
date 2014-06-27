@@ -401,28 +401,35 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
         return timeValue;
     };
 
-    $scope.shareSimulator = function(simId)
-    {
+    $scope.shareSimulator = function(simId) {
         console.log('Share simulator ' + simId);
         
         shareDialog = $modal.open({
             templateUrl: 'share.html',
-            controller: shareDialogCtrl
+            controller: shareDialogCtrl,
+            resolve: {
+                simId: function() {
+                    return simId;
+                }
+            }
         });
+
     };
 
     // a controller for the share dialog
-    var shareDialogCtrl = function ($scope, $modalInstance) {
+    var shareDialogCtrl = function ($scope, $modalInstance, simId) {
         $scope.closeDlg = function () {
             $modalInstance.close();
         };
         $scope.invite = function(inviteStr) {
+            if(!inviteStr) return;
             // remove delimiters
             var s = inviteStr.replace(/(,|;)/gm, ' ');
             // remove double spaces and split
             var invites = s.replace(/\s+/g, ' ').split(' ');
-            console.log('shareDialog  inviting: ' + invites);
-               
+            console.log('shareDialog   inviting: ' + invites);
+            console.log('to sim ' + simId);
+                       
         };
     };
 

@@ -88,8 +88,11 @@ var SimulationSchema = new Schema({
     // each call back has a unique token, to prevent
     secret_token: {
         type: String
-    }
+    },
 
+    access_list : [{
+        email: String
+    }]
 });
 
 //
