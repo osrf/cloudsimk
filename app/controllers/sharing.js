@@ -37,3 +37,14 @@ exports.uploadAllUserKeysToSimulator = function(sim, userId, cb) {
         }
     });
 };
+
+
+//////////////////////////////////////////////////////////////////////////////
+///
+/// @param req the request
+/// @param res the response
+exports.share = function(req, res) {
+    var result = {};
+    res.jsonp(result);
+};
+
