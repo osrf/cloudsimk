@@ -32,10 +32,6 @@ module.exports = function(app) {
     app.get('/simulations/:simulationId/keys.zip',
         authorization.requiresLogin, Simulations.keysDownload);
 
-    /// POST a username to share a simulator with that user
-    app.post('/simulations/:simulationId/share',
-        authorization.requiresLogin, Simulations.shareSimulator);
-
     /// GET /simulations/:simulationId
     /// Return properties for one simulation
     app.get('/simulations/:simulationId',

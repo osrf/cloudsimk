@@ -6,11 +6,13 @@
 var uuid = require('node-uuid');
 var mongoose = require('mongoose'),
     Simulation = mongoose.model('Simulation'),
+    User = mongoose.model('User'),
     fs = require('fs'),
     CloudsimUser = mongoose.model('CloudsimUser'),
     billing = require('./billing'),
     _ = require('lodash');
 
+var sharing = require('./sharing');
 var sockets = require('../lib/sockets');
 var util = require('util');
 var config = require('../../config/config');
@@ -323,7 +325,7 @@ exports.create = function(req, res) {
 exports.update = function(req, res) {
     // Get the simulation from the request
     var simulation = req.simulation;
-    console.log('body state ' + req.body.state + ' sim: ' + simulation.state);
+    console.log('simulation update (new state: ' + req.body.state + ' , current state: ' + simulation.state + ')');
  
     if (simulation.state === 'Terminated') {
         // don't rewrite history, just return.
@@ -350,6 +352,45 @@ exports.update = function(req, res) {
         // Can't change the world.
         res.jsonp(error);
         return;
+    }
+    // check if we are sharing with new users
+    var newSharedUsers = [];
+    for(var i=0; i < req.body.access_list.length; i++) {
+        var u = req.body.access_list[i];
+        console.log('XXXX ' + u);
+        if(!(u in simulation.access_list ) ) {
+            newSharedUsers.push(u);
+        }
+    }
+
+    // share with each new user
+    for(var i=0; i<newSharedUsers.length; i++) {
+        var userName = newSharedUsers[i];
+        var userId;
+
+	console.log('Sharing sim ' + simulation._id + '  with ' + userName);
+	User.find({email: userName}).exec(function(err, users) {
+	    if(err || users.length != 1) {
+                if (err) console.log(err); 
+            } else {
+                userId = users[0];
+                // remove unknown names from the access_list
+                if (!userId) {
+                    var idx = req.body.access_list.indexOf(userName);
+                    req.body.access_list.splice(idx, 1);
+                } else {
+                    // share this simulator with the user
+                    sharing.uploadAllUserKeysToSimulator(simulation, userId, function(err) {
+                        if(err) {
+                            console.trace('error uploading keys: ' + err);
+                        } else {
+                            console.log('sharing sim ' + simulation._id  + ' with ' + userName);
+                            simulation.access_list.push(userName);
+                        }
+                    });
+                }
+            }
+	});
     }
 
     // use the lodash library to populate each
@@ -751,58 +792,3 @@ function getPublicKeys(userId, cb) {
     });
 }
 
-
-/*
-    User.find({email: email}).exec(function(err, users) {
-        if (err) {
-            console.err('getPublicKeys error looking for user: ' + err);
-            cb(err);
-        } else {
-            if(users.length !== 1) {
-                var m = 'Can\'t find user ' + email;
-                console.err(m);
-                cb(m);
-            } else {
-                var user = users[0];
-                // hardcoded for now
-                var publicKeys = [];
-                var k = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDd9kDR7TF5Xslh82TlC/7J45N42aHVMRWlWa5KFac5qgm9DAKyXeCxxIDF4ao2Ogj+7YSe0G2J5GBMEz0HM1ZysukbY4Z+G/nkADNuWi4BMASaplfvdB86B3e4ubkGUdhPoNPETBAt7EjJe5ZNlN1lcprOeoS0wlbeKnLNTHpojkr+y99jrQgldpyOUsuDc6H0/JTfYkStCr5iTJ3uDWRAVZ2UhddIts1ecDZpI6xMXnt4DtxTBmMGOcWl+YbfgftGhOKRvETeDP6Fi5VnlDgV4LnMZEDDxBv5Ap8O3v5LBiga4hvuoxUWlDMEE5c5UYluSrOMxNl2ATpygV5lal/H hugo@osrfoundation.org';
-                publicKeys.push(k);
-                cb(null, publicKeys);
-            }
-        }
-    }); // User.find
-}
-*/
-
-
-//////////////////////////////////////////////////////////////////////////////
-//
-// Share a simulator with a user, by sending the user's public ssh key(s) to
-// the /home/ubuntu/.i// @param req request
-// @param res response
-exports.shareSimulator = function(req, res) {
-    console.log('Sharing simulator: ' + req.user.username + ' :' + req.simulation.sim_id);
-    console.log('with user :' + req.body.newUser);
-    var newUser = req.body.newUser;
-
-    // gather ssh connection info
-    var hostIp = req.simulation.machine_ip; 
-    var privKey = req.simulation.ssh_private_key; 
-    getPublicKeys(newUser._id, function(err, publicKeys) {
-        if(err) {
-            console.log('shareSimulator error getting public keys: ' + err);
-            res.jsonp(500, {error: err});
-        } else {
-            // upload all the keys from this user
-            sshServices.uploadPublicKeys(hostIp, privKey, publicKeys, function(err, results) {  
-                if(err) {
-                    console.log('error sending public keys to simulator: ' + err);
-                    res.jsonp(500, {error: err});
-                } else {
-                    res.jsonp(results);
-                }
-            });
-        }
-    });
-};
