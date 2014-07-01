@@ -401,26 +401,39 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
         return timeValue;
     };
 
+    $scope.alist= ['a', 'b', 'c'];
+
     $scope.shareSimulator = function(simId) {
-        console.log('Share simulator ' + simId);
-        
         shareDialog = $modal.open({
             templateUrl: 'share.html',
             controller: shareDialogCtrl,
             resolve: {
                 simId: function() {
                     return simId;
+                },
+
+                sim: function() {
+                    for (var i=0; i < $scope.simulations.length; i++) {
+                        var s = $scope.simulations[i];
+                        if( simId == s._id) {
+                            return s;
+                        }
+                    }
+                    console.log('share dialog: sim ' + simId + ' not found error');
+                    return null;
                 }
             }
         });
-
     };
 
     // a controller for the share dialog
-    var shareDialogCtrl = function ($scope, $modalInstance, simId) {
+    var shareDialogCtrl = function ($scope, $modalInstance, simId, sim) {
         $scope.closeDlg = function () {
             $modalInstance.close();
         };
+        $scope.access_list = sim.access_list;
+        console.log($scope.access_list);
+
         $scope.invite = function(inviteStr) {
             if(!inviteStr) return;
             // remove delimiters
@@ -429,7 +442,14 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
             var invites = s.replace(/\s+/g, ' ').split(' ');
             console.log('shareDialog   inviting: ' + invites);
             console.log('to sim ' + simId);
-                       
+            // add new invites to access list without duplicates
+            for(var i in invites) {
+                if( ! (invites[i] in sim.access_list) ) {
+                    sim.access_list.push(invites[i]);
+                }
+            }
+            sim.$update({simulationId: sim.sim_id});
+            // console.log('SIM ID: ' + sim._id );
         };
     };
 

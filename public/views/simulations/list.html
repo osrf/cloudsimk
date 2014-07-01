@@ -84,7 +84,7 @@
             <textarea  ng-model="inviteStr" rows="4" cols="45"></textarea>
         </div>
         <div class="modal-body">
-            Invited people can: SSH into teh simulator and access gzweb.
+            Invited people can: SSH into the simulator and access gzweb.
             <br>They cannot: modify or shut down the simulator from CloudSim.</br>
         </div>
         <div align="right" class="modal-body">
@@ -94,6 +94,21 @@
         <div class="modal-footer">
             <div align="left">
                 <h3>Who has access</h3>
+                <table
+                    <thead>
+                        <tr>
+                        </tr>
+                    </thead>
+                    
+                    <tbody>
+                    <tr ng-repeat="user in access_list">
+                        <td>{{user}}</td>
+                    </tr>
+                    </tbody>                    
+ 
+                    <tfoot>
+                    </tfoot>
+                </table>
             </div>
             <button class="btn btn-default" ng-click="closeDlg()">Close</button>
         </div>

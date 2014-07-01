@@ -90,9 +90,7 @@ var SimulationSchema = new Schema({
         type: String
     },
 
-    access_list : [{
-        email: String
-    }]
+    access_list : [ String ]
 });
 
 //
