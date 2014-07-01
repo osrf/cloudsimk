@@ -357,8 +357,7 @@ exports.update = function(req, res) {
     var newSharedUsers = [];
     for(var i=0; i < req.body.access_list.length; i++) {
         var u = req.body.access_list[i];
-        console.log('XXXX ' + u);
-        if(!(u in simulation.access_list ) ) {
+        if(simulation.access_list.indexOf(u) < 0) {
             newSharedUsers.push(u);
         }
     }
@@ -366,36 +365,32 @@ exports.update = function(req, res) {
     // share with each new user
     for(var i=0; i<newSharedUsers.length; i++) {
         var userName = newSharedUsers[i];
-        var userId;
-
-	console.log('Sharing sim ' + simulation._id + '  with ' + userName);
 	User.find({email: userName}).exec(function(err, users) {
 	    if(err || users.length != 1) {
-                if (err) console.log(err); 
+                if (err) console.log(err);
+		if (users.length ==0) {
+                    console.log('Sharing error: user ' + userName  + ' is not in the database');
+		}
+		// remove unknown name from the access_list
+		var idx = req.body.access_list.indexOf(userName);
+                req.body.access_list.splice(idx, 1); 
             } else {
-                userId = users[0];
-                // remove unknown names from the access_list
-                if (!userId) {
-                    var idx = req.body.access_list.indexOf(userName);
-                    req.body.access_list.splice(idx, 1);
-                } else {
-                    // share this simulator with the user
-                    sharing.uploadAllUserKeysToSimulator(simulation, userId, function(err) {
-                        if(err) {
-                            console.trace('error uploading keys: ' + err);
-                        } else {
-                            console.log('sharing sim ' + simulation._id  + ' with ' + userName);
-                            simulation.access_list.push(userName);
-                        }
-                    });
-                }
+                var userId = users[0];
+                // share this simulator with the user
+                sharing.uploadAllUserKeysToSimulator(simulation, userId, function(err) {
+                    if(err) {
+                        console.trace('error uploading keys: ' + err);
+                    } else {
+                        console.log('sharing sim ' + simulation._id  + ' with ' + userName);
+                    }
+                });
             }
 	});
     }
 
     // use the lodash library to populate each
     // simulation attribute with the values in the
-    // request body
+    // request body (including users in access_list)
     simulation = _.extend(simulation, req.body);
 
     // Save the updated simulation to the database
