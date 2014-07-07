@@ -2,7 +2,6 @@
 /// @module users_controller
 /// Server side users controller
 
-
 /// Module dependencies.
 var mongoose = require('mongoose'),
     User = mongoose.model('User'),
