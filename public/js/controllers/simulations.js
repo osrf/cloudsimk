@@ -415,7 +415,7 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
                 sim: function() {
                     for (var i=0; i < $scope.simulations.length; i++) {
                         var s = $scope.simulations[i];
-                        if( simId == s._id) {
+                        if( simId === s._id) {
                             return s;
                         }
                     }

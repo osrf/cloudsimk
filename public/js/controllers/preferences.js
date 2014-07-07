@@ -116,8 +116,6 @@ angular.module('cloudsim.preferences').controller('PreferencesController',
             m = m < 10 ? '0' + m : m;
             d = d < 10 ? '0' + d : d;
 
-            var key = form.key.$viewValue;
-
             // add a new key if the index was nmt defined.
             // otherwise, update an existing key
             if (index === undefined) {

@@ -45,7 +45,7 @@ exports.simulatorCallback = function (req, res) {
                             // note: sim.user is the _id of the user, because there is no 'populate' done
                             sharing.uploadAllUserKeysToSimulator(sim, sim.user, function(err, keys) {
                                 if(err) {
-                                    var msg = "Error loading user keys to simulator: " + err;
+                                    var msg = 'Error loading user keys to simulator: ' + err;
                                     console.log(msg);
                                 } else { 
                                     // save simulation state
@@ -57,7 +57,7 @@ exports.simulatorCallback = function (req, res) {
                                             res.jsonp({result: 'Error', message: msg});
                                         } else {
                                            // success: simulator found, status updated
-                                            res.jsonp({result: 'OK', message: 'Update successful' });
+                                            res.jsonp({result: 'OK', message: '' + keys.length + ' ssh keys uploaded to simulator' });
                                             // let all the other browser windows know
                                            sockets.getUserSockets().notifyUser(sim.user,
                                                                                 'simulation_update',

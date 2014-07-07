@@ -290,13 +290,18 @@ exports.create = function(req, res) {
 /// @param[in] req Nodejs request object.
 /// @param[out] res Nodejs response object.
 exports.me = function(req, res) {
-    CloudsimUser.findFromUserId(req.user._id, function(err, cloudsimUser) {
-        if (err) {
-            res.jsonp({ error: {message: 'Unable to find CloudSim user info' }});
-        } else {
-            res.jsonp(merge(req.user, cloudsimUser) || null);
-        }
-    });
+    // check if we are logged in
+    if(!req.user) {
+        res.jsonp(null);
+    } else {
+        CloudsimUser.findFromUserId(req.user._id, function(err, cloudsimUser) {
+            if (err) {
+                res.jsonp({ error: {message: 'Unable to find CloudSim user info' }});
+            } else {
+                res.jsonp(merge(req.user, cloudsimUser) || null);
+            }
+        });
+    }
 };
 
 /////////////////////////////////////////////////

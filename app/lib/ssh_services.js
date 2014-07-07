@@ -2,16 +2,17 @@
 
 var ssh2 = require('ssh2');
 
+// determine if we are performing the ssh calls for real or
+// if we are simply executing local tests.
+var fake = typeof(process.env.AWS_ACCESS_KEY_ID) === 'undefined';
+
 //////////////////////////////////////////////////////////////////
 // executes an ssh command on a server. This is used internally
 // by the exported functions of this module 
 function executeSshCommand(hostIp, sshPrivateKeyStr, cmd, cb) {
-    // determine if we are performing the ssh calls for real or
-    // if we are simply executing local tests.
-    var fake = typeof(process.env.AWS_ACCESS_KEY_ID) === 'undefined';
     if(fake){
         console.log('FAKE ssh: ' + cmd);
-        cb(null, {status:'Running'});
+        cb(null, {status:'Running', code: 0 });
         return;
     }
 
@@ -96,11 +97,19 @@ exports.getSimulatorStatus = function(hostIp, sshPrivateKeyStr, cb) {
 // @param sshPrivateKey  the content of the private key for the ubuntu user
 // @param publicKeyStrArray  list of the public keys content to upload
 exports.uploadPublicKeys = function(hostIp, sshPrivateKeyStr, publicKeyStrArray, cb) {
+    var results =[];
     for(var i=0; i < publicKeyStrArray.length; i++) {
         var publicKeyStr = publicKeyStrArray[i];
         var cmd =  'echo ' + publicKeyStr + '  >> .ssh/authorized_keys && echo "Key copied"' ;
-        executeSshCommand(hostIp, sshPrivateKeyStr, cmd, cb);
+        executeSshCommand(hostIp, sshPrivateKeyStr, cmd, function(err, result) {
+            if(err) {
+                results.push({success: false, key: publicKeyStr, output: result});
+            } else {
+                results.push({success: true, key: publicKeyStr, output: result});
+            }
+        });
     }
+    cb(null, results);
 };
 
 

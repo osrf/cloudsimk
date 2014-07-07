@@ -18,9 +18,6 @@ var util = require('util');
 var config = require('../../config/config');
 var child_process = require('child_process');
 
-// to send ssh keys
-var sshServices = require('../lib/ssh_services.js');
-
 // initialise cloudServices, depending on the environment
 var cloudServices;
 if(process.env.AWS_ACCESS_KEY_ID) {
@@ -353,26 +350,30 @@ exports.update = function(req, res) {
         res.jsonp(error);
         return;
     }
+
     // check if we are sharing with new users
     var newSharedUsers = [];
-    for(var i=0; i < req.body.access_list.length; i++) {
-        var u = req.body.access_list[i];
-        if(simulation.access_list.indexOf(u) < 0) {
-            newSharedUsers.push(u);
+    if(req.body.access_list) {
+        for(var i=0; i < req.body.access_list.length; i++) {
+            var u = req.body.access_list[i];
+            if(simulation.access_list.indexOf(u) < 0) {
+                newSharedUsers.push(u);
+            }
         }
     }
 
-    // share with each new user
-    for(var i=0; i<newSharedUsers.length; i++) {
-        var userName = newSharedUsers[i];
-	User.find({email: userName}).exec(function(err, users) {
-	    if(err || users.length != 1) {
-                if (err) console.log(err);
-		if (users.length ==0) {
+    // share with each new user (if any)
+    for(var j=0; j < newSharedUsers.length; j++) {
+        var userName = newSharedUsers[j];
+        User.find({email: userName}).exec(function(err, users) {
+            if(err || users.length !== 1) {
+                if (err)
+                    console.log(err);
+                if (users.length === 0) {
                     console.log('Sharing error: user ' + userName  + ' is not in the database');
-		}
-		// remove unknown name from the access_list
-		var idx = req.body.access_list.indexOf(userName);
+                }
+                // remove unknown name from the access_list
+                var idx = req.body.access_list.indexOf(userName);
                 req.body.access_list.splice(idx, 1); 
             } else {
                 var userId = users[0];
@@ -385,7 +386,7 @@ exports.update = function(req, res) {
                     }
                 });
             }
-	});
+        });
     }
 
     // use the lodash library to populate each
@@ -769,21 +770,4 @@ exports.keysDownload = function(req, res) {
     });
 };
 
-
-function getPublicKeys(userId, cb) {
-
-    CloudsimUser.findFromUserId(userId, function(err, cloudsimUser) {
-        if(err) {
-            console.log('Error looking for cloudsimuser in getPlicKeys : ' + err);
-            cb(err);
-        } else {
-            for(var i=0; i < cloudsimUser.public_ssh_keys.length; i++) {
-                var keyName =  cloudsimUser.public_ssh_keys[i].name;
-                var keyStr =  cloudsimUser.public_ssh_keys[i].name;
-                console.log('PUBKEY ' + i + ' ' + keyName + ': ' + keyStr);
-            }
-            cb(null, cloudsimUser.public_ssh_keys); 
-        }
-    });
-}
 
