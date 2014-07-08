@@ -32,15 +32,8 @@ angular.module('cloudsim').config(['$stateProvider', '$urlRouterProvider',
     .state('home', {
         url: '/',
         templateUrl: 'views/index.html'
-    })
-    .state('payment_success', {
-        url: '/payment/success',
-        templateUrl: 'views/billing/payment_success.html'
-    })
-    .state('payment_canceled', {
-        url: '/payment/canceled',
-        templateUrl: 'views/billing/payment_canceled.html'
     });
+
 }
 ]);
 

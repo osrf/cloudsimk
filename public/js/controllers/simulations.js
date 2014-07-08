@@ -282,7 +282,7 @@ angular.module('cloudsim.simulations').controller('SimulationsController',
                     world: newSim.world,
                     date_launch: newSim.date_launch,
                     upTime: 0,
-                    server_price: 100
+                    server_price_in_cents: 0
                 });
                 $scope.simulations.unshift(sim);
             }
