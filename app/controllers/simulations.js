@@ -184,7 +184,6 @@ exports.create = function(req, res) {
     // request
     console.log(util.inspect(req.body));    
     var simulation = {state: 'Launching'};
-    //new Simulation(req.body);
     simulation.region = req.body.region;
     simulation.world = req.body.world;
     // Set the simulation user
@@ -315,7 +314,6 @@ exports.create = function(req, res) {
 exports.update = function(req, res) {
     // Get the simulation from the request
     var simulation = req.simulation;
-    console.log('body state ' + req.body.state + ' sim: ' + simulation.state);
  
     if (simulation.state === 'Terminated') {
         // don't rewrite history, just return.
@@ -511,7 +509,7 @@ function billSimulatorTime(simulation, now, periodInSec) {
                                     {date_billed_until: bill.validUntil},
                                     function (err) {
             if(err) {
-                var msg = 'Error updating sim time validity fot sim "';
+                var msg = 'Error updating sim time validity for sim "';
                 msg += simulation.id + '" : ' + err;
                 console.log(msg);
             } else {
@@ -551,7 +549,6 @@ function billSimulatorTime(simulation, now, periodInSec) {
 /////////////////////////////////////////////////////////////////////////////
 // Collects all running simulations and updates the charges if necessary
 function billingCycle() {
-    // console.log('.');
     Simulation.getRunningSimulations( function (err, sims) {
         if(err) {
             console.log('Error getting running sims for billing: ' + err);

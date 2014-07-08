@@ -1,5 +1,7 @@
 'use strict';
 
+// Main application entry file.
+// Please note that the order of loading is important.
 
 // Module dependencies.
 //
@@ -11,13 +13,8 @@ var express = require('express'),
 
 var app = express(),
     http = require('http'),
-//    server = http.createServer(app),
-//    io = require('socket.io').listen(server);
     server = http.Server(app),
     io = require('socket.io')(server);
-
-// Main application entry file.
-// Please note that the order of loading is important.
 
 
 // Load configurations

@@ -9,7 +9,7 @@ var mongoose = require('mongoose'),
     Billing = mongoose.model('Billing');
 
 
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 /// Process a Paypal Instant Payment Notification (IPN) message
 /// @param req Nodejs request object.
 /// @param res Nodejs response object.
@@ -34,26 +34,23 @@ exports.paypal_ipn = function(req, res) {
                 var amountInCents = req.body.mc_gross * 100;
                 var note = 'Paypal payment';
                 exports.accountDeposit(userId, amountInCents, note, function(err) {
-                    if(err) {
+                    if (err) {
                         var msg = 'The Paypal payment of ' + amountInCents + ' cents ';
                         msg += 'for user ' + userId + ' was not deposited. ';
                         msg += 'Error: ' + err ;
                         console.error(msg);
                     }
                     else {
-                        console.log('Paypal payement received');
+                        console.log('Paypal payement received from user ' + userId);
                     }
                 });
-              console.log ('completed');
-              console.log('user ' + req.body.custom);
-              console.log('amount ' + req.body.mc_gross);
           }
       }
   });
 };
 
 
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 // Remove $ from account. Updates the balance, writes a billing doc in db
 // @param userId the __id of the user in the 
 exports.accountWithdrawal = function(userId, amountInCents, note, cb) {
@@ -88,7 +85,7 @@ exports.accountWithdrawal = function(userId, amountInCents, note, cb) {
     });
 };
 
-/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 // Add $ to account. Updates the user balance in the CloudsimUsers collection
 // and adds a document to the Billings collection. This opertation is 
 // performed as when a Paypal confirmation is received.
@@ -129,14 +126,13 @@ exports.accountDeposit = function(userId, amountInCents, note, cb) {
 
 
 
-////////////////////////////////////////////////////////////
-
+/////////////////////////////////////////////////
 // Helper functiont that adds seconds to a date
 function addSeconds(date, seconds) {
     return new Date(date.getTime() + seconds *1000);
 }
 
-//////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 // Helper function that compares a date d with the current date.
 // @param d the Date to compare things with.
 // @param dateNow the reference date (or now if undefined)
@@ -148,7 +144,7 @@ function secondsSince(d, dateNow) {
     return duration.seconds;
 }
 
-///////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 // Calculates how much a user should be charged for running a
 // simulator, and, if charged, until when. If the dueDate is in the future,
 // the charge is 0.

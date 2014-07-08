@@ -17,9 +17,6 @@ describe('<Unit Test>', function() {
     describe('Model simulation:', function() {
         beforeEach(function(done) {
             
-         //   Simulation.remove({}, function(err) {
-         //       should.not.exist(err);
-                
                 user = new User({
                     name: 'Simulation Tester',
                     email: 'test_sim@test.com',
@@ -38,11 +35,10 @@ describe('<Unit Test>', function() {
 
                     done();
                 });
-          //  });
         });
 
         describe('Method Save', function() {
-            it('', function(done) {
+            it('should clear all previous simulations', function(done) {
                 Simulation.remove({}, function(err) {
                     should.not.exist(err);
                     done();

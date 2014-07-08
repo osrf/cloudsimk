@@ -11,7 +11,7 @@ exports.render = function(req, res) {
         CloudsimUser.findFromUserId(req.user._id, function(err, cloudsimUser) {
             if(err) {
                 console.error('Can\'t find cloudsimUser data for user ' + req.user.email);
-                res.res.jsonp(500, { error: err });
+                res.jsonp(500, { error: err });
             }
             else {
                 res.render('index', {
