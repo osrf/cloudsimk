@@ -1,5 +1,7 @@
 'use strict';
 
+// Main application entry file.
+// Please note that the order of loading is important.
 
 // Module dependencies.
 //
@@ -11,11 +13,8 @@ var express = require('express'),
 
 var app = express(),
     http = require('http'),
-    server = http.createServer(app),
-    io = require('socket.io').listen(server);
-
-// Main application entry file.
-// Please note that the order of loading is important.
+    server = http.Server(app),
+    io = require('socket.io')(server);
 
 
 // Load configurations
@@ -27,6 +26,7 @@ var config = require('./config/config'),
     mongoose = require('mongoose');
 
 // Bootstrap db connection
+console.log('Using database: ' + config.db);
 var db = mongoose.connect(config.db);
 
 // make sure the download directory exists

@@ -48,7 +48,7 @@
             <td><img height="20px" ng-src="/img/icons/{{simulation.state}}.gif"/> {{simulation.state}} </td>
             <td>{{simulation.region}}</td>
             <td>{{formatTimeElapsed(simulation.upTime)}}</td>
-            <td>{{simulation.server_price}}</td>
+            <td>{{ (0.01 * simulation.server_price_in_cents).toFixed(2) }}</td>
             <td><a href="/simulations/{{simulation.sim_id}}/keys.zip">
                     <img height="20px" src="/img/icons/download.svg"/>
                 </a>
@@ -76,7 +76,7 @@
       </script>
     </tab>
 
-    <!-- History: Terminated Simulations -->
+   <!-- History: Terminated Simulations -->
     <tab heading='History'>
       <table class="table table-striped table-condensed table-hover">
         <thead>
@@ -126,7 +126,7 @@
             <td>{{simulation.world}}</td>
             <td>{{simulation.region}}</td>
             <td>{{formatTimeElapsed(simulation.upTime)}}</td>
-            <td>{{simulation.server_price}}</td>
+            <td>{{(0.01 * simulation.server_price_in_cents).toFixed(2)}}</td>
           </tr>
         </tbody>
       </table>

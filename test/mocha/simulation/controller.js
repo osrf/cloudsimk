@@ -1,5 +1,8 @@
 'use strict';
 
+console.log('test/mocha/simulation/controller.js');
+
+
 /// Module dependencies.
 var mongoose = require('mongoose'),
     User = mongoose.model('User'),
@@ -35,6 +38,7 @@ describe('<Unit Test>', function() {
                     username: 'user',
                     password: 'pass',
                     provider: 'local'
+                    
                 });
                 user2 = new User({
                     open_id: 'myopenid2',
@@ -68,13 +72,19 @@ describe('<Unit Test>', function() {
             });
         });
 
-        describe('Users should have CloudsimUser dosuments', function() {
+        describe('Users should have CloudsimUser documents', function() {
             it('should exist for user', function(done) {
-              csUser = new CloudSimUser({user: user._id});
+              csUser = new CloudSimUser({
+                    user: user._id,
+                    account_balance: 1000
+                });
               csUser.save(done);
             });
             it('should exist for user2', function(done) {
-                csUser2 = new CloudSimUser({user: user2._id});
+                csUser2 = new CloudSimUser({
+                    user: user2._id,
+                    account_balance: 1000
+                });
                 csUser2.save(done);
             });
         });
@@ -115,6 +125,8 @@ describe('<Unit Test>', function() {
                 .send({ world: 'empty.world', region:'US East' })
                 .end(function(err,res){
                     util.log_res(res);
+                    should.not.exist(err);
+                    should.exist(res);
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
                     var text = JSON.parse(res.text);
@@ -211,21 +223,22 @@ describe('<Unit Test>', function() {
                     util.log_res(res);
                     res.should.have.status(200);
                     res.redirect.should.equal(false);
-                    var text = JSON.parse(res.text);
-                    console.log (text);
-                    text.length.should.be.exactly(2);
-                    text[0].user.name.should.equal('User Tester');
-                    text[0].user.username.should.equal('user');
-                    text[0].sim_id.should.be.exactly(0);
-                    text[0].state.should.equal('Launching');
-                    text[0].region.should.equal('US East');
-                    text[0].world.should.equal('empty.world');
-                    text[1].user.name.should.equal('User Tester');
-                    text[1].user.username.should.equal('user');
-                    text[1].sim_id.should.be.exactly(1);
-                    text[1].state.should.equal('Launching');
-                    text[1].region.should.equal('Ireland');
-                    text[1].world.should.equal('blank.world');
+                    var sims = JSON.parse(res.text);
+                    console.log (sims[0]);
+                    sims.length.should.be.exactly(2);
+                    sims[0].user.name.should.equal('User Tester');
+                    sims[0].user.username.should.equal('user');
+                    sims[0].sim_id.should.be.exactly(0);
+                    sims[0].state.should.equal('Launching');
+                    sims[0].region.should.equal('US East');
+                    sims[0].world.should.equal('empty.world');
+                    console.log(sims[1]);
+                    sims[1].user.name.should.equal('User Tester');
+                    sims[1].user.username.should.equal('user');
+                    sims[1].sim_id.should.be.exactly(1);
+                    sims[1].state.should.equal('Launching');
+                    sims[1].region.should.equal('Ireland');
+                    sims[1].world.should.equal('blank.world');
                     done();
                 });
             });

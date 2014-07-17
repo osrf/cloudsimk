@@ -50,7 +50,8 @@ describe('<Unit Test>', function() {
 
             it('should be possible to increment the sim id', function(done) {
 
-                CloudsimUser.incrementNextSimId(user._id, function(err, id) {
+                CloudsimUser.incrementNextSimId(user._id, function(err, cloudsimUser) {
+                    var id = cloudsimUser.next_sim_id;
                     should.exist(id);
                     id.should.equal(0);
                     done();

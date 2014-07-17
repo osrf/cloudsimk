@@ -33,6 +33,7 @@ angular.module('cloudsim').config(['$stateProvider', '$urlRouterProvider',
         url: '/',
         templateUrl: 'views/index.html'
     });
+
 }
 ]);
 
