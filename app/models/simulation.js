@@ -4,7 +4,6 @@
 // The schema, validation, and static functions for a simulation model.
 
 // Module dependencies.
-
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 

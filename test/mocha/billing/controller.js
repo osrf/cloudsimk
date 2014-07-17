@@ -86,7 +86,7 @@ describe('<Unit Test>', function() {
                 done();
             });
 
-            it('should ncrease with top up an account', function(done) {
+            it('should increase with top up an account', function(done) {
                 // give a fiver ($5)
                 billCtrl.accountDeposit(user._id, 500, 'test top up',  function(err, newBalance) {
                     should.not.exist(err);
@@ -126,7 +126,7 @@ describe('<Unit Test>', function() {
                 });
             });
 
-           it('should be an impossible to withdraw more than available', function(done) {
+           it('should be possible to withdraw more than available if the balance is positive', function(done) {
                 // we have 50 left, but withdrawing 100
                 billCtrl.accountWithdrawal(user._id, 100, 
                                            '1hr of PR2 on sim 22 (aws i-23345)',
