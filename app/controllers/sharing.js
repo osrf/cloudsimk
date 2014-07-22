@@ -19,16 +19,12 @@ exports.uploadAllUserKeysToSimulator = function(sim, userId, cb) {
         if(err) {
             console.error('uploadUserKeys: error looking up user data: ' + err);
             cb(err);
- console.log('2 KJHKHJKJH !!!');
        } else {
- console.log('1.1 KJHKHJKJH !!! keys: ' +  csUser.public_ssh_keys.length);
 
             var publicKeyStrArray = [];
             for(var i=0; i < csUser.public_ssh_keys.length; i++) {
- console.log('222 3 KJHKHJKJH !!!');    
                 var k = csUser.public_ssh_keys[i].key;
                 publicKeyStrArray.push(k);
- console.log('3 KJHKHJKJH !!!');
            }
             sshServices.uploadPublicKeys(hostIp, sshPrivateKeyStr, publicKeyStrArray, function(err, result) {
                 if(err) {
@@ -36,7 +32,6 @@ exports.uploadAllUserKeysToSimulator = function(sim, userId, cb) {
                     cb(err);
                 } else {
                     cb(null, result);
- console.log('4 KJHKHJKJH !!!');
                }
             });
         }
