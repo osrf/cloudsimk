@@ -65,7 +65,7 @@ exports.deleteKey = function (keyName, region, cb) {
 // @param[in] hardware A hardware type
 // @param[in] image An AMI (image id registered in that region)
 // @param[in] a call back function
-exports.launchSimulator = function (region, keyName, hardware, image, tags, script, cb) {
+exports.launchSimulator = function (region, keyName, hardware, security, image, tags, script, cb) {
 
     // set AWS region
     AWS.config.region = region;
@@ -88,7 +88,7 @@ exports.launchSimulator = function (region, keyName, hardware, image, tags, scri
         MinCount:1,
         MaxCount: 1,
         UserData: userData,
-        SecurityGroups: ['cloudsimk'],
+        SecurityGroups: [security],
         DryRun: dryRun
     };
 
@@ -148,7 +148,7 @@ exports.simulatorStatus = function (machineInfo, cb) {
     // machine (machineInfo.id
     var params = {
         DryRun: dryRun,
-        Filters: [],
+//        Filters: [],
         InstanceIds: [machineInfo.id]
     };
 

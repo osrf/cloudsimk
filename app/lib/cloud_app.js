@@ -9,9 +9,9 @@ var cloud_services = require('./cloud_services');
 //
 // you must have the following environment variables setup:
 // AWS_SECRET_ACCESS_KEY
-// AWS_ACCESS_KEY_ID 
+// AWS_ACCESS_KEY_ID
 //
-// examples: 
+// examples:
 // 1) launch a simulator machine
 // node cloud_app.js launch region keyname : this will launch a
 // simulator in the specified region. The keyname refers
@@ -19,7 +19,7 @@ var cloud_services = require('./cloud_services');
 // 2) get the ip and status of  a simulator machine
 // node cloud_app stat id region
 // 3) terminate a simulator machine
-// node cloud_app.js term 
+// node cloud_app.js term
 
 
 var sim_id = 'sim_0';
@@ -27,19 +27,23 @@ var username = 'test@test.com';
 var image = 'ami-b8d2b088';
 var hardware = 'g2.2xlarge';
 var region = 'us-west-2';
+var security = 'gazebo'
+
+
 var cmd = process.argv[2];
 
 console.log('cmd: ' + cmd);
 
 if (cmd === 'launch') {
-    
-    hardware = 'm1.small';
-    image = 'ami-cc95f8fc';
+
+    hardware = 'm1.small'
+    image = 'ami-cc95f8fc'
 
     var keyName = process.argv[3];
     console.log('keyName: ' + keyName);
-
-    cloud_services.launchSimulator(username, keyName, sim_id, region, hardware, image, function (err, machineInfo) {
+    var script  = ""
+    var tags = {user:"hugo"}
+    cloud_services.launchSimulator(region, keyName, hardware, security, image, tags, script, function (err, machineInfo) {
         if(err) {
             console.log('my callback err: ' + err);
         } else {
@@ -89,7 +93,7 @@ if (cmd === 'key') {
 }
 
 if (cmd === 'genkey') {
-    
+
     var keyName =  process.argv[3];
     console.log('key name: ' + keyName);
     var region = process.argv[4];
