@@ -29,6 +29,8 @@ var hardware = 'g2.2xlarge';
 var region = 'us-west-2';
 var security = 'gazebo'
 
+// ami-df6a8b9b for ubuntu Trusty
+
 
 var cmd = process.argv[2];
 
@@ -36,11 +38,16 @@ console.log('cmd: ' + cmd);
 
 if (cmd === 'launch') {
 
-    hardware = 'm1.small'
-    image = 'ami-cc95f8fc'
+//    hardware = 'm1.small'
+//    image = 'ami-cc95f8fc'
 
     var keyName = process.argv[3];
     console.log('keyName: ' + keyName);
+    region = process.argv[4];
+    console.log('region: ' + region);
+    image = process.argv[5];
+    console.log('image:'  + image);
+
     var script  = ""
     var tags = {user:"hugo"}
     cloud_services.launchSimulator(region, keyName, hardware, security, image, tags, script, function (err, machineInfo) {
