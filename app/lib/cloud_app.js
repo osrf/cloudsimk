@@ -29,8 +29,12 @@ var hardware = 'g2.2xlarge';
 var region = 'us-west-2';
 var security = 'gazebo'
 
-// ami-df6a8b9b for ubuntu Trusty
+// ami-df6a8b9b for ubuntu Trusty us-west-1
 
+// Ruffin Oregon: ami-77dbdb47
+
+
+// trusty_nvidia_base us-west-1 ami-4f09c90b
 
 var cmd = process.argv[2];
 

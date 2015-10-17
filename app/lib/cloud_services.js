@@ -66,10 +66,8 @@ exports.deleteKey = function (keyName, region, cb) {
 // @param[in] image An AMI (image id registered in that region)
 // @param[in] a call back function
 exports.launchSimulator = function (region, keyName, hardware, security, image, tags, script, cb) {
-
     // set AWS region
     AWS.config.region = region;
-
     console.log('Launching simulator');
     console.log('- SSH key: ' +  keyName);
     console.log('- region:' + region);
@@ -77,10 +75,8 @@ exports.launchSimulator = function (region, keyName, hardware, security, image, 
     console.log('- image: ' + image);
     console.log('- tags: ' + util.inspect(tags));
     console.log('');
-
     // AWS requires the script to be Base64-encoded MIME
     var userData = new Buffer(script).toString('base64');
-
     var awsParams = {
         KeyName: keyName,
         ImageId: image,
@@ -91,7 +87,6 @@ exports.launchSimulator = function (region, keyName, hardware, security, image, 
         SecurityGroups: [security],
         DryRun: dryRun
     };
-
     var ec2 = new AWS.EC2();
     ec2.runInstances(awsParams, function (err, data) {
         if(err) {
@@ -203,12 +198,12 @@ exports.terminateSimulator = function (machineInfo, cb) {
 //////////////////////////////////////////////////////
 // Uploads a public ssh key to a specific AWS region
 // The key name on AWS is 'cs-' + the specified username
-exports.setupPublicKey = function (username, region, cb) {
+exports.setupPublicKey = function (keyname, keydata, region, cb) {
     var params = {
         // required
-        KeyName: 'cs-' + username,
+        KeyName: keyname,
         // required
-        PublicKeyMaterial: 'BASE64_ENCODED_STRING',
+        PublicKeyMaterial: keydata,
         DryRun: dryRun
     };
 
