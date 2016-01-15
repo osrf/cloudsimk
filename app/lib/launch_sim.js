@@ -20,7 +20,7 @@ if (process.argv.length != 3) {
   process.exit(-3)
 }
 
-let script = fs.readSync(process.argv[2], 'utf8')
+var script = fs.readFileSync(process.argv[2], 'utf8')
 
 let base_good = { desc: 'Trusty + nvidia (CUDA 6.5)',
                region : 'us-west-1',
